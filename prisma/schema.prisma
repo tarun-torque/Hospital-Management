@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// creator model
+model Creator {
+  id              Int               @id @default(autoincrement())
+  username        String            @unique
+  email           String            @unique
+  country_code    Int
+  contact_number  String
+  state           String
+  language        String[]
+  password        String
+  role            String            @default("noRole")
+  yt_contents     Yt_content[]
+  blog_contents   Blog_content[]
+  article_content Article_content[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Yt_content {
+  id           Int      @id @default(autoincrement())
+  iframe       String
+  heading      String
+  content      String
+  tags         String[]
+  category     String[]
+  creator      Creator  @relation(fields: [yt_creatorId], references: [id])
+  yt_creatorId Int
+  createdAt    DateTime @default(now())
+  updated      DateTime @updatedAt
+}
+
+model Article_content {
+  id                Int      @id @default(autoincrement())
+  heading           String
+  content           String
+  articleImagePath  String
+  articleImageType  String
+  tags              String[]
+  category          String[]
+  Creator           Creator  @relation(fields: [article_creatorId], references: [id])
+  article_creatorId Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Blog_content {
+  id             Int      @id @default(autoincrement())
+  heading        String
+  content        String
+  blogImagePath  String
+  blogImageType  String
+  tags           String[]
+  category       String[]
+  Creator        Creator  @relation(fields: [blog_creatorId], references: [id])
+  blog_creatorId Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+//patient models
+model Patient {
+  id             Int       @id @default(autoincrement())
+  name           String
+  email          String
+  country_code   String[]
+  contact_number Int
+  dob            String //selectd dob from calender(dd-mm-yy) to wish birthday of user
+  gender         String //male female others
+  new_patient    Boolean
+  support        Support[]
+  mood           Mood[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Support {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  patient     Patient  @relation(fields: [patientId], references: [id])
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Mood {
+  int             Int     @id @default(autoincrement())
+  patientId       Int
+  patient         Patient @relation(fields: [patientId], references: [id])
+  your_mood_today String
+  note            String //optional 
+}
