@@ -75,13 +75,17 @@ model Blog_content {
 //patient models
 model Patient {
   id             Int       @id @default(autoincrement())
+  username       String    @unique
   patient_name   String
-  email          String
-  country_code   String[]
-  contact_number Int
+  email          String    @unique
+  profile_path   String
+  profileType    String
+  country_code   String
+  contact_number String
   dob            String //selectd dob from calender(dd-mm-yy) to wish birthday of user
   gender         String //male female others
   new_patient    Boolean
+  password       String
   support        Support[]
   mood           Mood[]
   createdAt      DateTime  @default(now())

@@ -96,8 +96,6 @@ export const CreateDoctor_profile = async (req, res) => {
 }
 
 
-
-
 // login doctor
 export const doctorLogin = async (req, res) => {
 
@@ -186,3 +184,10 @@ export const deleteDoctor_profile = async (req, res) => {
 
 
 }
+
+// get patient profile
+
+// filter doctor state
+// filter doctor language
+// filter doctor exp.
+// filter specialities
