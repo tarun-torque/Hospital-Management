@@ -14,7 +14,7 @@ export const creator_profile = async (req, res) => {
         const validator = vine.compile(creator_vaidation)
         const payload = await validator.validate({username,email,contact_number,country_code,state,language,password})
         
-        const salt = bcrypt.genSaltSync(10);
+        const salt = await bcrypt.genSaltSync(10);
         payload.password = bcrypt.hashSync(payload.password, salt)
       
         
@@ -31,7 +31,7 @@ export const creator_profile = async (req, res) => {
             language:info.language
         }
         // create token
-        const token = jwt.sign(creator,process.env.SECRET_KEY,{expiresIn:'99999h'})
+        const token = jwt.sign(creator,process.env.SECRET_KEY,{expiresIn:'999h'})
 
         res.status(201).json({token:token})
 

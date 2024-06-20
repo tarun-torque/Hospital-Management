@@ -18,7 +18,7 @@ model Creator {
   id              Int               @id @default(autoincrement())
   username        String            @unique
   email           String            @unique
-  country_code    Int
+  country_code    String
   contact_number  String
   state           String
   language        String[]
@@ -75,7 +75,7 @@ model Blog_content {
 //patient models
 model Patient {
   id             Int       @id @default(autoincrement())
-  name           String
+  patient_name   String
   email          String
   country_code   String[]
   contact_number Int
@@ -104,4 +104,26 @@ model Mood {
   patient         Patient @relation(fields: [patientId], references: [id])
   your_mood_today String
   note            String //optional 
+}
+
+model Doctor {
+  id                Int      @id @default(autoincrement())
+  username          String   @unique
+  verified          String   @default("no")
+  profile_pic       String
+  profile_picType   String
+  doctor_name       String
+  email             String   @unique
+  password          String
+  country_code      String
+  contact_number    String
+  state             String
+  languages         String[]
+  specialities      String[]
+  experience        Int
+  maximum_education String
+  documents         String
+  documents_type    String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
