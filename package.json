@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "npx prisma migrate deploy && nodemon server.js"
+    "start": "npx prisma generate && npx prisma migrate dev --name ok &&  prisma migrate deploy && nodemon server.js"
   },
   "author": "tarun",
   "license": "ISC",
