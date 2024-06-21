@@ -1,13 +1,13 @@
 {
   "name": "phoenix-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend server for Phoenix application",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "npx prisma migrate deploy && nodemon server.js"
   },
-  "author": "",
+  "author": "tarun",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.15.0",

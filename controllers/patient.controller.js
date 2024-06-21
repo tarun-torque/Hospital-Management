@@ -81,6 +81,3 @@ export const newPatients = async (req, res) => {
 // get mood patient
 
 
-
-
-
