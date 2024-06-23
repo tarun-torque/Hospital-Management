@@ -9,76 +9,111 @@ import { messages } from '@vinejs/vine/defaults';
 // create creator
 export const creator_profile = async (req, res) => {
     try {
-        const {username,email,country_code,contact_number,state,language,password} = req.body;
+        // get data
+        const { username, email, country_code, contact_number, state, language, password } = req.body;
+        const fileInfo = req.file;
 
-        // const validator = vine.compile(creator_vaidation)
-        // const payload = await validator.validate({username,email,contact_number,country_code,state,language,password})
-        
-        const salt =  bcrypt.genSaltSync(10);
+        // creator is already present or not 
+        const isUsername = await prisma.creator.findUnique({ where: { username } })
+        if (isUsername) {
+            return res.status(409).json({ message: `username ${username} is not available` })
+        }
+        const isEmail = await prisma.creator.findUnique({ where: { email } })
+        if (isEmail) {
+            return res.status(409).json({ message: `Email ${email} is already registered ` })
+        }
+
+
+        // validate date
+        const validator = vine.compile(creator_vaidation)
+        const payload = await validator.validate({ username, email, contact_number, country_code, state, language, password })
+
+
+        // check file  
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+        if (!isFile) {
+            return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+        }
+
+        // encrypt password
+        const salt = bcrypt.genSaltSync(10);
         const hash_pswd = bcrypt.hashSync(password, salt)
 
+        // data
         const data = {
-            username,email,contact_number,country_code,state,language,password:hash_pswd}
-        
-      
-        
+            username,
+            email,
+            contact_number,
+            country_code,
+            state,
+            language,
+            password: hash_pswd,
+            profile_path: fileInfo.path,
+            profile_type: fileInfo.mimetype
+        }
+
+
+        // save in database
         const info = await prisma.creator.create({
             data
         })
 
 
+        // for token
         const creator = {
-            id:info.id,
-            username:info.username,
-            email:info.email,
-            state:info.state,
-            language:info.language
+            id: info.id,
+            username: info.username,
+            email: info.email,
+            state: info.state,
+            language: info.language,
+            profile_path: info.profile_path
         }
         // create token
-        const token = jwt.sign(creator,process.env.SECRET_KEY,{expiresIn:'999h'})
+        const token = jwt.sign(creator, process.env.SECRET_KEY, { expiresIn: '999h' })
 
-        res.status(201).json({message:'Creator is registered',token:token})
+        // send token
+        res.status(201).json({ message: 'Creator is registered', token: token })
 
-    
     } catch (error) {
-        res.status(400).json({message:error})
+        res.status(400).json({ msg: error.message || 'Something went wrong' })
     }
 }
 
 // login creator
-export const login_creator = async(req,res)=>{
+export const login_creator = async (req, res) => {
     try {
 
-        const {email,password}=req.body;
+        const { email, password } = req.body;
 
-        const isCreator = await prisma.creator.findUnique({where:{email}})
-        if(! isCreator){
-            return res.status(404).json({message:'Incorrect Email or Password'})
+        const isCreator = await prisma.creator.findUnique({ where: { email } })
+        if (!isCreator) {
+            return res.status(404).json({ message: 'Incorrect Email or Password' })
         }
-        
-        const isPassword = bcrypt.compareSync(password,await prisma.creator.password)
 
-        if(! isPassword){
-            return res.status(404).json({message:'Incorrect Email or Password'})
+        const isPassword = bcrypt.compareSync(password, isCreator.password)
+
+        if (!isPassword) {
+            return res.status(404).json({ message: 'Incorrect Email or Password' })
         }
 
         const data = {
-            id:await prisma.creator.id,
-            username:await prisma.creator.username,
-            email:await prisma.creator.email,
-            state:await prisma.creator.state,
-            language:await prisma.creator.language,
-
+            id: await prisma.creator.id,
+            username: isCreator.username,
+            email: isCreator.email,
+            state: isCreator.state,
+            language: isCreator.language,
+            profile_path: isCreator.profile_path
         }
 
-        const token = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'99999h'})
+        const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
 
-        res.status(200).json({token:token})
+        res.status(200).json({ messages: 'Logged In', token: token })
 
 
-        
+
     } catch (error) {
-        res.send(error)
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -87,7 +122,7 @@ export const create_yt_Content = async (req, res) => {
     try {
 
         const id = +req.params.id
-        const { iframe, heading, content, tags } = req.body;
+        const { iframe, heading, content, tags, category } = req.body;
 
         const creator = await prisma.creator.findUnique({
             where: {
@@ -102,13 +137,14 @@ export const create_yt_Content = async (req, res) => {
         const data = { yt_creatorId: creator.id, iframe, heading, content, tags, category }
 
         const info = await prisma.yt_content.create({ data })
-        res.send(info)
+        res.status(201).json({ message: 'Youtube content is created Succesfully' })
 
     } catch (error) {
         console.log(error)
-
+        res.status(400).json({ message: error.message })
     }
 }
+
 
 // create blog_content
 export const create_blog_content = async (req, res) => {
@@ -128,17 +164,17 @@ export const create_blog_content = async (req, res) => {
         if ((type == 'image/png' || type == 'image/jpg') && (size <= 2)) {
 
             // construct the data
-            const { heading, content, tags, category} = req.body
-            const data = { blog_creatorId: creator.id, heading, content, tags, category,ImagePath:path,imageType:type }
+            const { heading, content, tags, category } = req.body
+            const data = { blog_creatorId: creator.id, heading, content, tags, category, ImagePath: path, imageType: type }
             // console.log(blogImage_path,imageType)
             // // add in db
             const info = await prisma.blog_content.create({ data })
-            res.status(201).json({message:'Blog is created successfully'})
+            res.status(201).json({ message: 'Blog is created successfully' })
 
         }
 
-        else{
-            return res.status(405).json({message:'File size must be less than 2MB and should be png or jpg type'})
+        else {
+            return res.status(405).json({ message: 'File size must be less than 2MB and should be png or jpg type' })
         }
 
 
@@ -177,7 +213,7 @@ export const create_arcticle_content = async (req, res) => {
 
 }
 
-// get profile of user
+// get profile of creator
 export const get_profile = async (req, res) => {
 
     try {
@@ -340,9 +376,9 @@ export const delete_blog = async (req, res) => {
 }
 
 
-// update creator profile 
+// update creator profile
 
-// search creator  with posts by username
+// search creator including posts by username
 export const search_creator = async (req, res) => {
     try {
 
@@ -371,14 +407,106 @@ export const search_creator = async (req, res) => {
 
 }
 
-
 // filter content by states
+export const stateContent = async (req, res) => {
+    try {
+        const { state } = req.body;
+        const stateContent = await prisma.creator.findMany({
+            where: {
+                state
+            },
+            select: {
+                yt_contents: true,
+                blog_contents: true,
+                article_content: true
+            }
+        })
+        if (stateContent.length == 0) {
+            return res.status(404).json({ message: 'Sorry,creator of this state is not found' })
+        }
 
+        res.status(200).json({ stateContent })
 
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Something went wrong' })
+    }
 
+}
 
 // filter posts by language
+export const languagePost = async (req, res) => {
 
+    try {
+
+        const { language } = req.body;
+        const languageContent = await prisma.creator.findMany({
+            where: {
+                language: {
+                    has: language
+                }
+            },
+            select:{
+                yt_contents:true,
+                blog_contents:true,
+                article_content:true
+            }
+        })
+        
+        if(languageContent.length==0){
+            return res.status(404).json({message:`Content of ${language} language is not found`})
+        }
+
+        res.status(200).json({languageContent})
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
+
+}
 
 
 // filter by category
+export const categoryContent = async (req, res) => {
+ try {
+    const {category} = req.body;
+    const ytContent =  await prisma.yt_content.findMany({
+      where:{
+          category:{
+              has:category
+          }
+      }
+    })
+
+    const blogContent =  await prisma.blog_content.findMany({
+        where:{
+            category:{
+                has:category
+            }
+        }
+      })
+
+      const articleContent =  await prisma.article_content.findMany({
+        where:{
+            category:{
+                has:category
+            }
+        }
+      })
+
+    
+      if(ytContent.length==0 && blogContent.length==0 &&ytContent.length==0 ){
+        return res.status(404).json({message:`Content of ${category} category is not found`})
+      }
+
+      const filtered = [{articleContent:articleContent},{blogContent:blogContent},{ytContent:ytContent}]
+
+      res.status(200).json({filtered})
+
+    
+ } catch (error) {
+    console.log(error)
+    res.status(400).json({message:error.message})
+ }
+
+}

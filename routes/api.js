@@ -2,10 +2,11 @@ import { Router } from "express";
 import multer from "multer";
 const router = Router()
 
-import { creator_profile, create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator } from "../controllers/creater.controller.js";
+import { creator_profile, create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile } from "../controllers/doctor.controller.js";
-import { registerPatient } from "../controllers/patient.controller.js";
+import { registerPatient } from "../controllers/patient.controller.js";4
 
+const creatorProfile  = multer({dest:'creatorProfile'})
 const articleImage = multer({ dest: 'articleImage/' })
 const blogImage = multer({ dest: 'blogImage/' })
 const doctor = multer({ dest: 'doctorProfile/' })
@@ -14,7 +15,7 @@ const patient = multer({dest:'patientProfile/'})
 
 
 // creator api
-router.post('/creatorProfile', creator_profile)
+router.post('/creatorProfile',creatorProfile.single('creator_picture'), creator_profile)
 router.post('/login/creator', login_creator)
 router.post('/user/:id/createYtContent', create_yt_Content)
 router.post('/user/:id/createBlogContent', blogImage.single('blogImage'), create_blog_content)
@@ -28,7 +29,9 @@ router.delete('/user/:creatorId/deleteYt/:ytId', delete_yt)
 router.delete('/user/:creatorId/deleteArticle/:articleId', delete_article)
 router.delete('/user/:creatorId/deleteBlog/:blogId', delete_blog)
 router.get('/searchCreator', search_creator)
-
+router.get('/state/content',stateContent)
+router.get('/filter/language/content',languagePost)
+router.get('/filter/category/content',categoryContent)
 
 
 // doctor api
