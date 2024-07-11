@@ -6,12 +6,12 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 
-// create doctor profile
+//  requst for approval
 export const CreateDoctor_profile = async (req, res) => {
     try {
 
         // gather info from the doctor 
-        const { doctor_name, username, password, email, country_code, contact_number, state, languages, specialities, experience, maximum_education } = req.body
+        const { doctor_name, username, password, email, country_code, contact_number, state, languages, specialities, experience, maximum_education,pricePerSession} = req.body
         const fileInfo = req.files;
 
         const isUsername = await prisma.doctor.findUnique({ where: { username } })
@@ -48,6 +48,7 @@ export const CreateDoctor_profile = async (req, res) => {
         }
 
         const experienceInt = parseInt(experience)
+        const priceInt = parseInt(pricePerSession)
 
         // for database
         const data = {
@@ -61,6 +62,7 @@ export const CreateDoctor_profile = async (req, res) => {
             languages,
             specialities,
             experience: experienceInt,
+            pricePerSession:priceInt,
             maximum_education,
             profile_pic: doctorProfile_path,
             profile_picType: doctorProfile_type,
@@ -86,8 +88,7 @@ export const CreateDoctor_profile = async (req, res) => {
 
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
 
-        res.status(201).json({ message: 'Profile Created Succesfully', token })
-
+        res.status(201).json({ message: 'Request is done', token })
 
     } catch (error) {
         console.log(error)
@@ -134,12 +135,15 @@ export const doctorLogin = async (req, res) => {
 }
 
 
+
+
+
 // update profile
 export const updateDoctorProfile = async (req, res) => {
 try {
 
     const DoctorId = +req.params.DoctorId;
-    const {email,country_code,contact_number,state,languages,specialities,experience,maximum_education}= req.body;
+    const {email,country_code,contact_number,state,languages,specialities,experience,maximum_education,pricePerSession}= req.body;
 
     // check doctor
     const isDoctor = await prisma.doctor.findUnique({where:{id:DoctorId}})
@@ -149,7 +153,7 @@ try {
 
     //update information
     const info = await prisma.doctor.update({where:{id:DoctorId},data:{
-        email,country_code,contact_number,state,languages,specialities,experience,maximum_education
+        email,country_code,contact_number,state,languages,specialities,experience,maximum_education,pricePerSession
 
     }})
 
@@ -185,7 +189,51 @@ export const deleteDoctor_profile = async (req, res) => {
 
 }
 
-// get patient profile
+// update status iff verified == yes
+export const updateDoctorStatus = async(req,res)=>{
+    try {
+        const DoctorId = +req.params.DoctorId;
+        const {status} = req.body;
+
+        const isDoctor = await prisma.doctor.findUnique({where:{id:DoctorId}})
+        if(! isDoctor){
+            res.status(404).json({message:'Something went wrong'})
+        }
+        if(isDoctor.verified=='no'){
+            res.status(400).json({message:'You are not verified'})
+        }
+        const updateStatus = await prisma.doctor.update({where:{id:DoctorId},data:{status}})
+
+        res.status(200).json({message:`Your status updated to ${status}`})
+        
+    } catch (error) {
+        res.status(400).json({message:'something went wrong'})
+        console.log(error)
+    }
+}
+
+// update remarks iff verified == yes 
+export const updateDoctorRemarks = async(req,res)=>{
+    try {
+        const DoctorId = +req.params.DoctorId;
+        const {remarks} = req.body;
+
+        const isDoctor = await prisma.doctor.findUnique({where:{id:DoctorId}})
+        if(! isDoctor){
+            res.status(404).json({message:'Something went wrong'})
+        }
+        if(isDoctor.verified=='no'){
+            res.status(400).json({message:'You are not verified'})
+        }
+        const updateStatus = await prisma.doctor.update({where:{id:DoctorId},data:{remarks}})
+
+        res.status(200).json({message:'Remarks is updated'})
+        
+    } catch (error) {
+        res.status(400).json({message:'something went wrong'})
+        console.log(error)
+    }
+}
 
 // filter doctor state
 // filter doctor language

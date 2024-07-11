@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
@@ -8,10 +7,52 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// admin model
+model admin {
+  id        Int      @id @default(autoincrement())
+  name      String   @default("Kanika")
+  email     String
+  password  String
+  secretKey String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// blogs,ytcontent,article category model
+model ContentCategory {
+  id       Int    @id @default(autoincrement())
+  category String
+}
+
+// service model 
+model Service {
+  id                   Int        @id @default(autoincrement())
+  title                String
+  imagePath            String
+  description          String
+  tags                 String[]
+  subtitle             String[]
+  what_we_will_discuss String[]
+  benefits             String[]
+  languages            String[]
+  duration             Int
+  category             Category[]
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  coverPath   String
+  description String
+  Service     Service? @relation(fields: [serviceId], references: [id])
+  serviceId   Int?
 }
 
 // creator model
@@ -21,8 +62,8 @@ model Creator {
   email           String            @unique
   profile_path    String
   profile_type    String
-  country_code    String                //country code and country name (default 91 India)
-  contact_number  String                 //mobile number
+  country_code    String //country code and country name (default 91 India)
+  contact_number  String //mobile number
   state           String
   language        String[]
   password        String
@@ -34,7 +75,7 @@ model Creator {
   updatedAt       DateTime          @updatedAt
 }
 
-
+// yt model
 model Yt_content {
   id           Int      @id @default(autoincrement())
   iframe       String
@@ -42,12 +83,14 @@ model Yt_content {
   content      String
   tags         String[]
   category     String[]
+  verified     String   @default("pending") //active,pending,unpublish,rejected,need improvement
   creator      Creator  @relation(fields: [yt_creatorId], references: [id])
   yt_creatorId Int
   createdAt    DateTime @default(now())
   updated      DateTime @updatedAt
 }
 
+// article model
 model Article_content {
   id                Int      @id @default(autoincrement())
   heading           String
@@ -56,20 +99,23 @@ model Article_content {
   articleImageType  String
   tags              String[]
   category          String[]
+  verified          String   @default("pending") //active,pending,unpublish,rejected,need improvement
   Creator           Creator  @relation(fields: [article_creatorId], references: [id])
   article_creatorId Int
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
 
+// blogs model
 model Blog_content {
   id             Int      @id @default(autoincrement())
   heading        String
   content        String
   blogImagePath  String
   blogImageType  String
-  tags           String[]
-  category       String[]
+  tags           String[] //multi
+  category       String[] //multi
+  verified       String   @default("pending") //active,pending,unpublish,rejected,need improvement
   Creator        Creator  @relation(fields: [blog_creatorId], references: [id])
   blog_creatorId Int
   createdAt      DateTime @default(now())
@@ -88,7 +134,7 @@ model Patient {
   contact_number String
   dob            String //selectd dob from calender(dd-mm-yy) to wish birthday of user
   gender         String //male female others
-  new_patient    Boolean
+  new_patient    String
   password       String
   support        Support[]
   mood           Mood[]
@@ -114,6 +160,7 @@ model Mood {
   note            String //optional 
 }
 
+// doctor model
 model Doctor {
   id                Int      @id @default(autoincrement())
   username          String   @unique
@@ -132,6 +179,24 @@ model Doctor {
   maximum_education String
   documents         String
   documents_type    String
+  pricePerSession   Int
+  status            String?  @default("active")
+  remarks           String?  @default("I am active")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+// manager model
+model manager {
+  id             Int      @id @default(autoincrement())
+  name           String
+  username       String
+  email          String
+  state          String
+  country_code   String
+  contact_number String
+  password       String
+  verified       String   @default("no")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
