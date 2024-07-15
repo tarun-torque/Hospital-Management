@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import prisma from '../DB/db.config.js'
 import nodemailer from 'nodemailer'
 import 'dotenv/config'
-import transporter from '../utils/transporter.js' 
+import transporter from '../utils/transporter.js'
 import bcrypt from 'bcryptjs'
 import vine from '@vinejs/vine'
 import contentCategory_validation from '../validations/validatons.js'
@@ -10,80 +10,80 @@ import { messages } from '@vinejs/vine/defaults'
 
 
 // approve request of doctor
-export const approveDoctorRequest = async(req,res)=>{
+export const approveDoctorRequest = async (req, res) => {
     try {
         const DoctorId = +req.params.DoctorId;
 
-        const verify = await prisma.doctor.update({where:{id:DoctorId},data:{verified:'yes'}}) 
-      
+        const verify = await prisma.doctor.update({ where: { id: DoctorId }, data: { verified: 'yes' } })
+
         // send mail to the doctor
         const mailOptions = {
-            from:process.env.ADMIN_EMAIL,
-            to:`${verify.email}`,
-            subject:`${verify.username},Congratulations from Harmony`,
-            text:'Grettings from Harmony,You request has been approved!'
+            from: process.env.ADMIN_EMAIL,
+            to: `${verify.email}`,
+            subject: `${verify.username},Congratulations from Harmony`,
+            text: 'Grettings from Harmony,You request has been approved!'
         }
 
-        transporter.sendMail(mailOptions,(error,info)=>{
-            if(error){
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
                 console.log(error);
-                res.status(500).json({message:`${verify.username} is verified but email not sent`});
-            }else{
+                res.status(500).json({ message: `${verify.username} is verified but email not sent` });
+            } else {
                 console.log('Email sent')
-                res.status(200).json({message:`${verify.username} is verified and sent succesfully`})
+                res.status(200).json({ message: `${verify.username} is verified and sent succesfully` })
             }
         })
 
     } catch (error) {
-        res.status(400).json({message:'Something went wromg'})
+        res.status(400).json({ message: 'Something went wromg' })
         console.log(error)
     }
 }
 
 // reject doctor request
-export const rejectDoctor = async(req,res)=>{
+export const rejectDoctor = async (req, res) => {
     try {
-        const DoctorId  = +req.params.DoctorId;
-        const {reason} =  req.body;
+        const DoctorId = +req.params.DoctorId;
+        const { reason } = req.body;
         // update verified as rejected
-        const rejected = await prisma.doctor.update({where:{id:DoctorId},data:{verified:'rejected'}})
+        const rejected = await prisma.doctor.update({ where: { id: DoctorId }, data: { verified: 'rejected' } })
 
         // send mail
         const mailOptions = {
-            from:process.env.ADMIN_EMAIL,
-            to:`${rejected.email}`,
-            subject:`${rejected.username},Info. from Harmony`,
-            text:reason
+            from: process.env.ADMIN_EMAIL,
+            to: `${rejected.email}`,
+            subject: `${rejected.username},Info. from Harmony`,
+            text: reason
         }
 
-        transporter.sendMail(mailOptions,(error,info)=>{
-            if(error){
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
                 console.log(error);
-                res.status(500).json({message:`${rejected.username} is rejected but email not sent`});
-            }else{
+                res.status(500).json({ message: `${rejected.username} is rejected but email not sent` });
+            } else {
                 console.log('Email sent')
-                res.status(200).json({message:`${rejected.username} is rejected and email sent succesfully`})
+                res.status(200).json({ message: `${rejected.username} is rejected and email sent succesfully` })
             }
         })
 
     } catch (error) {
-        res.status(400).json({message:'Something went wromg'})
+        res.status(400).json({ message: 'Something went wromg' })
         console.log(error)
     }
 }
 
 // get rejected doctors
-export const getRejectedDoctors = async(req,res)=>{
+export const getRejectedDoctors = async (req, res) => {
     try {
 
-        const rejectedDoctors  =  await prisma.doctor.findMany({where:{verified:'rejected'}})
+        const rejectedDoctors = await prisma.doctor.findMany({ where: { verified: 'rejected' } })
         const count = rejectedDoctors.length
-        const data = {count,rejectedDoctors}
-        res.status(200).json({data})
-        
+        const data = { count, rejectedDoctors }
+        res.status(200).json({ data })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({message:'Something went wrong'})
+        res.status(500).json({ message: 'Something went wrong' })
     }
 }
 
@@ -100,14 +100,14 @@ export const getPendingDoctors = async (req, res) => {
         res.status(200).json({ data })
 
     } catch (error) {
-          res.status(400).json('Something went wrong')
-          console.log(error)
+        res.status(400).json('Something went wrong')
+        console.log(error)
     }
 }
 
 
 // get approved doctors
-export const getApprovedDoctors  = async(req,res)=>{
+export const getApprovedDoctors = async (req, res) => {
     try {
         const approvalDoctors = await prisma.doctor.findMany({ where: { verified: 'yes' } })
         const count = approvalDoctors.length;
@@ -116,164 +116,175 @@ export const getApprovedDoctors  = async(req,res)=>{
         res.status(200).json({ data })
 
     } catch (error) {
-          res.status(400).json('Something went wrong')
-          console.log(error)
+        res.status(400).json('Something went wrong')
+        console.log(error)
     }
 }
 
 
 // get active doctors list 
-export const getActiveDoctors  = async(req,res)=>{
+export const getActiveDoctors = async (req, res) => {
     try {
-        const activeDoctors  = await prisma.doctor.findMany({where:{verified:'yes',status:'active'}})
+        const activeDoctors = await prisma.doctor.findMany({ where: { verified: 'yes', status: 'active' } })
         const count = activeDoctors.length
-        const data = {count,activeDoctors}
-        res.status(200).json({data})
-        
+        const data = { count, activeDoctors }
+        res.status(200).json({ data })
+
     } catch (error) {
-        res.status(400).json({data:'Something went wrong'})
+        res.status(400).json({ data: 'Something went wrong' })
         console.log(error)
     }
 }
 
 
 // get inactive doctors list
-export const getInactiveDoctors = async(req,res)=>{
+export const getInactiveDoctors = async (req, res) => {
     try {
-        const InactiveDoctors  = await prisma.doctor.findMany({where:{verified:'yes',status:'inactive'}})
+        const InactiveDoctors = await prisma.doctor.findMany({ where: { verified: 'yes', status: 'inactive' } })
         const count = InactiveDoctors.length
-        const data = {count,InactiveDoctors}
-        res.status(200).json({data})
-        
+        const data = { count, InactiveDoctors }
+        res.status(200).json({ data })
+
     } catch (error) {
-        res.status(400).json({data:'Something went wrong'})
+        res.status(400).json({ data: 'Something went wrong' })
         console.log(error)
     }
 }
 
 
 // get temporary off doctors list 
-export const getTemporaryoffDoctors  =async(req,res)=>{
+export const getTemporaryoffDoctors = async (req, res) => {
     try {
-        const temporayOffDoctors  = await prisma.doctor.findMany({where:{verified:'yes',status:'temporaryoff'}})
+        const temporayOffDoctors = await prisma.doctor.findMany({ where: { verified: 'yes', status: 'temporaryoff' } })
         const count = temporayOffDoctors.length
-        const data = {count,temporayOffDoctors}
-        res.status(200).json({data})
-        
+        const data = { count, temporayOffDoctors }
+        res.status(200).json({ data })
+
     } catch (error) {
-        res.status(400).json({data:'Something went wrong'})
+        res.status(400).json({ data: 'Something went wrong' })
         console.log(error)
     }
 }
 
+
 // create content category
-export const contentCategory = async(req,res)=>{
+export const contentCategory = async (req, res) => {
     try {
         const data = req.body;
-        const validator  = vine.compile(contentCategory_validation)
-        const validateData = await validator.validate(data) 
-        const isCategory =  await prisma.contentCategory.findUnique({where:{category:validateData.category}})
-        if(isCategory){
-            return res.status(400).json({message:`${isCategory.category} is already Present`})
+        const fileInfo = req.file;
+        const validator = vine.compile(contentCategory_validation)
+        const validateData = await validator.validate(data)
+        const isCategory = await prisma.contentCategory.findUnique({ where: { category: validateData.category } })
+        if (isCategory) {
+            return res.status(400).json({ message: `${isCategory.category} is already Present` })
+        }
+        // check file
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+        if (!isFile) {
+            return res.status(400).json({ message: 'Image should be jpg/png and size less than 2MB' })
         }
 
+        const allData = { category: validateData.category, description: validateData.description, image_path: req.file.path }
 
-        const createCategory = await prisma.contentCategory.create({data:validateData})
-        res.status(201).json({message:`${validateData.category} has been added in Content Categories`})
-        
+        const createCategory = await prisma.contentCategory.create({ data: allData })
+        res.status(201).json({ message: `${validateData.category} has been added in Content Categories` })
+
     } catch (error) {
-        res.status(400).json({message:error})
+        res.status(400).json({ message: error })
         console.log(error)
     }
 }
 
 // update content Category
-export const update_ContentCategory = async(req,res)=>{
+export const update_ContentCategory = async (req, res) => {
     try {
-       const CategoryId = +req.params.CategoryId;
-       const {category}  = req.body;
-       const update =  await prisma.contentCategory.update({where:{id:CategoryId},data:{category:category}})
-       res.status(200).json({message:'Category has been updated'})
+        const CategoryId = +req.params.CategoryId;
+        const fileInfo = req.file;
+        const { category, description } = req.body;
+        // check file
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+        if (!isFile) {
+            return res.status(400).json({ message: 'Image should be jpg/png and size less than 2MB' })
+        }
+        const update = await prisma.contentCategory.update({ where: { id: CategoryId }, data: { category: category, description: description, image_path: req.file.path } })
+        res.status(200).json({ message: 'Category has been updated' })
     } catch (error) {
-        res.status(400).json({message:error})
+        res.status(400).json({ message: error })
         console.log(error)
     }
 }
 
 // delete category
-export const deleteCategory =  async(req,res)=>{
+export const deleteCategory = async (req, res) => {
     try {
-        const CategoryId  =  +req.params.CategoryId;
-        const deleteCategory = await prisma.contentCategory.delete({where:{id:CategoryId}})
-        res.status(200).json({message:`${deleteCategory.category} has been deleted`})
+        const CategoryId = +req.params.CategoryId;
+        const deleteCategory = await prisma.contentCategory.delete({ where: { id: CategoryId } })
+        res.status(200).json({ message: `${deleteCategory.category} has been deleted` })
 
     } catch (error) {
-        res.status(400).json({message:'something went wrong'})
+        res.status(400).json({ message: 'something went wrong' })
         console.log(error)
     }
 }
 
 // get content category
-export const getContentCategory  =  async(req,res)=>{
+export const getContentCategory = async (req, res) => {
     try {
-        
+
         const allCategory = await prisma.contentCategory.findMany()
-        res.status(200).json({allCategory})
-        
+        res.status(200).json({ allCategory })
+
     } catch (error) {
-        res.status(500).json({error:error.message})
+        res.status(500).json({ error: error.message })
     }
 }
 
-
-
 // create service 
-export const createService = async(req,res)=>{
+export const createService = async (req, res) => {
     try {
-        const {title,description,tags,subtitle,what_we_will_discuss,benefits,languages,duration} = req.body;
-        const file  = req.file;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
+        const file = req.file;
 
         // check service image
-        const  type = file.mimetype;
-        const size = file.size/(1024*1024)  //size in MB
-        const checkFile  = ( (type=='image/jpg' || type=='image/png') && (size<=2) )
-        if(! checkFile){
-            return res.status(400).json({message:'File Must be jpg/png and size less than 2MB'})
+        const type = file.mimetype;
+        const size = file.size / (1024 * 1024)  //size in MB
+        const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
+        if (!checkFile) {
+            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
 
-        const data= {title,description,tags,subtitle,what_we_will_discuss,benefits,languages,duration,imagePath:file.path}
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration, imagePath: file.path }
 
-        const createService = await prisma.service.create({data})
-        res.status(201).json({createService})
-        }
+        const createService = await prisma.service.create({ data })
+        res.status(201).json({ createService })
+    }
 
-     catch (error) {
-        res.status(400).json({message:'something went wrong'})
+    catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
         console.log(error)
     }
 }
 
-
 // create category of service
-export const servieCategory = async(req,res)=>{
+export const servieCategory = async (req, res) => {
     try {
         const ServiceId = req.params.ServiceId;
-        const {name,description} = req.body;
-        const file=req.file;
+        const { name, description } = req.body;
+        const file = req.file;
 
         // check file
-        const  type = file.mimetype;
-        const size = file.size/(1024*1024)  //size in MB
-        const checkFile  = ( (type=='image/jpg' || type=='image/png') && (size<=2) )
-        if(! checkFile){
-            return res.status(400).json({message:'File Must be jpg/png and size less than 2MB'})
+        const type = file.mimetype;
+        const size = file.size / (1024 * 1024)  //size in MB
+        const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
+        if (!checkFile) {
+            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
 
-        const data={name,description,coverPath:file.path}
-        const Category = await prisma.category.create({wh})
+        const data = { name, description, coverPath: file.path }
+        const Category = await prisma.category.create({ wh })
 
     } catch (error) {
-        
+
     }
 }
 
@@ -283,55 +294,55 @@ export const register_manager = async (req, res) => {
     try {
 
         // get info.
-        const {name,username,email,state,country,contact_number,password}  = req.body;
+        const { name, username, email, state, country, contact_number, password } = req.body;
         const fileInfo = req.file;
 
 
 
         // check manager is present or not 
-        const isManager = await prisma.manager.findUnique({where:{email}})
-        if(isManager){
-            return res.status(400).json({message:"Manager is already Present"})
+        const isManager = await prisma.manager.findUnique({ where: { email } })
+        if (isManager) {
+            return res.status(400).json({ message: "Manager is already Present" })
         }
 
 
-         // check file  
-         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+        // check file  
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
 
-         if (!isFile) {
-             return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
-         }
+        if (!isFile) {
+            return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+        }
 
         // encrypt password
-        const salt  = bcrypt.genSaltSync(10);
-        const hash_pswd = bcrypt.hashSync(password,salt)
+        const salt = bcrypt.genSaltSync(10);
+        const hash_pswd = bcrypt.hashSync(password, salt)
         // save in db
-        const data = {name,username,email,state,country,contact_number,password:hash_pswd,profile_path:fileInfo.path}
+        const data = { name, username, email, state, country, contact_number, password: hash_pswd, profile_path: fileInfo.path }
         //send token
-        const savedData = await prisma.manager.create({data})
+        const savedData = await prisma.manager.create({ data })
         // send token
-        const token = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
-        
+        const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
+
         // send mail to the manager
         const mailOptions = {
-            from:process.env.ADMIN_EMAIL,
-            to:email,
-            subject:'Congratulations from Harmony',
-            text:`You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
+            from: process.env.ADMIN_EMAIL,
+            to: email,
+            subject: 'Congratulations from Harmony',
+            text: `You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
         }
 
-        transporter.sendMail(mailOptions,(error,info)=>{
-            if(error){
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
                 console.log(error);
-                res.status(500).json({message:`Manager ${name} is created but email not sent`});
-            }else{
+                res.status(500).json({ message: `Manager ${name} is created but email not sent` });
+            } else {
                 console.log('Email sent')
-                res.status(201).json({message:"Manger is Created",token:token})
+                res.status(201).json({ message: "Manger is Created", token: token })
             }
         })
     } catch (error) {
         console.log(error)
-           res.status(400).json({message:error})
+        res.status(400).json({ message: error })
     }
 }
 
@@ -397,19 +408,19 @@ export const creator_profile = async (req, res) => {
         // create token
         const token = jwt.sign(creator, process.env.SECRET_KEY, { expiresIn: '999h' })
 
-          // send mail to the manager
-          const mailOptions = {
-            from:process.env.ADMIN_EMAIL,
-            to:email,
-            subject:`congratulations ${username},You are creator on Harmony`,
-            text:`You are Creator in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
+        // send mail to the manager
+        const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: email,
+            subject: `congratulations ${username},You are creator on Harmony`,
+            text: `You are Creator in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
         }
 
-        transporter.sendMail(mailOptions,(error,info)=>{
-            if(error){
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
                 console.log(error);
-                res.status(500).json({message:`Creator ${username} is created but email not sent`});
-            }else{
+                res.status(500).json({ message: `Creator ${username} is created but email not sent` });
+            } else {
                 console.log('Email sent')
                 res.status(201).json({ message: 'Creator is registered', token: token })
             }

@@ -8,7 +8,9 @@ const messages = {
   
 
 const contentCategory_validation = vine.object({
-    category:vine.string()
+    category:vine.string(),
+    description:vine.string()
 })
+
 
 export default contentCategory_validation

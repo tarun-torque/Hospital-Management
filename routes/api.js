@@ -17,6 +17,7 @@ const patient = multer({dest:'patientProfile/'})
 const serviceImage = multer({dest:'serviceImage'})
 const serviceCategoryImage= multer({dest:'serviceCategoryImage'})
 const managerProfile=multer({dest:'managerProfile'})
+const contentCategoryImage = multer({dest:'contentCategoryImage'})
 
 
 
@@ -74,7 +75,7 @@ router.get('/admin/get/active/doctors',getActiveDoctors)
 router.get('/admin/get/inactive/doctors',getInactiveDoctors)
 router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
 //admin -----service/service category and content category
-router.post('/admin/create/content/category',contentCategory)
+router.post('/admin/create/content/category',contentCategoryImage.single('contentCategoryImage'),contentCategory)
 router.get('/all/content/categories',getContentCategory)
 router.delete('admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',update_ContentCategory)
