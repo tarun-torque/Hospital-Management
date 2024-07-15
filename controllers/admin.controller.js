@@ -6,6 +6,7 @@ import transporter from '../utils/transporter.js'
 import bcrypt from 'bcryptjs'
 import vine from '@vinejs/vine'
 import contentCategory_validation from '../validations/validatons.js'
+import { messages } from '@vinejs/vine/defaults'
 
 
 // approve request of doctor
@@ -36,7 +37,6 @@ export const approveDoctorRequest = async(req,res)=>{
     } catch (error) {
         res.status(400).json({message:'Something went wromg'})
         console.log(error)
-        
     }
 }
 
@@ -136,6 +136,7 @@ export const getActiveDoctors  = async(req,res)=>{
     }
 }
 
+
 // get inactive doctors list
 export const getInactiveDoctors = async(req,res)=>{
     try {
@@ -165,15 +166,20 @@ export const getTemporaryoffDoctors  =async(req,res)=>{
     }
 }
 
-
 // create content category
 export const contentCategory = async(req,res)=>{
     try {
         const data = req.body;
         const validator  = vine.compile(contentCategory_validation)
         const validateData = await validator.validate(data) 
+        const isCategory =  await prisma.contentCategory.findUnique({where:{category:validateData.category}})
+        if(isCategory){
+            return res.status(400).json({message:`${isCategory.category} is already Present`})
+        }
+
+
         const createCategory = await prisma.contentCategory.create({data:validateData})
-        res.status(201).json({message:`${category} has been added in Content Categories`})
+        res.status(201).json({message:`${validateData.category} has been added in Content Categories`})
         
     } catch (error) {
         res.status(400).json({message:error})
@@ -181,6 +187,18 @@ export const contentCategory = async(req,res)=>{
     }
 }
 
+// update content Category
+export const update_ContentCategory = async(req,res)=>{
+    try {
+       const CategoryId = +req.params.CategoryId;
+       const {category}  = req.body;
+       const update =  await prisma.contentCategory.update({where:{id:CategoryId},data:{category:category}})
+       res.status(200).json({message:'Category has been updated'})
+    } catch (error) {
+        res.status(400).json({message:error})
+        console.log(error)
+    }
+}
 
 // delete category
 export const deleteCategory =  async(req,res)=>{

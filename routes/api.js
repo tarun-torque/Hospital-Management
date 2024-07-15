@@ -5,7 +5,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, filterPatient, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory } from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -73,10 +73,11 @@ router.get('/admin/getApprovedDoctors',getApprovedDoctors)
 router.get('/admin/get/active/doctors',getActiveDoctors)
 router.get('/admin/get/inactive/doctors',getInactiveDoctors)
 router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
-//admin -----service/service category and conttent category
+//admin -----service/service category and content category
 router.post('/admin/create/content/category',contentCategory)
 router.get('/all/content/categories',getContentCategory)
 router.delete('admin/delete/category/:CategoryId',deleteCategory)
+router.put('/admin/update/category/:CategoryId',update_ContentCategory)
 router.post('/admin/create/service',serviceImage.single('serviceImage'),createService)
 router.post('/admincreate/service/:ServiceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
 // admin-----creator api

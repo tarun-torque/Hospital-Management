@@ -25,7 +25,7 @@ model admin {
 // blogs,ytcontent,article category model
 model ContentCategory {
   id       Int    @id @default(autoincrement())
-  category String
+  category String @unique
 }
 
 // service model 
