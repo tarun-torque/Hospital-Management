@@ -2,11 +2,12 @@ import { Router } from "express";
 import multer from "multer";
 const router = Router()
 
-import { creator_profile, create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
+import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, filterPatient, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, rejectDoctor, servieCategory } from "../controllers/admin.controller.js";
-4
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory } from "../controllers/admin.controller.js";
+import { login_manager } from "../controllers/manager.controller.js";
+
 
 const creatorProfile  = multer({dest:'creatorProfile'})
 const articleImage = multer({ dest: 'articleImage/' })
@@ -15,6 +16,7 @@ const doctor = multer({ dest: 'doctorProfile/' })
 const patient = multer({dest:'patientProfile/'})
 const serviceImage = multer({dest:'serviceImage'})
 const serviceCategoryImage= multer({dest:'serviceCategoryImage'})
+const managerProfile=multer({dest:'managerProfile'})
 
 
 
@@ -37,6 +39,8 @@ router.get('/filter/language/content',languagePost)
 router.get('/filter/category/content',categoryContent)
 
 
+
+
 // doctor api
 router.post('/createDoctorProfile', doctor.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
 router.post('/doctor/login',doctorLogin)
@@ -44,6 +48,7 @@ router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
 router.delete('/delete/doctor/profile/:DoctorId',deleteDoctor_profile)
 router.put('/update/status/:DoctorId',updateDoctorStatus)
 router.put('/update/remarks/:DoctorId',updateDoctorRemarks)
+
 
 
 // patient api
@@ -60,20 +65,29 @@ router.get('/get/:patientId/mood',get_mood)
 
 // admin routes
 //-----doctor api
-router.put('/approveDoctorRequest/:DoctorId',approveDoctorRequest)
-router.put('/reject/doctor/request/:DoctorId',rejectDoctor)
-router.get('/getPendingDoctors',getPendingDoctors)
-router.get('/get/rejectedDoctors',getRejectedDoctors)
-router.get('/getApprovedDoctors',getApprovedDoctors)
-router.get('/get/active/doctors',getActiveDoctors)
-router.get('/get/inactive/doctors',getInactiveDoctors)
-router.get('/get/temporaryoff/doctors',getTemporaryoffDoctors)
-// -----service/service category and conttent category
-router.post('/create/content/category',contentCategory)
-router.delete('/delete/category/:CategoryId',deleteCategory)
+router.put('/admin/approveDoctorRequest/:DoctorId',approveDoctorRequest)
+router.put('/admin/reject/doctor/request/:DoctorId',rejectDoctor)
+router.get('/admin/getPendingDoctors',getPendingDoctors)
+router.get('/admin/get/rejectedDoctors',getRejectedDoctors)
+router.get('/admin/getApprovedDoctors',getApprovedDoctors)
+router.get('/admin/get/active/doctors',getActiveDoctors)
+router.get('/admin/get/inactive/doctors',getInactiveDoctors)
+router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
+//admin -----service/service category and conttent category
+router.post('/admin/create/content/category',contentCategory)
+router.delete('admin/delete/category/:CategoryId',deleteCategory)
 router.post('/admin/create/service',serviceImage.single('serviceImage'),createService)
-router.post('/create/service/:ServiceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
-// -----creator api
+router.post('/admincreate/service/:ServiceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
+// admin-----creator api
 router.post('/admin/creatorProfile',creatorProfile.single('creator_picture'), creator_profile)
+
+// admin----manager api
+router.post('/admin/create/manager',managerProfile.single('managerProfile'),register_manager); 
+
+
+// manager API
+router.post('/manager/login',login_manager);
+
+
 
 export default router

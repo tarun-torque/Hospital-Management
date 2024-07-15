@@ -1,84 +1,10 @@
 import 'dotenv/config'
 import prisma from '../DB/db.config.js'
-import creator_vaidation from '../validations/validatons.js';
+// import creator_vaidation from '../validations/validatons.js';
 import vine from '@vinejs/vine';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { messages } from '@vinejs/vine/defaults';
 
-// create creator
-export const creator_profile = async (req, res) => {
-    try {
-        // get data
-        const { username, email, country_code, contact_number, state, language, password } = req.body;
-        const fileInfo = req.file;
-
-        // creator is already present or not 
-        const isUsername = await prisma.creator.findUnique({ where: { username } })
-        if (isUsername) {
-            return res.status(409).json({ message: `username ${username} is not available` })
-        }
-        const isEmail = await prisma.creator.findUnique({ where: { email } })
-        if (isEmail) {
-            return res.status(409).json({ message: `Email ${email} is already registered ` })
-        }
-
-
-        // validate date
-        const validator = vine.compile(creator_vaidation)
-        const payload = await validator.validate({ username, email, contact_number, country_code, state, language, password })
-
-
-        // check file  
-        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
-
-        if (!isFile) {
-            return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
-        }
-
-        // encrypt password
-        const salt = bcrypt.genSaltSync(10);
-        const hash_pswd = bcrypt.hashSync(password, salt)
-
-        // data
-        const data = {
-            username,
-            email,
-            contact_number,
-            country_code,
-            state,
-            language,
-            password: hash_pswd,
-            profile_path: fileInfo.path,
-            profile_type: fileInfo.mimetype
-        }
-
-
-        // save in database
-        const info = await prisma.creator.create({
-            data
-        })
-
-
-        // for token
-        const creator = {
-            id: info.id,
-            username: info.username,
-            email: info.email,
-            state: info.state,
-            language: info.language,
-            profile_path: info.profile_path
-        }
-        // create token
-        const token = jwt.sign(creator, process.env.SECRET_KEY, { expiresIn: '999h' })
-
-        // send token
-        res.status(201).json({ message: 'Creator is registered', token: token })
-
-    } catch (error) {
-        res.status(400).json({ msg: error.message || 'Something went wrong' })
-    }
-}
 
 // login creator
 export const login_creator = async (req, res) => {

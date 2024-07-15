@@ -2,7 +2,6 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -62,15 +61,16 @@ model Creator {
   email           String            @unique
   profile_path    String
   profile_type    String
-  country_code    String //country code and country name (default 91 India)
+  country         String //country code and country name (default 91 India)
   contact_number  String //mobile number
   state           String
   language        String[]
   password        String
-  role            String            @default("noRole")
   yt_contents     Yt_content[]
   blog_contents   Blog_content[]
   article_content Article_content[]
+  manager         manager?          @relation(fields: [managerId], references: [id])
+  managerId       Int
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
@@ -130,7 +130,7 @@ model Patient {
   email          String    @unique
   profile_path   String
   profileType    String
-  country_code   String
+  country        String
   contact_number String
   dob            String //selectd dob from calender(dd-mm-yy) to wish birthday of user
   gender         String //male female others
@@ -170,7 +170,7 @@ model Doctor {
   doctor_name       String
   email             String   @unique
   password          String
-  country_code      String
+  country           String
   contact_number    String
   state             String
   languages         String[]
@@ -188,15 +188,18 @@ model Doctor {
 
 // manager model
 model manager {
-  id             Int      @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   name           String
-  username       String
-  email          String
+  username       String    @unique
+  email          String    @unique
   state          String
-  country_code   String
+  profile_path   String
+  country        String
   contact_number String
   password       String
-  verified       String   @default("no")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  status         String?   @default("active")
+  remarks        String?   @default("I am active")
+  creators       Creator[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

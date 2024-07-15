@@ -4,7 +4,8 @@ import nodemailer from 'nodemailer'
 import 'dotenv/config'
 import transporter from '../utils/transporter.js' 
 import bcrypt from 'bcryptjs'
-import { messages } from '@vinejs/vine/defaults'
+import vine from '@vinejs/vine'
+import contentCategory_validation from '../validations/validatons.js'
 
 
 // approve request of doctor
@@ -168,16 +169,20 @@ export const getTemporaryoffDoctors  =async(req,res)=>{
 // create content category
 export const contentCategory = async(req,res)=>{
     try {
-        const {category} = req.body;
-        const data = {category}
-        const createCategory = await prisma.contentCategory.create({data})
+        const data = req.body;
+        const validator  = vine.compile(contentCategory_validation)
+        const validateData = await validator.validate(data) 
+        const createCategory = await prisma.contentCategory.create({data:validateData})
         res.status(201).json({message:`${category} has been added in Content Categories`})
         
     } catch (error) {
-        res.status(400).json({message:'something went wrong'})
+        res.status(400).json({message:error})
         console.log(error)
     }
 }
+
+
+
 // delete category
 export const deleteCategory =  async(req,res)=>{
     try {
@@ -243,4 +248,146 @@ export const servieCategory = async(req,res)=>{
     }
 }
 
-// admin create creator
+
+//create manager
+export const register_manager = async (req, res) => {
+    try {
+
+        // get info.
+        const {name,username,email,state,country,contact_number,password}  = req.body;
+        const fileInfo = req.file;
+
+
+
+        // check manager is present or not 
+        const isManager = await prisma.manager.findUnique({where:{email}})
+        if(isManager){
+            return res.status(400).json({message:"Manager is already Present"})
+        }
+
+
+         // check file  
+         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+         if (!isFile) {
+             return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+         }
+
+        // encrypt password
+        const salt  = bcrypt.genSaltSync(10);
+        const hash_pswd = bcrypt.hashSync(password,salt)
+        // save in db
+        const data = {name,username,email,state,country,contact_number,password:hash_pswd,profile_path:fileInfo.path}
+        //send token
+        const savedData = await prisma.manager.create({data})
+        // send token
+        const token = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
+        
+        // send mail to the manager
+        const mailOptions = {
+            from:process.env.ADMIN_EMAIL,
+            to:email,
+            subject:'Congratulations from Harmony',
+            text:`You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
+        }
+
+        transporter.sendMail(mailOptions,(error,info)=>{
+            if(error){
+                console.log(error);
+                res.status(500).json({message:`Manager ${name} is created but email not sent`});
+            }else{
+                console.log('Email sent')
+                res.status(201).json({message:"Manger is Created",token:token})
+            }
+        })
+    } catch (error) {
+        console.log(error)
+           res.status(400).json({message:error})
+    }
+}
+
+
+
+// register creator
+export const creator_profile = async (req, res) => {
+    try {
+        // get data
+        const { username, email, country, contact_number, state, language, password } = req.body;
+        const fileInfo = req.file;
+
+        // creator is already present or not 
+        const isUsername = await prisma.creator.findUnique({ where: { username } })
+        if (isUsername) {
+            return res.status(409).json({ message: `username ${username} is not available` })
+        }
+        const isEmail = await prisma.creator.findUnique({ where: { email } })
+        if (isEmail) {
+            return res.status(409).json({ message: `Email ${email} is already registered ` })
+        }
+
+
+        // check file  
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+        if (!isFile) {
+            return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+        }
+
+        // encrypt password
+        const salt = bcrypt.genSaltSync(10);
+        const hash_pswd = bcrypt.hashSync(password, salt)
+
+        // data
+        const data = {
+            username,
+            email,
+            contact_number,
+            country,
+            state,
+            language,
+            password: hash_pswd,
+            profile_path: fileInfo.path,
+            profile_type: fileInfo.mimetype
+        }
+
+
+        // save in database
+        const info = await prisma.creator.create({
+            data
+        })
+
+        // for token
+        const creator = {
+            id: info.id,
+            username: info.username,
+            email: info.email,
+            state: info.state,
+            language: info.language,
+            profile_path: info.profile_path
+        }
+        // create token
+        const token = jwt.sign(creator, process.env.SECRET_KEY, { expiresIn: '999h' })
+
+          // send mail to the manager
+          const mailOptions = {
+            from:process.env.ADMIN_EMAIL,
+            to:email,
+            subject:`congratulations ${username},You are creator on Harmony`,
+            text:`You are Creator in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
+        }
+
+        transporter.sendMail(mailOptions,(error,info)=>{
+            if(error){
+                console.log(error);
+                res.status(500).json({message:`Creator ${username} is created but email not sent`});
+            }else{
+                console.log('Email sent')
+                res.status(201).json({ message: 'Creator is registered', token: token })
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({ msg: error.message || 'Something went wrong' })
+    }
+}
+

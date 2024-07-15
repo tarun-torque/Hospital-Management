@@ -1,13 +1,14 @@
-import vine from "@vinejs/vine";
+import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 
- const creator_vaidation = vine.object({
-    // username:vine.string(),
-    // email:vine.string().email(),
-    // password:vine.string().minLength(6).maxLength(10),
-    // country_code:vine.string,
-    // language:vine.array(vine.string()),
-    // contact_number:vine.string(),
-    // state:vine.string()
+const messages = {
+    string: 'The {{ field }} field must be a string',
+  }
+
+ vine.messagesProvider = new SimpleMessagesProvider(messages)
+  
+
+const contentCategory_validation = vine.object({
+    category:vine.string()
 })
 
-export default creator_vaidation
+export default contentCategory_validation
