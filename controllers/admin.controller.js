@@ -244,7 +244,6 @@ export const createService = async (req, res) => {
     try {
         const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
         const file = req.file;
-
         // check service image
         const type = file.mimetype;
         const size = file.size / (1024 * 1024)  //size in MB
