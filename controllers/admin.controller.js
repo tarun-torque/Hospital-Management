@@ -182,7 +182,6 @@ export const contentCategory = async(req,res)=>{
 }
 
 
-
 // delete category
 export const deleteCategory =  async(req,res)=>{
     try {
@@ -193,6 +192,18 @@ export const deleteCategory =  async(req,res)=>{
     } catch (error) {
         res.status(400).json({message:'something went wrong'})
         console.log(error)
+    }
+}
+
+// get content category
+export const getContentCategory  =  async(req,res)=>{
+    try {
+        
+        const allCategory = await prisma.contentCategory.findMany()
+        res.status(200).json({allCategory})
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
     }
 }
 
