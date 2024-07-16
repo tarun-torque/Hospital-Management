@@ -20,7 +20,6 @@ const managerProfile=multer({dest:'managerProfile'})
 const contentCategoryImage = multer({dest:'contentCategoryImage'})
 
 
-
 // creator api
 router.post('/login/creator', login_creator)
 router.post('/user/:id/createYtContent', create_yt_Content)
@@ -77,20 +76,15 @@ router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
 //admin -----service/service category and content category
 router.post('/admin/create/content/category',contentCategoryImage.single('contentCategoryImage'),contentCategory)
 router.get('/all/content/categories',getContentCategory)
-router.delete('admin/delete/category/:CategoryId',deleteCategory)
+router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',update_ContentCategory)
 router.post('/admin/create/service',serviceImage.single('serviceImage'),createService)
-router.post('/admincreate/service/:ServiceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
+router.post('/admincreate/service/:serviceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
 // admin-----creator api
 router.post('/admin/creatorProfile',creatorProfile.single('creator_picture'), creator_profile)
-
 // admin----manager api
 router.post('/admin/create/manager',managerProfile.single('managerProfile'),register_manager); 
 
-
 // manager API
 router.post('/manager/login',login_manager);
-
-
-
 export default router

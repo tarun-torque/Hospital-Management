@@ -245,11 +245,6 @@ export const createService = async (req, res) => {
         const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
         const file = req.file;
 
-
-
-
-
-        
         // check service image
         const type = file.mimetype;
         const size = file.size / (1024 * 1024)  //size in MB
@@ -273,7 +268,7 @@ export const createService = async (req, res) => {
 // create category of service
 export const servieCategory = async (req, res) => {
     try {
-        const ServiceId = req.params.ServiceId;
+        const serviceId = +req.params.serviceId;
         const { name, description } = req.body;
         const file = req.file;
 
@@ -285,11 +280,63 @@ export const servieCategory = async (req, res) => {
             return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
 
-        const data = { name, description, coverPath: file.path }
-        const Category = await prisma.category.create({ wh })
+        const data = { serviceId: serviceId, name, description, coverPath: file.path }
+        const Category = await prisma.category.create({ data })
+        res.status(201).json({ message: 'Service Category has been added' })
 
     } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
 
+// update service 
+export const update_service = async (req, res) => {
+    try {
+        const serviceId = +req.params.serviceId;
+        const file = req.file;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
+        // check service image
+        const type = file.mimetype;
+        const size = file.size / (1024 * 1024)  //size in MB
+        const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
+        if (!checkFile) {
+            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
+        }
+
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration, imagePath: file.path }
+        const newService = await prisma.service.update({ where: { id: serviceId }, data: { data } })
+        res.status(201).json({ message: 'service has been updated' })
+
+
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// update category of service
+export const update_serviceCategory = async (req, res) => {
+    try {
+        const serviceId = +req.params.serviceId;
+        const { name, description } = req.body;
+        const file = req.file;
+        // check image
+        const type = file.mimetype;
+        const size = file.size / (1024 * 1024)  //size in MB
+        const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
+        if (!checkFile) {
+            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
+        }
+
+        const data = { serviceId: serviceId, name, description, coverPath: file.path }
+        const updatedData = await prisma.category.update({ where: { serviceId }, data: { data } })
+        res.status(200).json({ message: 'Service category has been updated' })
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
     }
 }
 
@@ -302,14 +349,11 @@ export const register_manager = async (req, res) => {
         const { name, username, email, state, country, contact_number, password } = req.body;
         const fileInfo = req.file;
 
-
-
         // check manager is present or not 
         const isManager = await prisma.manager.findUnique({ where: { email } })
         if (isManager) {
             return res.status(400).json({ message: "Manager is already Present" })
         }
-
 
         // check file  
         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
@@ -350,7 +394,6 @@ export const register_manager = async (req, res) => {
         res.status(400).json({ message: error })
     }
 }
-
 
 
 // register creator
