@@ -5,12 +5,11 @@ import cors from 'cors'
 
 const app = express()
 
-app.use(cors({
-  origin: '' // Adjust this to match your Next.js server's URL
-}));
 
 
 
+
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use('/api',ApiRoutes)
