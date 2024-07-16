@@ -524,4 +524,3 @@ export const creator_profile = async (req, res) => {
         res.status(400).json({ msg: error.message || 'Something went wrong' })
     }
 }
-
