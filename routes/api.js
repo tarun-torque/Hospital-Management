@@ -9,16 +9,15 @@ import { creator_profile,approveDoctorRequest, contentCategory, createService, d
 import { login_manager } from "../controllers/manager.controller.js";
 
 
-const creatorProfile  = multer({dest:'creatorProfile'})
+const creatorProfile  = multer({dest:'creatorProfile/'})
 const articleImage = multer({ dest: 'articleImage/' })
 const blogImage = multer({ dest: 'blogImage/' })
 const doctor = multer({ dest: 'doctorProfile/' })
 const patient = multer({dest:'patientProfile/'})
-const serviceImage = multer({dest:'serviceImage'})
-const serviceCategoryImage= multer({dest:'serviceCategoryImage'})
-const managerProfile=multer({dest:'managerProfile'})
-const contentCategoryImage = multer({dest:'contentCategoryImage'})
-
+const serviceImage = multer({dest:'serviceImage/'})
+const serviceCategoryImage= multer({dest:'serviceCategoryImage/'})
+const managerProfile=multer({dest:'managerProfile/'})
+const contentCategoryImage = multer({dest:'contentCategoryImage/'})
 
 // creator api
 router.post('/login/creator', login_creator)
@@ -90,8 +89,4 @@ router.put('/admin/update/manager',updateManager)
 
 // manager API
 router.post('/manager/login',login_manager);
-
-
-
-
 export default router
