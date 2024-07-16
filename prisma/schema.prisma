@@ -197,7 +197,7 @@ model manager {
   state          String
   profile_path   String
   country        String
-  contact_number String
+  contact_number BigInt
   password       String
   status         String?   @default("active")
   remarks        String?   @default("I am active")

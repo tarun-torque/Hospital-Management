@@ -366,7 +366,7 @@ export const register_manager = async (req, res) => {
         const salt = bcrypt.genSaltSync(10);
         const hash_pswd = bcrypt.hashSync(password, salt)
         // save in db
-        const data = { name, username, email, state, country, contact_number, password: hash_pswd, profile_path: fileInfo.path }
+        const data = { name, username, email, state, country, contact_number:BigInt(contact_number), password: hash_pswd, profile_path: fileInfo.path }
         //send token
         const savedData = await prisma.manager.create({ data })
         // send token
@@ -394,7 +394,53 @@ export const register_manager = async (req, res) => {
         res.status(400).json({ message: error })
     }
 }
+// get manager
+export const getAllManager = async(req,res)=>{
+    try {
 
+        const alllManager = await prisma.manager.findMany()
+        res.status(200).json({alllManager})
+        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+//delete manager 
+export const delete_manager = async(req,res)=>{
+    try {
+        const managerId  = +req.params.managerId;
+        const deleteManager  = await prisma.manager.delete({where:{id:managerId}})
+        res.status(200).json({message:`Manager ${deleteManager.name} has been deleted`})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// update manager
+export const updateManager = async(req,res)=>{
+    try {
+        const managerId = +req.params.managerId;
+        const { name, username, email, state, country, contact_number } = req.body;
+        const fileInfo = req.file;
+
+          // check file  
+          const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+          if (!isFile) {
+              return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+          }
+
+          const updateManager = await prisma.manager.update({where:{id:managerId},data:{profile_path:fileInfo.path,name, username, email, state, country, contact_number:BigInt(contact_number)}})
+          res.status(200).json({message:'Manager Profile has been updated'})
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
 
 // register creator
 export const creator_profile = async (req, res) => {
