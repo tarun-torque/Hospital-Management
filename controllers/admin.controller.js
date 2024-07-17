@@ -409,7 +409,7 @@ export const register_manager = async (req, res) => {
         const salt = bcrypt.genSaltSync(10);
         const hash_pswd = bcrypt.hashSync(password, salt)
         // save in db
-        const data = { name, username, email, state, country, contact_number:BigInt(contact_number), password: hash_pswd, profile_path: fileInfo.path }
+        const data = { name, username, email, state, country, contact_number, password: hash_pswd, profile_path: fileInfo.path }
         //send token
         const savedData = await prisma.manager.create({ data })
         // send token
@@ -442,7 +442,6 @@ export const getAllManager = async(req,res)=>{
     try {
 
         const alllManager = await prisma.manager.findMany()
-       
         res.status(200).json({alllManager})
         
     } catch (error) {
