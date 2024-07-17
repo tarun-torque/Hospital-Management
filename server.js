@@ -2,8 +2,16 @@ import 'dotenv/config'
 import express from 'express'
 import ApiRoutes from './routes/api.js'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __fileName = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__fileName)
 
 const app = express()
+
+app.use('/uploads',express.static(path.join(__dirname,'uploads')))
+
 
 app.use(cors())
 app.use(express.json())

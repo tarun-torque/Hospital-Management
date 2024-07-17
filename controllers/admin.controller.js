@@ -151,7 +151,6 @@ export const getInactiveDoctors = async (req, res) => {
     }
 }
 
-
 // get temporary off doctors list 
 export const getTemporaryoffDoctors = async (req, res) => {
     try {
@@ -165,7 +164,6 @@ export const getTemporaryoffDoctors = async (req, res) => {
         console.log(error)
     }
 }
-
 
 // create content category
 export const contentCategory = async (req, res) => {
@@ -232,7 +230,9 @@ export const getContentCategory = async (req, res) => {
     try {
 
         const allCategory = await prisma.contentCategory.findMany()
-        res.status(200).json({ allCategory })
+        const categoriesCount = allCategory.length
+        const data  =  {allCategory,categoriesCount}
+        res.status(200).json({ data })
 
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -309,9 +309,6 @@ export const update_service = async (req, res) => {
         const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration, imagePath: file.path }
         const newService = await prisma.service.update({ where: { id: serviceId }, data: { data } })
         res.status(201).json({ message: 'service has been updated' })
-
-
-
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -425,7 +422,7 @@ export const register_manager = async (req, res) => {
             subject: 'Congratulations from Harmony',
             text: `You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
         }
-
+        
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log(error);
