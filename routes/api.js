@@ -5,7 +5,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, filterPatient, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager } from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -77,8 +77,15 @@ router.post('/admin/create/content/category',contentCategoryImage.single('conten
 router.get('/all/content/categories',getContentCategory)
 router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',update_ContentCategory)
+
+
 router.post('/admin/create/service',serviceImage.single('serviceImage'),createService)
-router.post('/admincreate/service/:serviceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
+router.post('/admin/create/service/:serviceId/category',serviceCategoryImage.single('serviceCategoryImage'),servieCategory)
+router.get('/admin/get/service/stats',getService)
+router.delete('/admin/delete/service/:serviceId',deleteService)
+router.delete('/admin/delete/category/:serviceId/:categoryId',deleteCategoryService)
+
+
 // admin-----creator api
 router.post('/admin/creatorProfile',creatorProfile.single('creator_picture'), creator_profile)
 // admin----manager api

@@ -244,6 +244,7 @@ export const createService = async (req, res) => {
     try {
         const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
         const file = req.file;
+        const intDuration = parseInt(duration)
 
         // check service image
         const type = file.mimetype;
@@ -252,8 +253,9 @@ export const createService = async (req, res) => {
         if (!checkFile) {
             return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
+        
 
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration, imagePath: file.path }
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration:intDuration, imagePath: file.path }
 
         const createService = await prisma.service.create({ data })
         res.status(201).json({ createService })
@@ -340,6 +342,50 @@ export const update_serviceCategory = async (req, res) => {
     }
 }
 
+// get all service/categories and stats
+ export const getService  = async(req,res)=>{
+    try {
+        const allServices = await prisma.service.findMany({include:{category:true}})
+        const allCategory  = await prisma.category.findMany()
+        const serviceCount =  allServices.length
+        const categoriesCount = allCategory.length
+        const data = {serviceCount,categoriesCount,allServices}
+
+        res.status(200).json({data})
+        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+ }
+
+// delete service 
+export const deleteService = async(req,res)=>{
+    try {
+        const serviceId = +req.params.serviceId;
+        const deleteService  = await prisma.service.delete({where:{id:serviceId}})
+        const deleteCategory = await prisma.category.delete({where:{serviceId}})
+        res.status(200).json({message:`Service ${deleteService.title} has been deleted`})
+        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// delete category of service
+export const deleteCategoryService = async(req,res)=>{
+    try {
+        const serviceId = +req.params.serviceId;
+        const categoryId = +req.params.categoryId;
+
+        const deleteCategory  = await prisma.category.delete({where:{serviceId:serviceId,id:categoryId}})
+        res.status(200).json({message:`Service Category ${deleteCategory.name} has been deleted`})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
 
 //create manager
 export const register_manager = async (req, res) => {
