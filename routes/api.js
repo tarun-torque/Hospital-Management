@@ -130,7 +130,6 @@ router.get('/all/content/categories',getContentCategory)
 router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',update_ContentCategory)
 
-
 router.post('/admin/create/service',upload.single('serviceImage'),createService)
 router.post('/admin/create/service/:serviceId/category',upload.single('serviceCategoryImage'),servieCategory)
 router.get('/admin/get/service/stats',getService)

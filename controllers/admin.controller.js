@@ -136,7 +136,6 @@ export const getActiveDoctors = async (req, res) => {
     }
 }
 
-
 // get inactive doctors list
 export const getInactiveDoctors = async (req, res) => {
     try {
@@ -392,6 +391,7 @@ export const register_manager = async (req, res) => {
         const { name, username, email, state, country, contact_number, password } = req.body;
         const fileInfo = req.file;
 
+     
         // check manager is present or not 
         const isManager = await prisma.manager.findUnique({ where: { email } })
         if (isManager) {
@@ -422,7 +422,7 @@ export const register_manager = async (req, res) => {
             subject: 'Congratulations from Harmony',
             text: `You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
         }
-        
+
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log(error);
@@ -442,6 +442,7 @@ export const getAllManager = async(req,res)=>{
     try {
 
         const alllManager = await prisma.manager.findMany()
+       
         res.status(200).json({alllManager})
         
     } catch (error) {

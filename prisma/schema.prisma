@@ -30,7 +30,6 @@ model ContentCategory {
   image_path  String
 }
 
-
 // service model 
 model Service {
   id                   Int        @id @default(autoincrement())
@@ -46,8 +45,9 @@ model Service {
   category             Category[]
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
+  manager              manager?   @relation(fields: [managerId], references: [id])
+  managerId            Int?
 }
-
 
 model Category {
   id          Int      @id @default(autoincrement())
@@ -188,6 +188,8 @@ model Doctor {
   remarks           String?  @default("I am active")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  manager           manager? @relation(fields: [managerId], references: [id])
+  managerId         Int?
 }
 
 // manager model
@@ -196,14 +198,17 @@ model manager {
   name           String
   username       String    @unique
   email          String    @unique
-  state          String
+  state          String[]
   profile_path   String
-  country        String
+  country        String[]
   contact_number BigInt
   password       String
   status         String?   @default("active")
   remarks        String?   @default("I am active")
   creators       Creator[]
+  doctors        Doctor[]
+  service        Service[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
+
