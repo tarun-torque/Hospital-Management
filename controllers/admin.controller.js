@@ -442,7 +442,7 @@ export const register_manager = async (req, res) => {
 export const getAllManager = async(req,res)=>{
     try {
 
-        const alllManager = await prisma.manager.findMany()
+        const alllManager = await prisma.manager.findMany({include:{creators:true,doctors:true,service:true}})
         res.status(200).json({alllManager})
         
     } catch (error) {
@@ -568,6 +568,39 @@ export const creator_profile = async (req, res) => {
         res.status(400).json({ msg: error.message || 'Something went wrong' })
     }
 }
+
+// get creators
+export const getCreators  = async(req,res)=>{
+    try {
+        
+        const allCreators = await prisma.creator.findMany({include:{yt_contents:true,blog_contents:true,article_content:true}})
+        const count = allCreators.length
+        const data = {allCreators,count}
+        res.status(200).json({data})        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+// assign creator to manager
+export const assignCreator = async(req,res)=>{
+    try {
+        
+        const creatorId = +req.params.creatorId;
+        const managerId = +req.params.managerId;
+        
+        
+
+
+        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+
 
 
 

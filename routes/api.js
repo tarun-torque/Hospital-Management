@@ -8,7 +8,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient } from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -19,9 +19,9 @@ function ensureDirectoryExistence(filePath){
         return true;
     }
     ensureDirectoryExistence(dirname)
-    fs.mkdirSync(dirname)
-   
+    fs.mkdirSync(dirname)  
 }
+
 
 // multer storage
 const storage  = multer.diskStorage({
@@ -63,6 +63,7 @@ const storage  = multer.diskStorage({
     }
 })
 
+
 // filter file types 
 const fileFilter = function(req,file,cb){
     if(file.mimetype==='image/jpg' ||file.mimetype==='image/png' || file.mimetype==='application/zip'){
@@ -71,6 +72,7 @@ const fileFilter = function(req,file,cb){
         cb(new Error('Only JPG,PNG or Zip files are allowed'),false)
     }
 }
+
 
 const upload = multer({storage:storage,fileFilter:fileFilter})
 
@@ -123,11 +125,14 @@ router.get('/admin/getApprovedDoctors',getApprovedDoctors)
 router.get('/admin/get/active/doctors',getActiveDoctors)
 router.get('/admin/get/inactive/doctors',getInactiveDoctors)
 router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
+
+
 //admin -----service/service category and content category
 router.post('/admin/create/content/category',upload.single('contentCategoryImage'),contentCategory)
 router.get('/all/content/categories',getContentCategory)
 router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',update_ContentCategory)
+
 
 router.post('/admin/create/service',upload.single('serviceImage'),createService)
 router.post('/admin/create/service/:serviceId/category',upload.single('serviceCategoryImage'),servieCategory)
@@ -137,6 +142,8 @@ router.delete('/admin/delete/category/:serviceId/:categoryId',deleteCategoryServ
 
 // admin-----creator api
 router.post('/admin/creatorProfile',upload.single('creator_picture'),creator_profile)
+router.get('/get/creators/stats',getCreators)
+
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
 router.get('/admin/get/all/manager',getAllManager)
@@ -146,7 +153,6 @@ router.put('/admin/update/manager',updateManager)
 // admin -patient routes
 router.get('/admin/filter/patient',filterPatient);
 router.get('/admin/all/patients',allPatient)
-
 
 // manager API
 router.post('/manager/login',login_manager);

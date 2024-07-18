@@ -65,7 +65,7 @@ model Creator {
   email           String            @unique
   profile_path    String
   profile_type    String
-  country         String //country code and country name (default 91 India)
+  country         String //country name (default 91 India)
   contact_number  String //mobile number
   state           String
   language        String[]
@@ -74,7 +74,7 @@ model Creator {
   blog_contents   Blog_content[]
   article_content Article_content[]
   manager         manager?          @relation(fields: [managerId], references: [id])
-  managerId       Int
+  managerId       Int?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
