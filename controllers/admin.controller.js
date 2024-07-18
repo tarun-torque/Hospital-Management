@@ -389,7 +389,7 @@ export const register_manager = async (req, res) => {
     try {
 
         // get info.
-        const { name, username, email, state, country, contact_number, password } = req.body;
+        const { name, username, email, states, countries, contact_number, password } = req.body;
         const fileInfo = req.file;
 
      
@@ -410,7 +410,7 @@ export const register_manager = async (req, res) => {
         const salt = bcrypt.genSaltSync(10);
         const hash_pswd = bcrypt.hashSync(password, salt)
         // save in db
-        const data = { name, username, email, state, country, contact_number, password: hash_pswd, profile_path: fileInfo.path }
+        const data = { name, username, email, states, countries, contact_number, password: hash_pswd, profile_path: fileInfo.path }
         //send token
         const savedData = await prisma.manager.create({ data })
         // send token
@@ -467,7 +467,7 @@ export const delete_manager = async(req,res)=>{
 export const updateManager = async(req,res)=>{
     try {
         const managerId = +req.params.managerId;
-        const { name, username, email, state, country, contact_number } = req.body;
+        const { name, username, email, state, countries, contact_number } = req.body;
         const fileInfo = req.file;
 
           // check file  
