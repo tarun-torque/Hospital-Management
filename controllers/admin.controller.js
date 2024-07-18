@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs'
 import vine from '@vinejs/vine'
 import contentCategory_validation from '../validations/validatons.js'
 import { messages } from '@vinejs/vine/defaults'
+import { json } from 'express'
 
 
 // approve request of doctor
@@ -565,5 +566,38 @@ export const creator_profile = async (req, res) => {
 
     } catch (error) {
         res.status(400).json({ msg: error.message || 'Something went wrong' })
+    }
+}
+
+
+
+// filter old and new patients
+export const filterPatient = async (req, res) => {
+    try {
+
+        const { new_patient } = req.query;
+        const filteredPatients = await prisma.patient.findMany({ where: { new_patient },include:{support:true} })
+        const count = filteredPatients.length
+        const data = {filteredPatients,count}
+        res.status(200).json({ data })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ messages: error.message })
+    }
+}
+
+// get all patients
+export const allPatient  = async(req,res)=>{
+    try {
+
+        const allPatient = await prisma.patient.findMany({include:{support:true}})
+        const count  = allPatient.length
+        const data  = {allPatient,count}
+        res.status(200).json({data})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ messages: error.message })
     }
 }

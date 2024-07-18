@@ -7,8 +7,8 @@ const router = Router()
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
-import { delete_support, filterPatient, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService } from "../controllers/admin.controller.js";
+import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -105,7 +105,6 @@ router.put('/update/remarks/:DoctorId',updateDoctorRemarks)
 // patient api
 router.post('/create/patient/profile',upload.single('patientProfile'),registerPatient)
 router.post('/login/patient',loginPatient)
-router.get('/filter/patient',filterPatient)
 router.post('/:patientId/support',post_support)
 router.put('/update/:patientId/:supportId',update_support)
 router.get('/get/support/:id',get_support)
@@ -143,6 +142,11 @@ router.post('/admin/create/manager',upload.single('managerProfile'),register_man
 router.get('/admin/get/all/manager',getAllManager)
 router.delete('/admin/delete/manager/:managerId',delete_manager)
 router.put('/admin/update/manager',updateManager)
+
+// admin -patient routes
+router.get('/admin/filter/patient',filterPatient);
+router.get('/admin/all/patients',allPatient)
+
 
 // manager API
 router.post('/manager/login',login_manager);

@@ -101,32 +101,6 @@ export const loginPatient = async (req, res) => {
 //delete patient profile
 
 
-// filter old or new patient
-export const filterPatient = async (req, res) => {
-    try {
-
-        const { new_patient } = req.query;
-        const filteredPatients = await prisma.patient.findMany({ where: { new_patient } })
-        if (filteredPatients.length == 0) {
-            return res.status(404).json({ message: 'No patient Found' })
-        }
-
-        const data = [{
-            id: filteredPatients.id,
-            username: filteredPatients.username,
-            patient_name: filteredPatients.patient_name,
-            email: filteredPatients.email,
-            profile_path: filteredPatients.profile_path,
-            contact_number: filteredPatients.contact_number
-        }]
-
-        res.status(200).json({ data })
-
-    } catch (error) {
-        console.log(error)
-        res.status(400).json({ messages: error.message })
-    }
-}
 
 
 // post support
