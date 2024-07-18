@@ -584,28 +584,28 @@ export const getCreators  = async(req,res)=>{
 }
 
 // set temporary off status
-export const setTempoaryOffCreator = async(req,res)=>{
-    try {
-        const creatorId = +req.params.creatorId;
-        const updateStatus  = await prisma.creator.update({where:{id:creator}})
-        res.status(200).json({messag:`Status of ${updateStatus.username} changed to Temporary off`});
+// export const setTempoaryOffCreator = async(req,res)=>{
+//     try {
+//         const creatorId = +req.params.creatorId;
+//         const updateStatus  = await prisma.creator.update({where:{id:creator}})
+//         res.status(200).json({messag:`Status of ${updateStatus.username} changed to Temporary off`});
         
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
+//     } catch (error) {
+//         res.status(400).json({ message: 'something went wrong' })
+//         console.log(error)
+//     }
+// }
 
 // set inactive status
-export const setInactiveCreator  = async(req,res)=>{
-    try {
+// export const setInactiveCreator  = async(req,res)=>{
+//     try {
 
-        const updateStatus = await prisma.manager.update({where:})
+//         const updateStatus = await prisma.manager.update({where:})
         
-    } catch (error) {
+//     } catch (error) {
         
-    }
-} 
+//     }
+// } 
 // update remarks
 
 
