@@ -75,8 +75,6 @@ model Creator {
   yt_contents     Yt_content[]
   blog_contents   Blog_content[]
   article_content Article_content[]
-  manager         manager?          @relation(fields: [managerId], references: [id])
-  managerId       Int?              @default(0)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
@@ -207,7 +205,7 @@ model manager {
   password       String
   status         String?   @default("active")
   remarks        String?   @default("I am active")
-  creators       Creator[]
+  // creators       Creator[]
   doctors        Doctor[]
   service        Service[]
   createdAt      DateTime  @default(now())
