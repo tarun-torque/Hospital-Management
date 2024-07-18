@@ -574,7 +574,6 @@ export const creator_profile = async (req, res) => {
 // filter old and new patients
 export const filterPatient = async (req, res) => {
     try {
-
         const { new_patient } = req.query;
         const filteredPatients = await prisma.patient.findMany({ where: { new_patient },include:{support:true} })
         const count = filteredPatients.length
@@ -590,7 +589,6 @@ export const filterPatient = async (req, res) => {
 // get all patients
 export const allPatient  = async(req,res)=>{
     try {
-
         const allPatient = await prisma.patient.findMany({include:{support:true}})
         const count  = allPatient.length
         const data  = {allPatient,count}

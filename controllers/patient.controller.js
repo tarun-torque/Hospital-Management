@@ -81,7 +81,6 @@ export const loginPatient = async (req, res) => {
             return res.status(404).json({ message: 'Invalid Credentials' })
         }
 
-
         //generate token
         const data = { id: isEmail.id, username: isEmail.username, patient_name: isEmail.patient_name, profile_path: isEmail.profile_path }
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
@@ -123,9 +122,10 @@ export const post_support = async (req, res) => {
     catch (error) {
         console.log(error)
         res.status(400).json({ message: error.message })
-
     }
 }
+
+
 
 // update support
 export const update_support = async (req, res) => {
