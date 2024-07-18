@@ -70,11 +70,13 @@ model Creator {
   state           String
   language        String[]
   password        String
+  status          String            @default("active") //active pending temporary off
+  remarks         String            @default("no remarks")
   yt_contents     Yt_content[]
   blog_contents   Blog_content[]
   article_content Article_content[]
   manager         manager?          @relation(fields: [managerId], references: [id])
-  managerId       Int?
+  managerId       Int?              @default(0)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 }
