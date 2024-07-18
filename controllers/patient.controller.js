@@ -10,7 +10,7 @@ export const registerPatient = async (req, res) => {
     try {
 
         // get fields
-        const { username, patient_name, email, country_code, contact_number, dob, gender, new_patient, password } = req.body;
+        const { username, patient_name, email, country, contact_number, dob, gender, new_patient, password } = req.body;
         const fileInfo = req.file;
 
         // check patient is present or not
@@ -38,7 +38,7 @@ export const registerPatient = async (req, res) => {
             email,
             gender,
             patient_name,
-            country_code,
+            country,
             contact_number,
             dob,
             new_patient,

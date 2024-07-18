@@ -11,7 +11,7 @@ export const CreateDoctor_profile = async (req, res) => {
     try {
 
         // gather info from the doctor 
-        const { doctor_name, username, password, email, country_code, contact_number, state, languages, specialities, experience, maximum_education,pricePerSession} = req.body
+        const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education,pricePerSession} = req.body
         const fileInfo = req.files;
 
         const isUsername = await prisma.doctor.findUnique({ where: { username } })
@@ -56,7 +56,7 @@ export const CreateDoctor_profile = async (req, res) => {
             username,
             password: hash_pswd,
             email,
-            country_code,
+            country,
             contact_number,
             state,
             languages,
@@ -143,7 +143,7 @@ export const updateDoctorProfile = async (req, res) => {
 try {
 
     const DoctorId = +req.params.DoctorId;
-    const {email,country_code,contact_number,state,languages,specialities,experience,maximum_education,pricePerSession}= req.body;
+    const {email,country,contact_number,state,languages,specialities,experience,maximum_education,pricePerSession}= req.body;
 
     // check doctor
     const isDoctor = await prisma.doctor.findUnique({where:{id:DoctorId}})
@@ -153,7 +153,7 @@ try {
 
     //update information
     const info = await prisma.doctor.update({where:{id:DoctorId},data:{
-        email,country_code,contact_number,state,languages,specialities,experience,maximum_education,pricePerSession
+        email,country,contact_number,state,languages,specialities,experience,maximum_education,pricePerSession
 
     }})
 

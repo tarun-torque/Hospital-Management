@@ -65,10 +65,10 @@ const storage  = multer.diskStorage({
 
 // filter file types 
 const fileFilter = function(req,file,cb){
-    if(file.mimetype==='image/jpg' ||file.mimetype==='image/png'){
+    if(file.mimetype==='image/jpg' ||file.mimetype==='image/png' || file.mimetype==='application/zip'){
         cb(null,true)
     }else{
-        cb(new Error('Only JPG and PNG files are allowed'),false)
+        cb(new Error('Only JPG,PNG or Zip files are allowed'),false)
     }
 }
 
