@@ -394,10 +394,10 @@ export const register_manager = async (req, res) => {
 
      
         // check manager is present or not 
-        const isManager = await prisma.manager.findUnique({ where: { email } })
-        if (isManager) {
-            return res.status(400).json({ message: "Manager is already Present" })
-        }
+        // const isManager = await prisma.manager.findUnique({ where: { email } })
+        // if (isManager) {
+        //     return res.status(400).json({ message: "Manager is already Present" })
+        // }
 
         // check file  
         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
@@ -413,8 +413,7 @@ export const register_manager = async (req, res) => {
         const data = { name, username, email, states, countries, contact_number, password: hash_pswd, profile_path: fileInfo.path }
         //send token
         const savedData = await prisma.manager.create({ data })
-        // send token
-        const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
+        const token = jwt.sign(savedData, process.env.SECRET_KEY, { expiresIn: '999h' })
 
         // send mail to the manager
         const mailOptions = {
