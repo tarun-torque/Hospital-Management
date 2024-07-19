@@ -77,6 +77,8 @@ model Creator {
   article_content Article_content[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+  manager         manager?          @relation(fields: [managerId], references: [id])
+  managerId       Int?
 }
 
 // yt model
@@ -192,6 +194,7 @@ model Doctor {
   managerId         Int?
 }
 
+
 // manager model
 model manager {
   id             Int       @id @default(autoincrement())
@@ -205,7 +208,7 @@ model manager {
   password       String
   status         String?   @default("active")
   remarks        String?   @default("I am active")
-  // creators       Creator[]
+  creators       Creator[]
   doctors        Doctor[]
   service        Service[]
   createdAt      DateTime  @default(now())
