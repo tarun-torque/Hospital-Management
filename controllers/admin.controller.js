@@ -437,7 +437,7 @@ export const register_manager = async (req, res) => {
         res.status(400).json({ message: error })
     }
 }
-// get manager
+// get all manager
 export const getAllManager = async(req,res)=>{
     try {
 
@@ -452,6 +452,49 @@ export const getAllManager = async(req,res)=>{
     }
 }
 
+
+// get inactive manager
+export const getInactiveManager = async(req,res)=>{
+    try {
+        const inactiveManger  = await prisma.manager.findMany({where:{status:'inactive'}})
+        const count =  inactiveManger.length
+        const data  = {count,inactiveManger}
+        res.status(200).json({data})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// get temporary off manager
+export const getOffManager = async(req,res)=>{
+    try {
+        const offManager = await prisma.manager.findMany({where:{status:'temporary off'}})
+        const count = offManager.length
+        const data = {offManager,count}
+        res.status(200).json({offManager})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+// get active manager
+export const getActiveManager = async(req,res)=>{
+    try {
+        const offManager = await prisma.manager.findMany({where:{status:'active'}})
+        const count = offManager.length
+        const data = {offManager,count}
+        res.status(200).json({offManager})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+
 //delete manager 
 export const delete_manager = async(req,res)=>{
     try {
@@ -463,6 +506,7 @@ export const delete_manager = async(req,res)=>{
         console.log(error)
     }
 }
+
 
 // update manager
 export const updateManager = async(req,res)=>{
@@ -486,6 +530,105 @@ export const updateManager = async(req,res)=>{
         console.log(error)
     }
 }
+
+
+// update status of manager---temporary off
+export const setOffManager = async(req,res)=>{
+    try {
+        const managerId = +req.params.managerId;
+        const updateStatus = await prisma.manager.update({where:{id:managerId},data:{status:'temporary off'}})
+
+          // send mail to the manager
+          const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.name} your status has been changed to Temporary off `
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now manager ${updateStatus.name} changed to Temporay off `})
+            }
+        })
+       
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+// update status of manager---inactive
+export const setInactiveManager = async(req,res)=>{
+    try {
+        const managerId = +req.params.managerId;
+        const updateStatus = await prisma.manager.update({where:{id:managerId},data:{status:'inactive'}})
+
+         // send mail to the manager
+         const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.name} your status has been changed to Inactive off `
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now manager ${updateStatus.name} changed to Inactive`})
+                
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+// update remarks of manager 
+export const updateRemarks = async(req,res)=>{
+    try {
+        const managerId = +req.params.managerId;
+        const {remarks} = req.body;
+        const updateRemark = await prisma.manager.update({where:{id:managerId},data:{remarks:remarks}})
+
+         // send mail to the manager
+         const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateRemark.email}`,
+            subject: 'Remarks has been changed',
+            text: `Dear ${updateRemark.name} Greeting from Harmony your remarks is ${remarks}  `
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Remark of ${updateRemark.name} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Remark of ${updateRemark.name} updated and Email Sent`})
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+
+
 
 // register creator
 export const creator_profile = async (req, res) => {

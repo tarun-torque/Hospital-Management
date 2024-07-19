@@ -8,7 +8,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators } from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -146,9 +146,17 @@ router.get('/get/creators/stats',getCreators)
 
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
-router.get('/admin/get/all/manager',getAllManager)
 router.delete('/admin/delete/manager/:managerId',delete_manager)
 router.put('/admin/update/manager',updateManager)
+router.put('/admin/manager/status/inactive/:managerId',setInactiveManager)
+router.put('/admin/manager/status/temporayoff/:managerId',setOffManager)
+router.get('/admin/get/all/manager',getAllManager)
+router.get('/admin/get/active/manager',getActiveManager)
+router.get('/admin/get/inactive/managet',getInactiveManager)
+router.get('/admin/get/off/manager',getOffManager)
+
+
+
 
 // admin -patient routes
 router.get('/admin/filter/patient',filterPatient);
