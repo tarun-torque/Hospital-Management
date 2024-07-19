@@ -141,7 +141,7 @@ router.delete('/admin/delete/service/:serviceId',deleteService)
 router.delete('/admin/delete/category/:serviceId/:categoryId',deleteCategoryService)
 
 // admin-----creator api
-router.post('/admin/creatorProfile',upload.single('creator_picture'),creator_profile)
+router.post('/admin/creatorProfile/:managerId',upload.single('creator_picture'),creator_profile)
 router.get('/get/creators/stats',getCreators)
 
 // admin----manager api

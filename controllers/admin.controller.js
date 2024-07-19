@@ -490,6 +490,7 @@ export const creator_profile = async (req, res) => {
     try {
         // get data
         const { username, email, country, contact_number, state, language, password } = req.body;
+        const managerId = +req.params.managerId;
         const fileInfo = req.file;
 
         // creator is already present or not 
@@ -522,11 +523,11 @@ export const creator_profile = async (req, res) => {
             country,
             state,
             language,
+            managerId:managerId,
             password: hash_pswd,
             profile_path: fileInfo.path,
             profile_type: fileInfo.mimetype
         }
-
 
         // save in database
         const info = await prisma.creator.create({
