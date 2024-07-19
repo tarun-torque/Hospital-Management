@@ -442,7 +442,9 @@ export const getAllManager = async(req,res)=>{
     try {
 
         const alllManager = await prisma.manager.findMany({include:{creators:true,doctors:true,service:true}})
-        res.status(200).json({alllManager})
+        const count  =  alllManager.length
+        const data  = {count,alllManager}
+        res.status(200).json({data})
         
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
