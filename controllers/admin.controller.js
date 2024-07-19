@@ -594,6 +594,38 @@ export const setInactiveManager = async(req,res)=>{
     }
 }
 
+// update status of  manager ---active
+export const setActiveManager = async(req,res)=>{
+    try {
+        const managerId = +req.params.managerId;
+        const updateStatus = await prisma.manager.update({where:{id:managerId},data:{status:'active'}})
+
+         // send mail to the manager
+         const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.name} your status has been changed to Active `
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now manager ${updateStatus.name} changed to Active`})
+                
+            }
+        })
+
+        
+    } catch (error) {
+             res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
 
 // update remarks of manager 
 export const updateRemarks = async(req,res)=>{
