@@ -437,6 +437,7 @@ export const register_manager = async (req, res) => {
         res.status(400).json({ message: error })
     }
 }
+
 // get all manager
 export const getAllManager = async(req,res)=>{
     try {
@@ -451,7 +452,6 @@ export const getAllManager = async(req,res)=>{
         console.log(error)
     }
 }
-
 
 // get inactive manager
 export const getInactiveManager = async(req,res)=>{
@@ -479,7 +479,6 @@ export const getOffManager = async(req,res)=>{
     }
 }
 
-
 // get active manager
 export const getActiveManager = async(req,res)=>{
     try {
@@ -493,8 +492,6 @@ export const getActiveManager = async(req,res)=>{
     }
 }
 
-
-
 //delete manager 
 export const delete_manager = async(req,res)=>{
     try {
@@ -506,7 +503,6 @@ export const delete_manager = async(req,res)=>{
         console.log(error)
     }
 }
-
 
 // update manager
 export const updateManager = async(req,res)=>{
@@ -530,7 +526,6 @@ export const updateManager = async(req,res)=>{
         console.log(error)
     }
 }
-
 
 // update status of manager---temporary off
 export const setOffManager = async(req,res)=>{
@@ -561,7 +556,6 @@ export const setOffManager = async(req,res)=>{
         console.log(error)
     }
 }
-
 
 // update status of manager---inactive
 export const setInactiveManager = async(req,res)=>{
@@ -626,7 +620,6 @@ export const setActiveManager = async(req,res)=>{
     }
 }
 
-
 // update remarks of manager 
 export const updateRemarks = async(req,res)=>{
     try {
@@ -659,7 +652,7 @@ export const updateRemarks = async(req,res)=>{
 }
 
 
-
+// ------------------------------------------creator API of admin
 
 
 // register creator
@@ -760,57 +753,170 @@ export const getCreators  = async(req,res)=>{
     }
 }
 
-// set temporary off status
-// export const setTempoaryOffCreator = async(req,res)=>{
-//     try {
-//         const creatorId = +req.params.creatorId;
-//         const updateStatus  = await prisma.creator.update({where:{id:creator}})
-//         res.status(200).json({messag:`Status of ${updateStatus.username} changed to Temporary off`});
-        
-//     } catch (error) {
-//         res.status(400).json({ message: 'something went wrong' })
-//         console.log(error)
-//     }
-// }
-
-// set inactive status
-// export const setInactiveCreator  = async(req,res)=>{
-//     try {
-
-//         const updateStatus = await prisma.manager.update({where:})
-        
-//     } catch (error) {
-        
-//     }
-// } 
-// update remarks
-
-
-
-
-
-
-
-
-
-
-
-// assign creator to manager
-export const assignCreator = async(req,res)=>{
+// delete creator
+export const deleteCreator = async(req,res)=>{
     try {
-        
-        const creatorId = +req.params.creatorId;
-        const managerId = +req.params.managerId;
-        
+        const creatorId  = +req.params.creatorId;
+        const deleteManager = await prisma.manager.delete({where:{id:creatorId}})
+        res.status(200).json({message:'Creator has been deleted'})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// update status of creator --- inactive
+export const setInactiveCreator = async(req,res)=>{
+    try {
+        const creatorId =  +req.params.creatorId;
+        const updateStatus = await prisma.creator.update({where:{id:creatorId},data:{status:'inactive'}})
+
+         // send mail to the manager
+         const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.username} your status has been changed to Inactive off `
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Inactive`})
+            }
+        })
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// update status of creator ---temporary off
+export const setOffCreator = async(req,res)=>{
+    try {
+        const creatorId =  +req.params.creatorId;
+        const updateStatus = await prisma.creator.update({where:{id:creatorId},data:{status:'temporary off'}})
+
+         // send mail to the manager
+         const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.username} your status has been changed to Temporary`
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Temporary off`})
+            }
+        })
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
 
 
+// update status of creator ---active 
+export const setActiveCreator = async(req,res)=>{
+    try {
+        const creatorId =  +req.params.creatorId;
+        const updateStatus = await prisma.creator.update({where:{id:creatorId},data:{status:'active'}})
 
+         // send mail to the manager
+         const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.username} your status has been changed to Active`
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Active`})
+            }
+        })
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+// get all creators
+export const allCreators  = async(req,res)=>{
+    try {
+        const allCreators =  await prisma.creator.findMany({include:{yt_contents:true,blog_contents:true,article_content:true}})
+        const count = allCreators.length
+        const data = {count,allCreators}
+        res.status(200).json({data})
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// get active creators
+export const activeCreators = async(req,res)=>{
+    try {
+        const activeCreators = await prisma.creator.findMany({where:{status:'active'}})
+        const count = activeCreators.length
+        const data = {activeCreators,count}
+        res.status(200).json({data})
         
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
     }
 }
+
+// get inactive creators
+export const inactiveCreators = async(req,res)=>{
+    try {
+        const inactiveCreators = await prisma.creator.findMany({where:{status:'inactive'}})
+        const count = inactiveCreators.length
+        const data = {inactiveCreators,count}
+        res.status(200).json({data})
+        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+
+// get temporary off creators
+export const offCreators = async(req,res)=>{
+    try {
+        const offCreators = await prisma.creator.findMany({where:{status:'temporary off'}})
+        const count = offCreators.length
+        const data = {offCreators,count}
+        res.status(200).json({data})
+        
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+//update remark of creator
+
+
+
+
+
+
 
 
 

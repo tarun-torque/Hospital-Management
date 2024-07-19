@@ -147,13 +147,13 @@ router.get('/get/creators/stats',getCreators)
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
 router.delete('/admin/delete/manager/:managerId',delete_manager)
-router.put('/admin/update/manager',updateManager)
+router.put('/admin/update/manager/:managerId',updateManager)
 router.put('/admin/manager/status/inactive/:managerId',setInactiveManager)
 router.put('/admin/manager/status/temporayoff/:managerId',setOffManager)
 router.put('/admin/manager/status/active/:managerId',setActiveManager)
 router.get('/admin/get/all/manager',getAllManager)
 router.get('/admin/get/active/manager',getActiveManager)
-router.get('/admin/get/inactive/managet',getInactiveManager)
+router.get('/admin/get/inactive/manager',getInactiveManager)
 router.get('/admin/get/off/manager',getOffManager)
 router.put('/admin/update/remarks/:managerId',updateRemarks)
 
