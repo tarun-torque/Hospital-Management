@@ -652,8 +652,7 @@ export const updateRemarks = async(req,res)=>{
 }
 
 
-// ------------------------------------------creator API of admin
-
+// ----------------------------------------creator API of admin
 
 // register creator
 export const creator_profile = async (req, res) => {
@@ -817,12 +816,13 @@ export const setOffCreator = async(req,res)=>{
                 res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Temporary off`})
             }
         })
+
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
     }
 }
-
 
 // update status of creator ---active 
 export const setActiveCreator = async(req,res)=>{
@@ -847,20 +847,6 @@ export const setActiveCreator = async(req,res)=>{
                 res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Active`})
             }
         })
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-
-// get all creators
-export const allCreators  = async(req,res)=>{
-    try {
-        const allCreators =  await prisma.creator.findMany({include:{yt_contents:true,blog_contents:true,article_content:true}})
-        const count = allCreators.length
-        const data = {count,allCreators}
-        res.status(200).json({data})
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -895,7 +881,6 @@ export const inactiveCreators = async(req,res)=>{
     }
 }
 
-
 // get temporary off creators
 export const offCreators = async(req,res)=>{
     try {
@@ -911,9 +896,38 @@ export const offCreators = async(req,res)=>{
 }
 
 //update remark of creator
+export const updateRemarkCreator = async(req,res)=>{
+    try {
+        const creatorId = +req.params.creatorId;
+        const {remarks} = req.body;
+        const updateRemark = await prisma.creator.update({where:{id:creatorId},data:{remarks:remarks}})
+
+          // send mail to the creator
+          const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${updateStatus.email}`,
+            subject: 'Status has been changed',
+            text: `Dear ${updateStatus.username} your remark is ${remarks}`
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+                res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
+            } else {
+                console.log('Email sent')
+                res.status(200).json({message:`Now Creator ${updateStatus.username} remark changed`})
+            }
+        })      
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
 
 
-
+// actions on creator content
+export const 
 
 
 

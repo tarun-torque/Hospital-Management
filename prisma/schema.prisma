@@ -194,7 +194,6 @@ model Doctor {
   managerId         Int?
 }
 
-
 // manager model
 model manager {
   id             Int       @id @default(autoincrement())

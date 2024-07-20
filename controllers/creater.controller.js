@@ -11,8 +11,9 @@ export const login_creator = async (req, res) => {
     try {
 
         const { email, password } = req.body;
-
+        
         const isCreator = await prisma.creator.findUnique({ where: { email } })
+
         if (!isCreator) {
             return res.status(404).json({ message: 'Incorrect Email or Password' })
         }
@@ -24,19 +25,15 @@ export const login_creator = async (req, res) => {
         }
 
         const data = {
-            id: await prisma.creator.id,
+            id: isCreator.id,
             username: isCreator.username,
             email: isCreator.email,
             state: isCreator.state,
             language: isCreator.language,
             profile_path: isCreator.profile_path
         }
-
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-
         res.status(200).json({ messages: 'Logged In', token: token })
-
-
 
     } catch (error) {
         res.status(400).json({ message: error.message })
@@ -436,3 +433,6 @@ export const categoryContent = async (req, res) => {
  }
 
 }
+
+
+
