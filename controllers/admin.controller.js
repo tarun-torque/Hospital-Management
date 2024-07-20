@@ -927,7 +927,6 @@ export const updateRemarkCreator = async(req,res)=>{
 
 
 // actions on creator content
-export const 
 
 
 

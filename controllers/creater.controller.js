@@ -33,7 +33,7 @@ export const login_creator = async (req, res) => {
             profile_path: isCreator.profile_path
         }
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({ messages: 'Logged In', token: token })
+        res.status(200).json({ messages: 'Logged In', token: token,id:isCreator.id })
 
     } catch (error) {
         res.status(400).json({ message: error.message })
