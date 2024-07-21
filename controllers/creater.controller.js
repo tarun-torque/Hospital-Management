@@ -73,6 +73,7 @@ export const create_yt_Content = async (req, res) => {
 export const create_blog_content = async (req, res) => {
     try {
         // get id
+        const { heading, content, tags, category} = req.body
         const fileInfo = req.file;
         const id = +req.params.id;
         const creator = await prisma.creator.findUnique({ where: { id } })
@@ -87,9 +88,8 @@ export const create_blog_content = async (req, res) => {
         if ((type == 'image/png' || type == 'image/jpg') && (size <= 2)) {
 
             // construct the data
-            const { heading, content, tags, category } = req.body
-            const data = { blog_creatorId: creator.id, heading, content, tags, category, ImagePath: path, imageType: type }
-            // console.log(blogImage_path,imageType)
+            const data = { blog_creatorId: creator.id, heading, content, tags, category, blogImagePath: path, blogImageType: type }
+
             // // add in db
             const info = await prisma.blog_content.create({ data })
             res.status(201).json({ message: 'Blog is created successfully' })
@@ -99,11 +99,6 @@ export const create_blog_content = async (req, res) => {
         else {
             return res.status(405).json({ message: 'File size must be less than 2MB and should be png or jpg type' })
         }
-
-
-
-
-
 
     } catch (error) {
         console.log(error)
