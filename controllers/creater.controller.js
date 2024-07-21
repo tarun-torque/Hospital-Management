@@ -110,15 +110,16 @@ export const create_blog_content = async (req, res) => {
 // create article content
 export const create_arcticle_content = async (req, res) => {
     try {
+        const { heading, content, tags, category} = req.body;
         const id = +req.params.id;
+        const fileInfo = req.file;
         const creator = await prisma.creator.findUnique({ where: { id } })
 
         if (!creator) {
             res.send("Creator not found")
         }
 
-        const { heading, content, tags, category } = req.body;
-        const data = { heading, content, tags, category, article_creatorId: creator.id }
+        const data = { heading, content, tags, category, article_creatorId: creator.id,articleImagePath:req.file.path,articleImageType:req.file.mimetype }
 
         const info = await prisma.article_content.create({ data })
 
