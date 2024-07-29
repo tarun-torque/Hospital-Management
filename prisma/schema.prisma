@@ -48,7 +48,6 @@ model Service {
   manager              manager?   @relation(fields: [managerId], references: [id])
   managerId            Int?
 }
-
 model Category {
   id          Int      @id @default(autoincrement())
   name        String
