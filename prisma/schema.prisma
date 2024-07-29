@@ -213,4 +213,5 @@ model manager {
   service        Service[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
 }
