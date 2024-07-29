@@ -41,6 +41,9 @@ export const approveDoctorRequest = async (req, res) => {
     }
 }
 
+// assign manager to approve doctors
+
+
 // reject doctor request
 export const rejectDoctor = async (req, res) => {
     try {
@@ -73,6 +76,25 @@ export const rejectDoctor = async (req, res) => {
     }
 }
 
+
+// assingn manager to approve doctors
+export const assignManager_doctor = async(req,res)=>{
+    try {
+        const doctorId = +req.params.doctorId;
+        const {assignedManager} = req.body;
+        const isDoctor = await prisma.doctor.findUnique({where:{id:doctorId,verified:'yes'}})
+        if(! isDoctor){
+            return res.status(400).json({message:'Doctor is not verified'})
+        } 
+        const assigned = await prisma.doctor.update({where:{id:doctorId},data:{assignedManager}})
+        res.status(200).json({message:'Manager assigned Succesfully'})
+    
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
 // get rejected doctors
 export const getRejectedDoctors = async (req, res) => {
     try {
@@ -87,8 +109,6 @@ export const getRejectedDoctors = async (req, res) => {
         res.status(500).json({ message: 'Something went wrong' })
     }
 }
-
-
 
 // get pending doctors
 export const getPendingDoctors = async (req, res) => {
@@ -105,7 +125,6 @@ export const getPendingDoctors = async (req, res) => {
         console.log(error)
     }
 }
-
 
 // get approved doctors
 export const getApprovedDoctors = async (req, res) => {
@@ -658,8 +677,7 @@ export const updateRemarks = async(req,res)=>{
 export const creator_profile = async (req, res) => {
     try {
         // get data
-        const { username, email, country, contact_number, state, language, password } = req.body;
-        const managerId = +req.params.managerId;
+        const { username, email, country, contact_number, state, language, password,assignedManager} = req.body;
         const fileInfo = req.file;
 
         // creator is already present or not 
@@ -692,7 +710,7 @@ export const creator_profile = async (req, res) => {
             country,
             state,
             language,
-            managerId:managerId,
+            assignedManager:assignedManager,
             password: hash_pswd,
             profile_path: fileInfo.path,
             profile_type: fileInfo.mimetype
@@ -930,12 +948,6 @@ export const updateRemarkCreator = async(req,res)=>{
 
 
 
-
-
-
-
-
-
 // filter old and new patients
 export const filterPatient = async (req, res) => {
     try {
@@ -964,3 +976,6 @@ export const allPatient  = async(req,res)=>{
         res.status(400).json({ messages: error.message })
     }
 }
+
+
+// active,pending,unpublished,rejected,need improvement

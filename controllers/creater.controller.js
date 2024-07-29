@@ -4,6 +4,7 @@ import prisma from '../DB/db.config.js'
 import vine from '@vinejs/vine';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { messages } from '@vinejs/vine/defaults';
 
 
 // login creator
@@ -44,9 +45,8 @@ export const login_creator = async (req, res) => {
 export const create_yt_Content = async (req, res) => {
     try {
 
-        const id = +req.params.id
         const { iframe, heading, content, tags, category } = req.body;
-
+        const id = +req.params.id
         const creator = await prisma.creator.findUnique({
             where: {
                 id
@@ -57,8 +57,7 @@ export const create_yt_Content = async (req, res) => {
             res.send("Creator not Found")
         }
 
-        const data = { yt_creatorId: creator.id, iframe, heading, content, tags, category }
-
+        const data = { yt_creatorId: creator.id,iframe,heading,content,tags,category }
         const info = await prisma.yt_content.create({ data })
         res.status(201).json({ message: 'Youtube content is created Succesfully' })
 
@@ -123,8 +122,7 @@ export const create_arcticle_content = async (req, res) => {
 
         const info = await prisma.article_content.create({ data })
 
-        res.send(info)
-
+        res.status(201).json({message:'Article created succesfully'})
     } catch (error) {
         console.log(error)
 

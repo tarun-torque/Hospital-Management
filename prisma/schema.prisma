@@ -77,8 +77,8 @@ model Creator {
   article_content Article_content[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  manager         manager?          @relation(fields: [managerId], references: [id])
-  managerId       Int?
+  manager         manager?          @relation(fields: [assignedManager], references: [username])
+  assignedManager String
 }
 
 // yt model
@@ -178,6 +178,7 @@ model Doctor {
   password          String
   country           String
   contact_number    String
+  gender            String
   state             String
   languages         String[]
   specialities      String[]
@@ -190,8 +191,8 @@ model Doctor {
   remarks           String?  @default("I am active")
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  manager           manager? @relation(fields: [managerId], references: [id])
-  managerId         Int?
+  manager           manager? @relation(fields: [assignedManager], references: [username])
+  assignedManager   String?
 }
 
 // manager model

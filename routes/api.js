@@ -8,7 +8,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator } from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -95,6 +95,7 @@ router.get('/filter/language/content',languagePost)
 router.get('/filter/category/content',categoryContent)
 
 
+
 // doctor api
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
 router.post('/doctor/login',doctorLogin)
@@ -118,6 +119,7 @@ router.get('/get/:patientId/mood',get_mood)
 // admin routes
 //-----doctor api
 router.put('/admin/approveDoctorRequest/:DoctorId',approveDoctorRequest)
+router.put('/admin/assign/manager/doctor/:doctorId',assignManager_doctor)
 router.put('/admin/reject/doctor/request/:DoctorId',rejectDoctor)
 router.get('/admin/getPendingDoctors',getPendingDoctors)
 router.get('/admin/get/rejectedDoctors',getRejectedDoctors)
@@ -134,7 +136,7 @@ router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',update_ContentCategory)
 
 
-router.post('/admin/create/service',upload.single('serviceImage'),createService)
+router.post('/admin/create/service/:managerId',upload.single('serviceImage'),createService)
 router.post('/admin/create/service/:serviceId/category',upload.single('serviceCategoryImage'),servieCategory)
 router.get('/admin/get/service/stats',getService)
 router.delete('/admin/delete/service/:serviceId',deleteService)
@@ -142,7 +144,7 @@ router.delete('/admin/delete/category/:serviceId/:categoryId',deleteCategoryServ
 
 
 // admin-----creator api
-router.post('/admin/creatorProfile/:managerId',upload.single('creator_picture'),creator_profile)
+router.post('/admin/creatorProfile',upload.single('creator_picture'),creator_profile)
 router.get('/admin/get/all/creators',getCreators)
 router.delete('/admin/delete/creator/:creatorId',deleteCreator)
 router.put('/admin/creator/starus/inactive/:creatorId',setInactiveCreator)
