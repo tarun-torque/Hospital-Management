@@ -11,11 +11,5 @@ ALTER TABLE "Service" DROP CONSTRAINT "Service_managerId_fkey";
 -- AlterTable
 ALTER TABLE "Service" DROP COLUMN "managerId";
 
--- AlterTable
-ALTER TABLE "manager" ADD COLUMN     "service" TEXT[];
-
 -- CreateIndex
 CREATE UNIQUE INDEX "Service_title_key" ON "Service"("title");
-
--- AddForeignKey
-ALTER TABLE "manager" ADD CONSTRAINT "manager_service_fkey" FOREIGN KEY ("service") REFERENCES "Service"("title") ON DELETE SET NULL ON UPDATE CASCADE;

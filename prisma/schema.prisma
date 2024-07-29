@@ -33,7 +33,7 @@ model ContentCategory {
 // service model 
 model Service {
   id                   Int        @id @default(autoincrement())
-  title                String
+  title                String @unique
   imagePath            String
   description          String
   tags                 String[]
@@ -42,12 +42,11 @@ model Service {
   benefits             String[]
   languages            String[]
   duration             Int
-  category             Category[]
+  categories           Category[]
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
-  manager              manager?   @relation(fields: [managerId], references: [id])
-  managerId            Int?
 }
+
 model Category {
   id          Int      @id @default(autoincrement())
   name        String
@@ -209,8 +208,6 @@ model manager {
   remarks        String?   @default("I am active")
   creators       Creator[]
   doctors        Doctor[]
-  service        Service[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-
 }
