@@ -542,22 +542,53 @@ export const delete_manager = async(req,res)=>{
     }
 }
 
-// update manager
-export const updateManager = async(req,res)=>{
+
+// update manager profile
+export const updateManager = async (req, res) => {
     try {
         const managerId = +req.params.managerId;
         const { name, username, email, state, countries, contact_number } = req.body;
         const fileInfo = req.file;
 
-          // check file  
-          const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+        const updatedData = {}
+        if (name) {
+            updatedData.name = name
+        }
+        if (username) {
+            updatedData.username = username
+        }
+        if (email) {
+            updatedData.email = email
+        }
+        if (state) {
+            updatedData.state = state
+        }
+        if (countries) {
+            updatedData.countries = countries
+        }
+        if (contact_number) {
+            updatedData.contact_number = contact_number
+        }
 
-          if (!isFile) {
-              return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
-          }
+        if (fileInfo) {
 
-          const updateManager = await prisma.manager.update({where:{id:managerId},data:{profile_path:fileInfo.path,name, username, email, state, country, contact_number:BigInt(contact_number)}})
-          res.status(200).json({message:'Manager Profile has been updated'})
+            // check file  
+            const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+            if (!isFile) {
+                return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+            }
+
+            updatedData.profile_path = fileInfo.path
+        }
+
+        
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({ message: 'No valid fields to update' });
+        }
+
+        const updateManager = await prisma.manager.update({ where: { id: managerId }, data:updatedData})
+        res.status(200).json({ message: 'Manager Profile has been updated' })
 
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
