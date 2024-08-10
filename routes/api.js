@@ -133,7 +133,7 @@ router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
 router.post('/admin/create/content/category',upload.single('contentCategoryImage'),contentCategory)
 router.get('/all/content/categories',getContentCategory)
 router.delete('/admin/delete/category/:CategoryId',deleteCategory)
-router.put('/admin/update/category/:CategoryId',update_ContentCategory)
+router.put('/admin/update/category/:CategoryId',upload.single('contentCategoryImage'),update_ContentCategory)
 
 
 router.post('/admin/create/service/:managerId',upload.single('serviceImage'),createService)
