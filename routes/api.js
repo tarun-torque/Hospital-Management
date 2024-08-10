@@ -160,7 +160,7 @@ router.put('/admin/update/remarks/:creatorId',updateRemarkCreator)
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
 router.delete('/admin/delete/manager/:managerId',delete_manager)
-router.put('/admin/update/manager/:managerId',updateManager)
+router.put('/admin/update/manager/:managerId',upload.single('managerProfile'),updateManager)
 router.put('/admin/manager/status/inactive/:managerId',setInactiveManager)
 router.put('/admin/manager/status/temporayoff/:managerId',setOffManager)
 router.put('/admin/manager/status/active/:managerId',setActiveManager)
