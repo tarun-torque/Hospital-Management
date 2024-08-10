@@ -356,8 +356,6 @@ export const delete_blog = async (req, res) => {
 }
 
 
-// update creator profile
-
 // search creator including posts by username
 export const search_creator = async (req, res) => {
     try {
@@ -390,7 +388,7 @@ export const search_creator = async (req, res) => {
 // filter content by states
 export const stateContent = async (req, res) => {
     try {
-        const { state } = req.body;
+        const { state } = req.query;
         const stateContent = await prisma.creator.findMany({
             where: {
                 state
@@ -418,7 +416,7 @@ export const languagePost = async (req, res) => {
 
     try {
 
-        const { language } = req.body;
+        const { language } = req.query;
         const languageContent = await prisma.creator.findMany({
             where: {
                 language: {
@@ -449,7 +447,7 @@ export const languagePost = async (req, res) => {
 // filter by category
 export const categoryContent = async (req, res) => {
  try {
-    const {category} = req.body;
+    const {category} = req.query;
     const ytContent =  await prisma.yt_content.findMany({
       where:{
           category:{
