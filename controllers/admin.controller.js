@@ -213,23 +213,49 @@ export const contentCategory = async (req, res) => {
 }
 
 // update content Category
+// update content Category
 export const update_ContentCategory = async (req, res) => {
     try {
         const CategoryId = +req.params.CategoryId;
         const fileInfo = req.file;
         const { category, description } = req.body;
-        // check file
-        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
-        if (!isFile) {
-            return res.status(400).json({ message: 'Image should be jpg/png and size less than 2MB' })
+
+   
+        const updateData = {};
+
+
+        if (category) {
+            updateData.category = category;
         }
-        const update = await prisma.contentCategory.update({ where: { id: CategoryId }, data: { category: category, description: description, image_path: req.file.path } })
-        res.status(200).json({ message: 'Category has been updated' })
+        if (description) {
+            updateData.description = description;
+        }
+        if (fileInfo) {
+           
+            const isFileValid = (fileInfo.mimetype === 'image/png' || fileInfo.mimetype === 'image/jpeg') && (fileInfo.size / (1024 * 1024)) <= 2;
+            if (!isFileValid) {
+                return res.status(400).json({ message: 'Image should be jpg/png and size less than 2MB' });
+            }
+            updateData.image_path = fileInfo.path;
+        }
+
+   
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'No valid fields to update' });
+        }
+
+        // Update category 
+        const update = await prisma.contentCategory.update({
+            where: { id: CategoryId },
+            data: updateData
+        });
+
+        res.status(200).json({ message: 'Category has been updated', data: update });
     } catch (error) {
-        res.status(400).json({ message: error })
-        console.log(error)
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while updating the category', error: error.message });
     }
-}
+};
 
 // delete category
 export const deleteCategory = async (req, res) => {
