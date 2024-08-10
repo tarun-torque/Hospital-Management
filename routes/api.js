@@ -8,7 +8,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor } from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile } from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -81,9 +81,9 @@ router.post('/user/:id/createBlogContent', upload.single('blogImage'), create_bl
 router.post('/user/:id/createArticleContent', upload.single('articleImage'), create_arcticle_content)
 router.get('/user/:id/getProfile',get_profile)
 router.get('/user/:id/getAllContent', get_all_content)
-router.put('/user/:userId/updateArticle/:articleId', update_article)
+router.put('/user/:userId/updateArticle/:articleId',upload.single('articleImage'),update_article)
 router.put('/user/:creatorId/updateYt/:ytId', update_yt)
-router.put('/user/:creatorId/updateBlog/:blogId', update_blog)
+router.put('/user/:creatorId/updateBlog/:blogId',upload.single('blogImage'),update_blog)
 router.delete('/user/:creatorId/deleteYt/:ytId', delete_yt)
 router.delete('/user/:creatorId/deleteArticle/:articleId', delete_article)
 router.delete('/user/:creatorId/deleteBlog/:blogId', delete_blog)
@@ -143,6 +143,7 @@ router.delete('/admin/delete/category/:serviceId/:categoryId',deleteCategoryServ
 
 // admin-----creator api
 router.post('/admin/creatorProfile',upload.single('creator_picture'),creator_profile)
+router.put('/admin/update/creator/profile/:creatorId',upload.single('creator_picture'),updateCreatorProfile)
 router.get('/admin/get/all/creators',getCreators)
 router.delete('/admin/delete/creator/:creatorId',deleteCreator)
 router.put('/admin/creator/starus/inactive/:creatorId',setInactiveCreator)

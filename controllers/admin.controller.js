@@ -722,12 +722,11 @@ export const updateRemarks = async(req,res)=>{
 
 
 // ----------------------------------------creator API of admin
-
 // register creator
 export const creator_profile = async (req, res) => {
     try {
         // get data
-        const { username, email, country, contact_number, state, language, password,assignedManager} = req.body;
+        const { username, email, country, contact_number, state, language, password, assignedManager } = req.body;
         const fileInfo = req.file;
 
         // creator is already present or not 
@@ -739,7 +738,6 @@ export const creator_profile = async (req, res) => {
         if (isEmail) {
             return res.status(409).json({ message: `Email ${email} is already registered ` })
         }
-
 
         // check file  
         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
@@ -760,7 +758,7 @@ export const creator_profile = async (req, res) => {
             country,
             state,
             language,
-            assignedManager:assignedManager,
+            assignedManager: assignedManager,
             password: hash_pswd,
             profile_path: fileInfo.path,
             profile_type: fileInfo.mimetype
@@ -806,6 +804,58 @@ export const creator_profile = async (req, res) => {
     }
 }
 
+// update creator profile
+export const updateCreatorProfile = async (req, res) => {
+    try {
+        const creatorId = +req.params.creatorId
+        const { username, email, country, state, languages, contact_number } = req.body;
+        const fileInfo = req.file;
+
+        const updatedData = {}
+
+        if (username) {
+            updatedData.username = username
+        }
+        if (email) {
+            updatedData.email = email
+        }
+        if (country) {
+            updatedData.country = country
+        }
+        if (state) {
+            updatedData.state = state
+        }
+        if (languages) {
+            updatedData.languages = languages
+        }
+        if (contact_number) {
+            updatedData.contact_number = contact_number
+        }
+
+        if (fileInfo) {
+            const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+            if (!isFile) {
+                return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+            }
+
+            updatedData.profile_path=fileInfo.path
+            updatedData.profile_type=fileInfo.mimetype
+
+        }
+
+        if(Object.keys(updatedData).length==0){
+            return res.status(400).json({message:"No valid field to update"})
+        }
+
+        const updateCreator = await prisma.creator.update({where:{id:creatorId},data:updatedData})
+        res.status(200).json({message:"Profile updated succesfully"})
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
 // get creators
 export const getCreators  = async(req,res)=>{
     try {

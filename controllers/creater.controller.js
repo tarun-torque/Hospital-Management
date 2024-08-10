@@ -178,30 +178,57 @@ export const get_all_content = async (req, res) => {
 
 // update article
 export const update_article = async (req, res) => {
-
+    try{
     const articleId = +req.params.articleId
     const userId = +req.params.userId;
     const { heading, content, tags, category } = req.body;
+    const fileInfo = req.file;
 
-    // check creator with the giver ids is present or not
-    // const isCreator = await prisma.article_content.findUnique({ 
-    //     where: { 
-    //         some:{
-    //             AND:{id:articleId,article_creatorId:userId}
-    //         })
+    const updatedData = {}
 
-    // if( ! isCreator){
-    //     res.send("No record With this information")
-    // }
+    if (heading) {
+        updatedData.heading = heading
+    }
+
+    if (content) {
+        updatedData.content = content
+    }
+    if (tags) {
+        updatedData.tags = tags
+    }
+    if (category) {
+        updatedData.category = category
+    }
+
+    if (fileInfo) {
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+        if (!isFile) {
+            return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+        }
+
+        updatedData.articleImagePath=fileInfo.path
+        updatedData.articleImageType=fileInfo.type
+        
+    }
+
+    if(Object.keys(updatedData).length==0){
+        return res.status(400).json({message:"No valid field to update"})
+    }
+
 
     // update the article
     const updateArticle = await prisma.article_content.update({
         where: { id: articleId, article_creatorId: userId },
-        data: { heading, content, tags, category }
+        data: updatedData
     })
 
-    res.send("Article Updated Succesfully")
-
+    res.status(200).json({message:"Article updated Succesfully"})
+}
+catch(error){
+    res.status(400).json({messages:'Something went wrong'})
+    console.log(error)
+}
 }
 
 // update yt content
@@ -225,8 +252,8 @@ export const update_yt = async (req, res) => {
     } catch (error) {
         console.log(error)
     }
-}
 
+}
 
 // update blogs
 export const update_blog = async (req, res) => {
@@ -234,19 +261,55 @@ export const update_blog = async (req, res) => {
         const creatorId = +req.params.creatorId;
         const blogId = +req.params.blogId
         const { heading, content, tags, category } = req.body;
+        const fileInfo = req.file
+
+        const updatedData = {}
+
+        if(heading){
+            updatedData.heading=heading
+        }
+        
+        if(content){
+            updatedData.content=content
+        }
+
+        if(tags){
+            updatedData.tags=tags
+        }
+        if(category){
+            updatedData.category=category
+        }
+
+        if (fileInfo) {
+            const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+    
+            if (!isFile) {
+                return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+            }
+    
+            updatedData.blogImagePath=fileInfo.path
+            updatedData.blogImageType=fileInfo.type
+            
+        }
+
+        if(Object.keys(updatedData).length==0){
+            return res.status(400).json({message:'NO valid Field to update'})
+        }
 
         // check user and post is present or not
         const updateBlog = await prisma.blog_content.update({
             where: { id: blogId, blog_creatorId: creatorId },
-            data: { heading, content, tags, category }
+            data:updatedData
         })
 
-        res.send("Blog updated succesfully")
+        res.status(200).json({message:"Blog updated"})
 
     } catch (error) {
-
+        res.status(400).json({messages:'Something went wrong'})
+        console.log(error)
     }
 }
+
 
 
 // delete yt
