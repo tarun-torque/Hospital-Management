@@ -1079,3 +1079,58 @@ export const allPatient  = async(req,res)=>{
 
 
 // active,pending,unpublished,rejected,need improvement
+
+
+
+
+
+
+
+
+
+
+// get content according to status
+export const statusOfContent = async (req, res) => {
+
+    try {
+        const { status } = req.query;
+
+        const yt = await prisma.yt_content.findMany({
+            where: {
+                verified: status
+            }
+        });
+
+        const blog = await prisma.blog_content.findMany({
+            where: {
+                verified: status
+            }
+        });
+
+
+        const articles = await prisma.article_content.findMany({
+            where: {
+                verified: status
+            }
+        });
+
+
+        if (articles.length == 0 && blog == 0 && yt == 0) {
+            return res.status(404).json({ message: `No ${status} content` })
+        }
+
+        const ytCount = yt.length
+        const blogCount = blog.length
+        const articleCount = articles.length
+
+
+        const content = { articles, blog, yt,ytCount,blogCount,articleCount }
+        res.status(200).json({ message: content })
+
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
