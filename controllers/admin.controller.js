@@ -438,7 +438,7 @@ export const register_manager = async (req, res) => {
         const fileInfo = req.file;
 
         // check file  
-        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
 
         if (!isFile) {
             return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
@@ -550,7 +550,7 @@ export const updateManager = async(req,res)=>{
         const fileInfo = req.file;
 
           // check file  
-          const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+          const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
 
           if (!isFile) {
               return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
@@ -711,7 +711,7 @@ export const creator_profile = async (req, res) => {
 
 
         // check file  
-        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size / (1024 * 1024)) <= 2)
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
 
         if (!isFile) {
             return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
