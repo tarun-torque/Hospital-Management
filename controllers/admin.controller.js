@@ -211,7 +211,7 @@ export const contentCategory = async (req, res) => {
     }
 }
 
-// update content Category
+
 // update content Category
 export const update_ContentCategory = async (req, res) => {
     try {
@@ -340,19 +340,65 @@ export const servieCategory = async (req, res) => {
 export const update_service = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
-        const file = req.file;
+        const fileInfo = req.file;
         const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
-        // check service image
-        const type = file.mimetype;
-        const size = file.size / (1024 * 1024)  //size in MB
-        const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
-        if (!checkFile) {
-            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
+
+        const updatedData = {}
+        
+        if (title) {
+            updatedData.title = title
         }
 
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration, imagePath: file.path }
-        const newService = await prisma.service.update({ where: { id: serviceId }, data: { data } })
-        res.status(201).json({ message: 'service has been updated' })
+        if (description) {
+            updatedData.description = description
+        }
+
+        if (tags) {
+            updatedData.tags = tags
+        }
+
+        if (subtitle) {
+            updatedData.subtitle = subtitle
+        }
+
+        if (what_we_will_discuss) {
+            updatedData.what_we_will_discuss = what_we_will_discuss
+        }
+
+        if (benefits) {
+            updatedData.benefits = benefits
+        }
+
+        if (languages) {
+            updatedData.languages = languages
+        }
+
+        if (duration) {
+            updatedData.duration = parseInt(duration)
+        }
+
+        if (fileInfo) {
+
+            // check service image
+            const type = file.mimetype;
+            const size = file.size / (1024 * 1024)  //size in MB
+            const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
+            if (!checkFile) {
+                return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
+            }
+            updatedData.imagePath=fileInfo.path
+        }
+
+        console.log('Updated Data:', updatedData);
+
+        if(Object.keys(updatedData).length === 0){
+            return res.status(404).json({message:'No valid field to update'})
+        }
+
+        const updateService = await prisma.service.update({ where: { id: serviceId }, data: updatedData })
+        res.status(200).json({ message: 'service has been updated' })
+
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
