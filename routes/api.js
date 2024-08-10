@@ -21,8 +21,6 @@ function ensureDirectoryExistence(filePath){
     ensureDirectoryExistence(dirname)
     fs.mkdirSync(dirname)  
 }
-
-
 // multer storage
 const storage  = multer.diskStorage({
     destination:function(req,file,cb){
