@@ -9,7 +9,6 @@ import contentCategory_validation from '../validations/validatons.js'
 import { messages } from '@vinejs/vine/defaults'
 import { json } from 'express'
 
-
 // approve request of doctor
 export const approveDoctorRequest = async (req, res) => {
     try {
