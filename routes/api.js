@@ -153,6 +153,7 @@ router.get('/admin/get/active/creator',activeCreators)
 router.get('/admin/get/inactive/creator',inactiveCreators)
 router.get('/admin/get/temporayoff/creator',offCreators)
 router.put('/admin/update/remarks/:creatorId',updateRemarkCreator)
+router.get('/get/content/status',statusOfContent)
 
 
 
