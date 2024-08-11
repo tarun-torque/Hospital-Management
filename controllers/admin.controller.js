@@ -77,17 +77,17 @@ export const rejectDoctor = async (req, res) => {
 
 
 // assingn manager to approve doctors
-export const assignManager_doctor = async(req,res)=>{
+export const assignManager_doctor = async (req, res) => {
     try {
         const doctorId = +req.params.doctorId;
-        const {assignedManager} = req.body;
-        const isDoctor = await prisma.doctor.findUnique({where:{id:doctorId,verified:'yes'}})
-        if(! isDoctor){
-            return res.status(400).json({message:'Doctor is not verified'})
-        } 
-        const assigned = await prisma.doctor.update({where:{id:doctorId},data:{assignedManager}})
-        res.status(200).json({message:'Manager assigned Succesfully'})
-    
+        const { assignedManager } = req.body;
+        const isDoctor = await prisma.doctor.findUnique({ where: { id: doctorId, verified: 'yes' } })
+        if (!isDoctor) {
+            return res.status(400).json({ message: 'Doctor is not verified' })
+        }
+        const assigned = await prisma.doctor.update({ where: { id: doctorId }, data: { assignedManager } })
+        res.status(200).json({ message: 'Manager assigned Succesfully' })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -219,7 +219,7 @@ export const update_ContentCategory = async (req, res) => {
         const fileInfo = req.file;
         const { category, description } = req.body;
 
-   
+
         const updateData = {};
 
 
@@ -230,7 +230,7 @@ export const update_ContentCategory = async (req, res) => {
             updateData.description = description;
         }
         if (fileInfo) {
-           
+
             const isFileValid = (fileInfo.mimetype === 'image/png' || fileInfo.mimetype === 'image/jpeg') && (fileInfo.size / (1024 * 1024)) <= 2;
             if (!isFileValid) {
                 return res.status(400).json({ message: 'Image should be jpg/png and size less than 2MB' });
@@ -238,7 +238,7 @@ export const update_ContentCategory = async (req, res) => {
             updateData.image_path = fileInfo.path;
         }
 
-   
+
         if (Object.keys(updateData).length === 0) {
             return res.status(400).json({ message: 'No valid fields to update' });
         }
@@ -275,7 +275,7 @@ export const getContentCategory = async (req, res) => {
 
         const allCategory = await prisma.contentCategory.findMany()
         const categoriesCount = allCategory.length
-        const data  =  {allCategory,categoriesCount}
+        const data = { allCategory, categoriesCount }
         res.status(200).json({ data })
 
     } catch (error) {
@@ -297,9 +297,9 @@ export const createService = async (req, res) => {
         if (!checkFile) {
             return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
-        
 
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration:intDuration, imagePath: file.path }
+
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration: intDuration, imagePath: file.path }
 
         const createService = await prisma.service.create({ data })
         res.status(201).json({ createService })
@@ -344,7 +344,7 @@ export const update_service = async (req, res) => {
         const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
 
         const updatedData = {}
-        
+
         if (title) {
             updatedData.title = title
         }
@@ -386,13 +386,13 @@ export const update_service = async (req, res) => {
             if (!checkFile) {
                 return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
             }
-            updatedData.imagePath=fileInfo.path
+            updatedData.imagePath = fileInfo.path
         }
 
         console.log('Updated Data:', updatedData);
 
-        if(Object.keys(updatedData).length === 0){
-            return res.status(404).json({message:'No valid field to update'})
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(404).json({ message: 'No valid field to update' })
         }
 
         const updateService = await prisma.service.update({ where: { id: serviceId }, data: updatedData })
@@ -430,30 +430,30 @@ export const update_serviceCategory = async (req, res) => {
 }
 
 // get all service/categories and stats
- export const getService  = async(req,res)=>{
+export const getService = async (req, res) => {
     try {
-        const allServices = await prisma.service.findMany({include:{category:true}})
-        const allCategory  = await prisma.category.findMany()
-        const serviceCount =  allServices.length
+        const allServices = await prisma.service.findMany({ include: { category: true } })
+        const allCategory = await prisma.category.findMany()
+        const serviceCount = allServices.length
         const categoriesCount = allCategory.length
-        const data = {serviceCount,categoriesCount,allServices}
+        const data = { serviceCount, categoriesCount, allServices }
 
-        res.status(200).json({data})
-        
+        res.status(200).json({ data })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
     }
- }
+}
 
 // delete service 
-export const deleteService = async(req,res)=>{
+export const deleteService = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
-        const deleteService  = await prisma.service.delete({where:{id:serviceId}})
-        const deleteCategory = await prisma.category.delete({where:{serviceId}})
-        res.status(200).json({message:`Service ${deleteService.title} has been deleted`})
-        
+        const deleteService = await prisma.service.delete({ where: { id: serviceId } })
+        const deleteCategory = await prisma.category.delete({ where: { serviceId } })
+        res.status(200).json({ message: `Service ${deleteService.title} has been deleted` })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -461,13 +461,13 @@ export const deleteService = async(req,res)=>{
 }
 
 // delete category of service
-export const deleteCategoryService = async(req,res)=>{
+export const deleteCategoryService = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
         const categoryId = +req.params.categoryId;
 
-        const deleteCategory  = await prisma.category.delete({where:{serviceId:serviceId,id:categoryId}})
-        res.status(200).json({message:`Service Category ${deleteCategory.name} has been deleted`})
+        const deleteCategory = await prisma.category.delete({ where: { serviceId: serviceId, id: categoryId } })
+        res.status(200).json({ message: `Service Category ${deleteCategory.name} has been deleted` })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -522,14 +522,14 @@ export const register_manager = async (req, res) => {
 }
 
 // get all manager
-export const getAllManager = async(req,res)=>{
+export const getAllManager = async (req, res) => {
     try {
 
-        const alllManager = await prisma.manager.findMany({include:{creators:true,doctors:true,service:true}})
-        const count  =  alllManager.length
-        const data  = {count,alllManager}
-        res.status(200).json({data})
-        
+        const alllManager = await prisma.manager.findMany({ include: { creators: true, doctors: true, service: true } })
+        const count = alllManager.length
+        const data = { count, alllManager }
+        res.status(200).json({ data })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -537,12 +537,12 @@ export const getAllManager = async(req,res)=>{
 }
 
 // get inactive manager
-export const getInactiveManager = async(req,res)=>{
+export const getInactiveManager = async (req, res) => {
     try {
-        const inactiveManger  = await prisma.manager.findMany({where:{status:'inactive'}})
-        const count =  inactiveManger.length
-        const data  = {count,inactiveManger}
-        res.status(200).json({data})
+        const inactiveManger = await prisma.manager.findMany({ where: { status: 'inactive' } })
+        const count = inactiveManger.length
+        const data = { count, inactiveManger }
+        res.status(200).json({ data })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -550,12 +550,12 @@ export const getInactiveManager = async(req,res)=>{
 }
 
 // get temporary off manager
-export const getOffManager = async(req,res)=>{
+export const getOffManager = async (req, res) => {
     try {
-        const offManager = await prisma.manager.findMany({where:{status:'temporary off'}})
+        const offManager = await prisma.manager.findMany({ where: { status: 'temporary off' } })
         const count = offManager.length
-        const data = {offManager,count}
-        res.status(200).json({offManager})
+        const data = { offManager, count }
+        res.status(200).json({ offManager })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -563,12 +563,12 @@ export const getOffManager = async(req,res)=>{
 }
 
 // get active manager
-export const getActiveManager = async(req,res)=>{
+export const getActiveManager = async (req, res) => {
     try {
-        const offManager = await prisma.manager.findMany({where:{status:'active'}})
+        const offManager = await prisma.manager.findMany({ where: { status: 'active' } })
         const count = offManager.length
-        const data = {offManager,count}
-        res.status(200).json({offManager})
+        const data = { offManager, count }
+        res.status(200).json({ offManager })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -576,11 +576,11 @@ export const getActiveManager = async(req,res)=>{
 }
 
 //delete manager 
-export const delete_manager = async(req,res)=>{
+export const delete_manager = async (req, res) => {
     try {
-        const managerId  = +req.params.managerId;
-        const deleteManager  = await prisma.manager.delete({where:{id:managerId}})
-        res.status(200).json({message:`Manager ${deleteManager.name} has been deleted`})
+        const managerId = +req.params.managerId;
+        const deleteManager = await prisma.manager.delete({ where: { id: managerId } })
+        res.status(200).json({ message: `Manager ${deleteManager.name} has been deleted` })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -627,12 +627,12 @@ export const updateManager = async (req, res) => {
             updatedData.profile_path = fileInfo.path
         }
 
-        
+
         if (Object.keys(updatedData).length === 0) {
             return res.status(400).json({ message: 'No valid fields to update' });
         }
 
-        const updateManager = await prisma.manager.update({ where: { id: managerId }, data:updatedData})
+        const updateManager = await prisma.manager.update({ where: { id: managerId }, data: updatedData })
         res.status(200).json({ message: 'Manager Profile has been updated' })
 
     } catch (error) {
@@ -642,13 +642,13 @@ export const updateManager = async (req, res) => {
 }
 
 // update status of manager---temporary off
-export const setOffManager = async(req,res)=>{
+export const setOffManager = async (req, res) => {
     try {
         const managerId = +req.params.managerId;
-        const updateStatus = await prisma.manager.update({where:{id:managerId},data:{status:'temporary off'}})
+        const updateStatus = await prisma.manager.update({ where: { id: managerId }, data: { status: 'temporary off' } })
 
-          // send mail to the manager
-          const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -661,10 +661,10 @@ export const setOffManager = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now manager ${updateStatus.name} changed to Temporay off `})
+                res.status(200).json({ message: `Now manager ${updateStatus.name} changed to Temporay off ` })
             }
         })
-       
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -672,13 +672,13 @@ export const setOffManager = async(req,res)=>{
 }
 
 // update status of manager---inactive
-export const setInactiveManager = async(req,res)=>{
+export const setInactiveManager = async (req, res) => {
     try {
         const managerId = +req.params.managerId;
-        const updateStatus = await prisma.manager.update({where:{id:managerId},data:{status:'inactive'}})
+        const updateStatus = await prisma.manager.update({ where: { id: managerId }, data: { status: 'inactive' } })
 
-         // send mail to the manager
-         const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -691,8 +691,8 @@ export const setInactiveManager = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now manager ${updateStatus.name} changed to Inactive`})
-                
+                res.status(200).json({ message: `Now manager ${updateStatus.name} changed to Inactive` })
+
             }
         })
 
@@ -703,13 +703,13 @@ export const setInactiveManager = async(req,res)=>{
 }
 
 // update status of  manager ---active
-export const setActiveManager = async(req,res)=>{
+export const setActiveManager = async (req, res) => {
     try {
         const managerId = +req.params.managerId;
-        const updateStatus = await prisma.manager.update({where:{id:managerId},data:{status:'active'}})
+        const updateStatus = await prisma.manager.update({ where: { id: managerId }, data: { status: 'active' } })
 
-         // send mail to the manager
-         const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -722,27 +722,27 @@ export const setActiveManager = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now manager ${updateStatus.name} changed to Active`})
-                
+                res.status(200).json({ message: `Now manager ${updateStatus.name} changed to Active` })
+
             }
         })
 
-        
+
     } catch (error) {
-             res.status(400).json({ message: 'something went wrong' })
+        res.status(400).json({ message: 'something went wrong' })
         console.log(error)
     }
 }
 
 // update remarks of manager 
-export const updateRemarks = async(req,res)=>{
+export const updateRemarks = async (req, res) => {
     try {
         const managerId = +req.params.managerId;
-        const {remarks} = req.body;
-        const updateRemark = await prisma.manager.update({where:{id:managerId},data:{remarks:remarks}})
+        const { remarks } = req.body;
+        const updateRemark = await prisma.manager.update({ where: { id: managerId }, data: { remarks: remarks } })
 
-         // send mail to the manager
-         const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateRemark.email}`,
             subject: 'Remarks has been changed',
@@ -755,7 +755,7 @@ export const updateRemarks = async(req,res)=>{
                 res.status(500).json({ message: `Remark of ${updateRemark.name} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Remark of ${updateRemark.name} updated and Email Sent`})
+                res.status(200).json({ message: `Remark of ${updateRemark.name} updated and Email Sent` })
             }
         })
 
@@ -884,17 +884,17 @@ export const updateCreatorProfile = async (req, res) => {
                 return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
             }
 
-            updatedData.profile_path=fileInfo.path
-            updatedData.profile_type=fileInfo.mimetype
+            updatedData.profile_path = fileInfo.path
+            updatedData.profile_type = fileInfo.mimetype
 
         }
 
-        if(Object.keys(updatedData).length==0){
-            return res.status(400).json({message:"No valid field to update"})
+        if (Object.keys(updatedData).length == 0) {
+            return res.status(400).json({ message: "No valid field to update" })
         }
 
-        const updateCreator = await prisma.creator.update({where:{id:creatorId},data:updatedData})
-        res.status(200).json({message:"Profile updated succesfully"})
+        const updateCreator = await prisma.creator.update({ where: { id: creatorId }, data: updatedData })
+        res.status(200).json({ message: "Profile updated succesfully" })
 
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
@@ -902,13 +902,13 @@ export const updateCreatorProfile = async (req, res) => {
     }
 }
 // get creators
-export const getCreators  = async(req,res)=>{
+export const getCreators = async (req, res) => {
     try {
-        
-        const allCreators = await prisma.creator.findMany({include:{yt_contents:true,blog_contents:true,article_content:true}})
+
+        const allCreators = await prisma.creator.findMany({ include: { yt_contents: true, blog_contents: true, article_content: true } })
         const count = allCreators.length
-        const data = {allCreators,count}
-        res.status(200).json({data})        
+        const data = { allCreators, count }
+        res.status(200).json({ data })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -916,11 +916,11 @@ export const getCreators  = async(req,res)=>{
 }
 
 // delete creator
-export const deleteCreator = async(req,res)=>{
+export const deleteCreator = async (req, res) => {
     try {
-        const creatorId  = +req.params.creatorId;
-        const deleteManager = await prisma.manager.delete({where:{id:creatorId}})
-        res.status(200).json({message:'Creator has been deleted'})
+        const creatorId = +req.params.creatorId;
+        const deleteManager = await prisma.manager.delete({ where: { id: creatorId } })
+        res.status(200).json({ message: 'Creator has been deleted' })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -928,13 +928,13 @@ export const deleteCreator = async(req,res)=>{
 }
 
 // update status of creator --- inactive
-export const setInactiveCreator = async(req,res)=>{
+export const setInactiveCreator = async (req, res) => {
     try {
-        const creatorId =  +req.params.creatorId;
-        const updateStatus = await prisma.creator.update({where:{id:creatorId},data:{status:'inactive'}})
+        const creatorId = +req.params.creatorId;
+        const updateStatus = await prisma.creator.update({ where: { id: creatorId }, data: { status: 'inactive' } })
 
-         // send mail to the manager
-         const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -947,7 +947,7 @@ export const setInactiveCreator = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Inactive`})
+                res.status(200).json({ message: `Now Creator ${updateStatus.username} changed to Inactive` })
             }
         })
     } catch (error) {
@@ -957,13 +957,13 @@ export const setInactiveCreator = async(req,res)=>{
 }
 
 // update status of creator ---temporary off
-export const setOffCreator = async(req,res)=>{
+export const setOffCreator = async (req, res) => {
     try {
-        const creatorId =  +req.params.creatorId;
-        const updateStatus = await prisma.creator.update({where:{id:creatorId},data:{status:'temporary off'}})
+        const creatorId = +req.params.creatorId;
+        const updateStatus = await prisma.creator.update({ where: { id: creatorId }, data: { status: 'temporary off' } })
 
-         // send mail to the manager
-         const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -976,7 +976,7 @@ export const setOffCreator = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Temporary off`})
+                res.status(200).json({ message: `Now Creator ${updateStatus.username} changed to Temporary off` })
             }
         })
 
@@ -988,13 +988,13 @@ export const setOffCreator = async(req,res)=>{
 }
 
 // update status of creator ---active 
-export const setActiveCreator = async(req,res)=>{
+export const setActiveCreator = async (req, res) => {
     try {
-        const creatorId =  +req.params.creatorId;
-        const updateStatus = await prisma.creator.update({where:{id:creatorId},data:{status:'active'}})
+        const creatorId = +req.params.creatorId;
+        const updateStatus = await prisma.creator.update({ where: { id: creatorId }, data: { status: 'active' } })
 
-         // send mail to the manager
-         const mailOptions = {
+        // send mail to the manager
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -1007,7 +1007,7 @@ export const setActiveCreator = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now Creator ${updateStatus.username} changed to Active`})
+                res.status(200).json({ message: `Now Creator ${updateStatus.username} changed to Active` })
             }
         })
     } catch (error) {
@@ -1017,13 +1017,13 @@ export const setActiveCreator = async(req,res)=>{
 }
 
 // get active creators
-export const activeCreators = async(req,res)=>{
+export const activeCreators = async (req, res) => {
     try {
-        const activeCreators = await prisma.creator.findMany({where:{status:'active'}})
+        const activeCreators = await prisma.creator.findMany({ where: { status: 'active' } })
         const count = activeCreators.length
-        const data = {activeCreators,count}
-        res.status(200).json({data})
-        
+        const data = { activeCreators, count }
+        res.status(200).json({ data })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -1031,13 +1031,13 @@ export const activeCreators = async(req,res)=>{
 }
 
 // get inactive creators
-export const inactiveCreators = async(req,res)=>{
+export const inactiveCreators = async (req, res) => {
     try {
-        const inactiveCreators = await prisma.creator.findMany({where:{status:'inactive'}})
+        const inactiveCreators = await prisma.creator.findMany({ where: { status: 'inactive' } })
         const count = inactiveCreators.length
-        const data = {inactiveCreators,count}
-        res.status(200).json({data})
-        
+        const data = { inactiveCreators, count }
+        res.status(200).json({ data })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -1045,13 +1045,13 @@ export const inactiveCreators = async(req,res)=>{
 }
 
 // get temporary off creators
-export const offCreators = async(req,res)=>{
+export const offCreators = async (req, res) => {
     try {
-        const offCreators = await prisma.creator.findMany({where:{status:'temporary off'}})
+        const offCreators = await prisma.creator.findMany({ where: { status: 'temporary off' } })
         const count = offCreators.length
-        const data = {offCreators,count}
-        res.status(200).json({data})
-        
+        const data = { offCreators, count }
+        res.status(200).json({ data })
+
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -1059,14 +1059,14 @@ export const offCreators = async(req,res)=>{
 }
 
 //update remark of creator
-export const updateRemarkCreator = async(req,res)=>{
+export const updateRemarkCreator = async (req, res) => {
     try {
         const creatorId = +req.params.creatorId;
-        const {remarks} = req.body;
-        const updateRemark = await prisma.creator.update({where:{id:creatorId},data:{remarks:remarks}})
+        const { remarks } = req.body;
+        const updateRemark = await prisma.creator.update({ where: { id: creatorId }, data: { remarks: remarks } })
 
-          // send mail to the creator
-          const mailOptions = {
+        // send mail to the creator
+        const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${updateStatus.email}`,
             subject: 'Status has been changed',
@@ -1079,9 +1079,9 @@ export const updateRemarkCreator = async(req,res)=>{
                 res.status(500).json({ message: `Status of ${updateStatus.username} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({message:`Now Creator ${updateStatus.username} remark changed`})
+                res.status(200).json({ message: `Now Creator ${updateStatus.username} remark changed` })
             }
-        })      
+        })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
         console.log(error)
@@ -1097,9 +1097,9 @@ export const updateRemarkCreator = async(req,res)=>{
 export const filterPatient = async (req, res) => {
     try {
         const { new_patient } = req.query;
-        const filteredPatients = await prisma.patient.findMany({ where: { new_patient },include:{support:true} })
+        const filteredPatients = await prisma.patient.findMany({ where: { new_patient }, include: { support: true } })
         const count = filteredPatients.length
-        const data = {filteredPatients,count}
+        const data = { filteredPatients, count }
         res.status(200).json({ data })
 
     } catch (error) {
@@ -1109,13 +1109,218 @@ export const filterPatient = async (req, res) => {
 }
 
 // get all patients
-export const allPatient  = async(req,res)=>{
+export const allPatient = async (req, res) => {
     try {
-        const allPatient = await prisma.patient.findMany({include:{support:true}})
-        const count  = allPatient.length
-        const data  = {allPatient,count}
-        res.status(200).json({data})
-        
+        const allPatient = await prisma.patient.findMany({ include: { support: true } })
+        const count = allPatient.length
+        const data = { allPatient, count }
+        res.status(200).json({ data })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ messages: error.message })
+    }
+}
+// Action of Admin on content----------------------------------------------------------------------------
+
+
+// publish,pending,unpublished,rejected,improve
+// ---------------for articles 
+export const articleAction = async (req, res) => {
+    try {
+
+        const creatorId = +req.params.creatorId;
+        const blogId = +req.params.articleId;
+        const { action } = req.query;
+
+        //get email of creator
+        const isCreator = await prisma.creator.findUnique({ where: { id: creatorId } })
+        if (!isCreator) {
+            return res.status(404).json({ message: 'Creator not found' })
+        }
+
+        // changed to publish
+        const updateStatus = await prisma.article_content.update({
+            where: { article_creatorId: creatorId, id: articleId },
+            data: { verified: action }
+        })
+
+        //send email to creator
+        if (action == 'improve') {
+            const { reason } = req.body;
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: `${isCreator.email}`,
+                subject: 'Content Status has been changed',
+                text: `Dear ${isCreator.username} your Article : ${updateStatus.heading} need improvement :  ${reason}   `
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ message: `Status of ${isCreator.username} changed but Email not sent` });
+                } else {
+                    console.log('Email sent')
+                    res.status(200).json({ message: `Content of  ${isCreator.username} changed to ${action}` })
+                }
+            })
+        }
+
+        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action=='pending') {
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: `${isCreator.email}`,
+                subject: 'Content Status has been changed',
+                text: `Dear ${isCreator.username} your Article : ${updateStatus.heading} Status Changed to ${action}   `
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ message: `Status of ${isCreator.username} changed but Email not sent` });
+                } else {
+                    console.log('Email sent')
+                    res.status(200).json({ message: `Content of  ${isCreator.username} changed to ${action}` })
+                }
+            })
+
+
+        }
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ messages: error.message })
+    }
+}
+
+// ---------------for blogs
+export const blogAction = async (req, res) => {
+    try {
+
+        const creatorId = +req.params.creatorId;
+        const blogId = +req.params.blogId;
+        const { action } = req.query;
+
+        //get email of creator
+        const isCreator = await prisma.creator.findUnique({ where: { id: creatorId } })
+        if (!isCreator) {
+            return res.status(404).json({ message: 'Creator not found' })
+        }
+
+        // changed to publish
+        const updateStatus = await prisma.blog_content.update({
+            where: { blog_creatorId: creatorId, id: blogId },
+            data: { verified: action }
+        })
+
+        //send email to creator
+        if (action == 'improve') {
+            const { reason } = req.body;
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: `${isCreator.email}`,
+                subject: 'Content Status has been changed',
+                text: `Dear ${isCreator.username} your Blog : ${updateStatus.heading} need improvement :  ${reason}   `
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ message: `Status of ${isCreator.username} changed but Email not sent` });
+                } else {
+                    console.log('Email sent')
+                    res.status(200).json({ message: `Content of  ${isCreator.username} changed to ${action}` })
+                }
+            })
+        }
+
+        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action=='pending') {
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: `${isCreator.email}`,
+                subject: 'Content Status has been changed',
+                text: `Dear ${isCreator.username} your Blog : ${updateStatus.heading} Status Changed to ${action}   `
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ message: `Status of ${isCreator.username} changed but Email not sent` });
+                } else {
+                    console.log('Email sent')
+                    res.status(200).json({ message: `Content of  ${isCreator.username} changed to ${action}` })
+                }
+            })
+
+
+        }
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ messages: error.message })
+    }
+}
+// ---------------for yt content
+export const ytAction = async (req, res) => {
+    try {
+
+        const creatorId = +req.params.creatorId;
+        const ytId = +req.params.ytId;
+        const { action } = req.query;
+
+        //get email of creator
+        const isCreator = await prisma.creator.findUnique({ where: { id: creatorId } })
+        if (!isCreator) {
+            return res.status(404).json({ message: 'Creator not found' })
+        }
+
+        // changed to publish
+        const updateStatus = await prisma.yt_content.update({
+            where: { yt_creatorId: creatorId, id: ytId },
+            data: { verified: action }
+        })
+
+        //send email to creator
+        if (action == 'improve') {
+            const { reason } = req.body;
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: `${isCreator.email}`,
+                subject: 'Content Status has been changed',
+                text: `Dear ${isCreator.username} your YouTube content : ${updateStatus.heading} need improvement :  ${reason}   `
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ message: `Status of ${isCreator.username} changed but Email not sent` });
+                } else {
+                    console.log('Email sent')
+                    res.status(200).json({ message: `Content of  ${isCreator.username} changed to ${action}` })
+                }
+            })
+        }
+
+        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action=='pending') {
+            const mailOptions = {
+                from: process.env.ADMIN_EMAIL,
+                to: `${isCreator.email}`,
+                subject: 'Content Status has been changed',
+                text: `Dear ${isCreator.username} your YouTube : ${updateStatus.heading} Status Changed to ${action}   `
+            }
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ message: `Status of ${isCreator.username} changed but Email not sent` });
+                } else {
+                    console.log('Email sent')
+                    res.status(200).json({ message: `Content of  ${isCreator.username} changed to ${action}` })
+                }
+            })
+        }
+
     } catch (error) {
         console.log(error)
         res.status(400).json({ messages: error.message })
@@ -1123,7 +1328,6 @@ export const allPatient  = async(req,res)=>{
 }
 
 
-// active,pending,unpublished,rejected,need improvement
 
 
 
@@ -1132,9 +1336,7 @@ export const allPatient  = async(req,res)=>{
 
 
 
-
-
-// get content according to status
+// get content according to status------------------ pending,publish,rejected,
 export const statusOfContent = async (req, res) => {
 
     try {
@@ -1169,7 +1371,7 @@ export const statusOfContent = async (req, res) => {
         const articleCount = articles.length
 
 
-        const content = { articles, blog, yt,ytCount,blogCount,articleCount }
+        const content = { articles, blog, yt, ytCount, blogCount, articleCount }
         res.status(200).json({ message: content })
 
 
