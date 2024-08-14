@@ -159,8 +159,6 @@ router.put('/article/action/:creatorId/:articleId',articleAction)
 router.put('/blog/action/:creatorId/:blogId',blogAction)
 router.put('yt/action/:ytId/:ytId',ytAction)
 
-
-
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
 router.delete('/admin/delete/manager/:managerId',delete_manager)
