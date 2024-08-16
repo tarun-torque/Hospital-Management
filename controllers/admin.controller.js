@@ -432,7 +432,7 @@ export const update_serviceCategory = async (req, res) => {
 // get all service/categories and stats
 export const getService = async (req, res) => {
     try {
-        const allServices = await prisma.service.findMany({ include: { category: true } })
+        const allServices = await prisma.service.findMany()
         const allCategory = await prisma.category.findMany()
         const serviceCount = allServices.length
         const categoriesCount = allCategory.length
