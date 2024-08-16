@@ -451,7 +451,7 @@ export const deleteService = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
         const deleteService = await prisma.service.delete({ where: { id: serviceId } })
-        const deleteCategory = await prisma.category.delete({ where: { serviceId } })
+        // const deleteCategory = await prisma.category.delete({ where: { serviceId } })
         res.status(200).json({ message: `Service ${deleteService.title} has been deleted` })
 
     } catch (error) {
