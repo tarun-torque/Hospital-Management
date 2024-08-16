@@ -436,7 +436,7 @@ export const getService = async (req, res) => {
         const allCategory = await prisma.category.findMany()
         const serviceCount = allServices.length
         const categoriesCount = allCategory.length
-        const data = { serviceCount, categoriesCount, allServices }
+        const data = { serviceCount, categoriesCount, allServices,allCategory }
 
         res.status(200).json({ data })
 
