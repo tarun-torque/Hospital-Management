@@ -293,7 +293,7 @@ export const createService = async (req, res) => {
         // check service image
         const type = file.mimetype;
         const size = file.size / (1024 * 1024)  //size in MB
-        const checkFile = ((type == 'image/jpg' || type == 'image/png') && (size <= 2))
+        const checkFile = ((type == 'image/jpeg' || type == 'image/png') && (size <= 2))
         if (!checkFile) {
             return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
