@@ -525,7 +525,7 @@ export const register_manager = async (req, res) => {
 export const getAllManager = async (req, res) => {
     try {
 
-        const alllManager = await prisma.manager.findMany({ include: { creators: true, doctors: true, service: true } })
+        const alllManager = await prisma.manager.findMany({ include: { creators: true, doctors: true } })
         const count = alllManager.length
         const data = { count, alllManager }
         res.status(200).json({ data })
