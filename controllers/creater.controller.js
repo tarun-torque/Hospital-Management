@@ -12,7 +12,7 @@ export const login_creator = async (req, res) => {
     try {
 
         const { email, password } = req.body;
-        
+
         const isCreator = await prisma.creator.findUnique({ where: { email } })
 
         if (!isCreator) {
@@ -34,7 +34,7 @@ export const login_creator = async (req, res) => {
             profile_path: isCreator.profile_path
         }
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({ messages: 'Logged In', token: token,id:isCreator.id })
+        res.status(200).json({ messages: 'Logged In', token: token, id: isCreator.id })
 
     } catch (error) {
         res.status(400).json({ message: error.message })
@@ -57,7 +57,7 @@ export const create_yt_Content = async (req, res) => {
             res.send("Creator not Found")
         }
 
-        const data = { yt_creatorId: creator.id,iframe,heading,content,tags,category }
+        const data = { yt_creatorId: creator.id, iframe, heading, content, tags, category }
         const info = await prisma.yt_content.create({ data })
         res.status(201).json({ message: 'Youtube content is created Succesfully' })
 
@@ -72,44 +72,34 @@ export const create_yt_Content = async (req, res) => {
 export const create_blog_content = async (req, res) => {
     try {
         // get id
-        const { heading, content, tags, category} = req.body
-        const fileInfo = req.file;
+        const { content, tags, category } = req.body
         const id = +req.params.id;
         const creator = await prisma.creator.findUnique({ where: { id } })
         if (!creator) {
             return res.send("creator is not found")
         }
 
-        const type = req.file.mimetype;
-        const path = req.file.path;
-        const size = (req.file.size) / (1024 * 1024); //file size in MB
 
-        if ((type == 'image/png' || type == 'image/jpg') && (size <= 2)) {
 
-            // construct the data
-            const data = { blog_creatorId: creator.id, heading, content, tags, category, blogImagePath: path, blogImageType: type }
+        // construct the data
+        const data = { blog_creatorId: creator.id, content, tags, category }
 
-            // // add in db
-            const info = await prisma.blog_content.create({ data })
-            res.status(201).json({ message: 'Blog is created successfully' })
+        // // add in db
+        const info = await prisma.blog_content.create({ data })
+        res.status(201).json({ message: 'Blog is created successfully' })
 
-        }
-
-        else {
-            return res.status(405).json({ message: 'File size must be less than 2MB and should be png or jpg type' })
-        }
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: 'Failed to create blog content' });
-    }
+    console.log(error)
+    res.status(500).json({ error: 'Failed to create blog content' });
+}
 
 }
 
 // create article content
 export const create_arcticle_content = async (req, res) => {
     try {
-        const { heading, content, tags, category} = req.body;
+        const { heading, content, tags, category } = req.body;
         const id = +req.params.id;
         const fileInfo = req.file;
         const creator = await prisma.creator.findUnique({ where: { id } })
@@ -118,11 +108,11 @@ export const create_arcticle_content = async (req, res) => {
             res.send("Creator not found")
         }
 
-        const data = { heading, content, tags, category, article_creatorId: creator.id,articleImagePath:req.file.path,articleImageType:req.file.mimetype }
+        const data = { heading, content, tags, category, article_creatorId: creator.id, articleImagePath: req.file.path, articleImageType: req.file.mimetype }
 
         const info = await prisma.article_content.create({ data })
 
-        res.status(201).json({message:'Article created succesfully'})
+        res.status(201).json({ message: 'Article created succesfully' })
     } catch (error) {
         console.log(error)
 
@@ -178,57 +168,57 @@ export const get_all_content = async (req, res) => {
 
 // update article
 export const update_article = async (req, res) => {
-    try{
-    const articleId = +req.params.articleId
-    const userId = +req.params.userId;
-    const { heading, content, tags, category } = req.body;
-    const fileInfo = req.file;
+    try {
+        const articleId = +req.params.articleId
+        const userId = +req.params.userId;
+        const { heading, content, tags, category } = req.body;
+        const fileInfo = req.file;
 
-    const updatedData = {}
+        const updatedData = {}
 
-    if (heading) {
-        updatedData.heading = heading
-    }
-
-    if (content) {
-        updatedData.content = content
-    }
-    if (tags) {
-        updatedData.tags = tags
-    }
-    if (category) {
-        updatedData.category = category
-    }
-
-    if (fileInfo) {
-        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
-
-        if (!isFile) {
-            return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+        if (heading) {
+            updatedData.heading = heading
         }
 
-        updatedData.articleImagePath=fileInfo.path
-        updatedData.articleImageType=fileInfo.type
-        
+        if (content) {
+            updatedData.content = content
+        }
+        if (tags) {
+            updatedData.tags = tags
+        }
+        if (category) {
+            updatedData.category = category
+        }
+
+        if (fileInfo) {
+            const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+
+            if (!isFile) {
+                return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
+            }
+
+            updatedData.articleImagePath = fileInfo.path
+            updatedData.articleImageType = fileInfo.type
+
+        }
+
+        if (Object.keys(updatedData).length == 0) {
+            return res.status(400).json({ message: "No valid field to update" })
+        }
+
+
+        // update the article
+        const updateArticle = await prisma.article_content.update({
+            where: { id: articleId, article_creatorId: userId },
+            data: updatedData
+        })
+
+        res.status(200).json({ message: "Article updated Succesfully" })
     }
-
-    if(Object.keys(updatedData).length==0){
-        return res.status(400).json({message:"No valid field to update"})
+    catch (error) {
+        res.status(400).json({ messages: 'Something went wrong' })
+        console.log(error)
     }
-
-
-    // update the article
-    const updateArticle = await prisma.article_content.update({
-        where: { id: articleId, article_creatorId: userId },
-        data: updatedData
-    })
-
-    res.status(200).json({message:"Article updated Succesfully"})
-}
-catch(error){
-    res.status(400).json({messages:'Something went wrong'})
-    console.log(error)
-}
 }
 
 // update yt content
@@ -260,52 +250,36 @@ export const update_blog = async (req, res) => {
     try {
         const creatorId = +req.params.creatorId;
         const blogId = +req.params.blogId
-        const { heading, content, tags, category } = req.body;
-        const fileInfo = req.file
+        const {content, tags, category } = req.body;
+     
 
         const updatedData = {}
 
-        if(heading){
-            updatedData.heading=heading
-        }
-        
-        if(content){
-            updatedData.content=content
+        if (content) {
+            updatedData.content = content
         }
 
-        if(tags){
-            updatedData.tags=tags
+        if (tags) {
+            updatedData.tags = tags
         }
-        if(category){
-            updatedData.category=category
-        }
-
-        if (fileInfo) {
-            const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
-    
-            if (!isFile) {
-                return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
-            }
-    
-            updatedData.blogImagePath=fileInfo.path
-            updatedData.blogImageType=fileInfo.type
-            
+        if (category) {
+            updatedData.category = category
         }
 
-        if(Object.keys(updatedData).length==0){
-            return res.status(400).json({message:'NO valid Field to update'})
+        if (Object.keys(updatedData).length == 0) {
+            return res.status(400).json({ message: 'NO valid Field to update' })
         }
 
         // check user and post is present or not
         const updateBlog = await prisma.blog_content.update({
             where: { id: blogId, blog_creatorId: creatorId },
-            data:updatedData
+            data: updatedData
         })
 
-        res.status(200).json({message:"Blog updated"})
+        res.status(200).json({ message: "Blog updated" })
 
     } catch (error) {
-        res.status(400).json({messages:'Something went wrong'})
+        res.status(400).json({ messages: 'Something went wrong' })
         console.log(error)
     }
 }
@@ -423,18 +397,18 @@ export const languagePost = async (req, res) => {
                     has: language
                 }
             },
-            select:{
-                yt_contents:true,
-                blog_contents:true,
-                article_content:true
+            select: {
+                yt_contents: true,
+                blog_contents: true,
+                article_content: true
             }
         })
-        
-        if(languageContent.length==0){
-            return res.status(404).json({message:`Content of ${language} language is not found`})
+
+        if (languageContent.length == 0) {
+            return res.status(404).json({ message: `Content of ${language} language is not found` })
         }
 
-        res.status(200).json({languageContent})
+        res.status(200).json({ languageContent })
 
     } catch (error) {
         console.log(error)
@@ -446,46 +420,46 @@ export const languagePost = async (req, res) => {
 
 // filter by category
 export const categoryContent = async (req, res) => {
- try {
-    const {category} = req.query;
-    const ytContent =  await prisma.yt_content.findMany({
-      where:{
-          category:{
-              has:category
-          }
-      }
-    })
-
-    const blogContent =  await prisma.blog_content.findMany({
-        where:{
-            category:{
-                has:category
+    try {
+        const { category } = req.query;
+        const ytContent = await prisma.yt_content.findMany({
+            where: {
+                category: {
+                    has: category
+                }
             }
-        }
-      })
+        })
 
-      const articleContent =  await prisma.article_content.findMany({
-        where:{
-            category:{
-                has:category
+        const blogContent = await prisma.blog_content.findMany({
+            where: {
+                category: {
+                    has: category
+                }
             }
+        })
+
+        const articleContent = await prisma.article_content.findMany({
+            where: {
+                category: {
+                    has: category
+                }
+            }
+        })
+
+
+        if (ytContent.length == 0 && blogContent.length == 0 && ytContent.length == 0) {
+            return res.status(404).json({ message: `Content of ${category} category is not found` })
         }
-      })
 
-    
-      if(ytContent.length==0 && blogContent.length==0 &&ytContent.length==0 ){
-        return res.status(404).json({message:`Content of ${category} category is not found`})
-      }
+        const filtered = [{ articleContent: articleContent }, { blogContent: blogContent }, { ytContent: ytContent }]
 
-      const filtered = [{articleContent:articleContent},{blogContent:blogContent},{ytContent:ytContent}]
+        res.status(200).json({ filtered })
 
-      res.status(200).json({filtered})
 
-    
- } catch (error) {
-    console.log(error)
-    res.status(400).json({message:error.message})
- }
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
 
 }
 

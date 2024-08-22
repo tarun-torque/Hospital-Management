@@ -44,14 +44,11 @@ const storage  = multer.diskStorage({
         else if(req.baseUrl==='/api/createDoctorProfile'){
             uploadPath = path.join(uploadPath,'doctorProfile')
         }
-        else if(req.baseUrl==='/api/user/:id/createBlogContent'){
-            uploadPath = path.join(uploadPath,'blogImage')
+        else if(req.baseUrl==='/api/admin/creatorProfile'){
+            uploadPath = path.join(uploadPath,'creatorProfile')
         }
         else if(req.baseUrl==='/api/user/:id/createArticleContent'){
             uploadPath = path.join(uploadPath,'articleImage')
-        }
-        else if(req.baseUrl==='/api/admin/creatorProfile'){
-            uploadPath = path.join(uploadPath,'creatorProfile')
         }
         
         cb(null,uploadPath)
@@ -77,13 +74,13 @@ const upload = multer({storage:storage,fileFilter:fileFilter})
 // creator api
 router.post('/login/creator',login_creator)
 router.post('/user/:id/createYtContent', create_yt_Content)
-router.post('/user/:id/createBlogContent', upload.single('blogImage'), create_blog_content)
-router.post('/user/:id/createArticleContent', upload.single('articleImage'), create_arcticle_content)
+router.post('/user/:id/createBlogContent', create_blog_content)
+router.post('/user/:id/createArticleContent',upload.single('articleImage') , create_arcticle_content)
 router.get('/user/:id/getProfile',get_profile)
 router.get('/user/:id/getAllContent', get_all_content)
 router.put('/user/:userId/updateArticle/:articleId',upload.single('articleImage'),update_article)
 router.put('/user/:creatorId/updateYt/:ytId', update_yt)
-router.put('/user/:creatorId/updateBlog/:blogId',upload.single('blogImage'),update_blog)
+router.put('/user/:creatorId/updateBlog/:blogId',update_blog)
 router.delete('/user/:creatorId/deleteYt/:ytId', delete_yt)
 router.delete('/user/:creatorId/deleteArticle/:articleId', delete_article)
 router.delete('/user/:creatorId/deleteBlog/:blogId', delete_blog)

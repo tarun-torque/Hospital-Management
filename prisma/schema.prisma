@@ -113,10 +113,7 @@ model Article_content {
 // blogs model
 model Blog_content {
   id             Int      @id @default(autoincrement())
-  heading        String
   content        String
-  blogImagePath  String
-  blogImageType  String
   tags           String[] //multi
   category       String[] //multi
   verified       String   @default("pending") //active,pending,unpublish,rejected,need improvement
