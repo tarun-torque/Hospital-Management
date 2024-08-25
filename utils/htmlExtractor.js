@@ -15,11 +15,17 @@ const extractContent = (htmlContent) => {
     const paragraphs = Array.from(document.querySelectorAll('p')).map(p => p.textContent.trim());
     const images = Array.from(document.querySelectorAll('img')).map(img => img.src);
 
+    const lists = Array.from(document.querySelectorAll('ol')).map(ol => {
+        return Array.from(ol.querySelectorAll('li')).map(li => li.textContent.trim());
+    });
+    
+
 
     return {
         headings,
         paragraphs,
-        images
+        images,
+        lists
     };
 }
 
