@@ -185,7 +185,7 @@ export const get_blogs = async(req,res)=>{
                           blog_creatorId:blogs.blog_creatorId
                          }
         
-    return res.status(200).json({msg:blogData})
+    return res.status(200).json({blogData})
         
     } catch (error) {
         console.log(error)
