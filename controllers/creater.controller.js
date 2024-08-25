@@ -5,7 +5,7 @@ import vine from '@vinejs/vine';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { messages } from '@vinejs/vine/defaults';
-
+import extractContent from '../utils/htmlExtractor.js';
 
 // login creator
 export const login_creator = async (req, res) => {
@@ -139,7 +139,7 @@ export const get_profile = async (req, res) => {
 
 }
 
-// get all content 
+// get all content excluding blogs
 export const get_all_content = async (req, res) => {
 
     try {
@@ -148,7 +148,6 @@ export const get_all_content = async (req, res) => {
             where: { id },
             include: {
                 yt_contents: true,
-                blog_contents: true,
                 article_content: true
             }
         })
@@ -160,11 +159,41 @@ export const get_all_content = async (req, res) => {
 
     } catch (error) {
         console.log(error)
-
     }
 
-
 }
+
+// get blogs
+export const get_blogs = async(req,res)=>{
+    try {
+        const id = +req.params.id
+
+        const blogs = await prisma.blog_content.findMany({where:{blog_creatorId:id}})
+        if(! blogs){
+            return res.status(404).json({msg:'No Blogs found'})
+        }
+
+        const extracedtContent = extractContent(blogs.content)
+        const blogData =   {
+                          id:blogs.id,
+                          tags:blogs.tags,
+                          category:blogs.category,
+                          data:extracedtContent,
+                          verified:blogs.verified,
+                          createdAt:blogs.createdAt,
+                          updatedAt:blogs.updatedAt,
+                          blog_creatorId:blogs.blog_creatorId
+                         }
+        
+    return res.status(200).json({msg:blogData})
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
 
 // update article
 export const update_article = async (req, res) => {
