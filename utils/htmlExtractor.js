@@ -1,9 +1,9 @@
-import jsdom from jsdom
+import jsdom from 'jsdom'
 const {JSDOM} = jsdom
 
  const extractContent = (htmlContent) =>{
     const dom =  new JSDOM(htmlContent)
-    const document = dom.wimndow.document
+    const document = dom.window.document
 
     const heading = {}
     for(let i=1;i<=6;i++){
