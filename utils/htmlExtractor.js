@@ -1,22 +1,30 @@
-import jsdom from 'jsdom'
-const {JSDOM} = jsdom
+import jsdom from 'jsdom';
+const { JSDOM } = jsdom;
 
- const extractContent = (htmlContent) =>{
-    const dom =  new JSDOM(htmlContent)
-    const document = dom.window.document
+const extractContent = (htmlContent) => {
+    const dom = new JSDOM(htmlContent);
+    const document = dom.window.document;
 
-    const heading = {}
-    for(let i=1;i<=6;i++){
-              const headingELement = document.querySelectorAll(`h1${i}`)
-              heading[`${i}`] = Array.from(headingELement).map(heading=>heading.textContent.trim())
+    const headings = {};
+    for (let i = 1; i <= 6; i++) {
+        // Correct the selector to 'h' + i instead of 'h1' + i
+        const headingElements = document.querySelectorAll(`h${i}`);
+        headings[`${i}`] = Array.from(headingElements).map(heading => heading.textContent.trim());
     }
 
-    const paragraph = Array.from(document.querySelectorAll('p')).map(p=>p.textContent.trim())
-    const image = Array.from(document.querySelectorAll('img')).map(img=>img.src)
+    const paragraphs = Array.from(document.querySelectorAll('p')).map(p => p.textContent.trim());
+    const images = Array.from(document.querySelectorAll('img')).map(img => img.src);
+
+    // Log intermediate results for debugging
+    console.log('Headings:', headings);
+    console.log('Paragraphs:', paragraphs);
+    console.log('Images:', images);
 
     return {
-        heading,paragraph,image
-    }
+        headings,
+        paragraphs,
+        images
+    };
 }
 
-export default extractContent
+export default extractContent;

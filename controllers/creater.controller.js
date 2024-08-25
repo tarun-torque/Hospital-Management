@@ -164,33 +164,41 @@ export const get_all_content = async (req, res) => {
 }
 
 // get blogs
-export const get_blogs = async(req,res)=>{
+export const get_blogs = async (req, res) => {
     try {
-        const id = +req.params.id
+        const id = +req.params.id;
 
-        const blogs = await prisma.blog_content.findMany({where:{blog_creatorId:id}})
-        if(! blogs){
-            return res.status(404).json({msg:'No Blogs found'})
+        // Fetch the blogs data
+        const blogs = await prisma.blog_content.findMany({ where: { blog_creatorId: id } });
+
+        // Check if blogs exist
+        if (!blogs || blogs.length === 0) {
+            return res.status(404).json({ msg: 'No Blogs found' });
         }
 
-        const extracedtContent = extractContent(blogs.content)
-        const blogData =   {
-                          id:blogs.id,
-                          tags:blogs.tags,
-                          category:blogs.category,
-                          data:extracedtContent,
-                          verified:blogs.verified,
-                          createdAt:blogs.createdAt,
-                          updatedAt:blogs.updatedAt,
-                          blog_creatorId:blogs.blog_creatorId
-                         }
-        
-    return res.status(200).json({blogData})
-        
+        // Loop through blogs and extract content
+        const blogDataArray = blogs.map(blog => {
+            const extractedContent = extractContent(blog.content);
+            return {
+                id: blog.id,
+                tags: blog.tags,
+                category: blog.category,
+                data: extractedContent,
+                verified: blog.verified,
+                createdAt: blog.createdAt,
+                updatedAt: blog.updatedAt,
+                blog_creatorId: blog.blog_creatorId
+            };
+        });
+
+        return res.status(200).json({ blogData: blogDataArray });
+
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        return res.status(500).json({ msg: 'An error occurred', error });
     }
-}
+};
+
 
 
 
