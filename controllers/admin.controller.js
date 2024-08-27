@@ -9,13 +9,10 @@ import contentCategory_validation from '../validations/validatons.js'
 import { messages } from '@vinejs/vine/defaults'
 import path from 'path'
 import { json } from 'express'
-
-
+import footer from './mailComponents/footer.js'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from 'constants'
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -521,7 +518,8 @@ export const register_manager = async (req, res) => {
     <p>Account Credentials :<br/> <strong>Email:</strong> ${email} <br/><strong>Password:</strong> ${password}   </p>
     <p>Please let me know if you require any further information or assistance as you transition into your new role.</p>
     <p>Thank you for taking on this responsibility. I am confident you will excel in managing Harmony and look forward to seeing your contributions.</p>
-    <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
+           
+       <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
 
     <p>Follow us on Social Meadia :<br/>
     <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
@@ -530,7 +528,8 @@ export const register_manager = async (req, res) => {
   
      </p>
     <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
-    `,
+
+     `,
             attachments: [
                 {
                     filename: 'insta_logo.png',
@@ -549,6 +548,8 @@ export const register_manager = async (req, res) => {
                 }
             ]
         }
+
+
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log(error);
@@ -1428,16 +1429,16 @@ export const statusOfContent = async (req, res) => {
 
 
 // api to get  staff 
-export const staff = async(req,res)=>{
+export const staff = async (req, res) => {
     try {
-        
+
         const creators = await prisma.creator.findMany()
         const managers = await prisma.manager.findMany()
         const doctors = await prisma.doctor.findMany()
 
-        const staff = { creators,managers,doctors}
+        const staff = { creators, managers, doctors }
 
-        res.status(200).json({staff})
+        res.status(200).json({ staff })
 
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
