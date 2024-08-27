@@ -28,8 +28,49 @@ export const approveDoctorRequest = async (req, res) => {
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${verify.email}`,
-            subject: `${verify.username},Congratulations from Harmony`,
-            text: 'Grettings from Harmony,You request has been approved!'
+            subject:'Congratulations! Your Application Has Been Approved',
+            html:
+    `Congratulations, Dr. ${verify.doctor_name}!
+
+     <p>We are pleased to inform you that your application has been approved by our team.</p>
+
+     <p>You are now officially part of the Harmony platform, and we are excited to have you on board!</p>
+
+     <p>To get started, please log in to your account and complete your profile by adding your availability and any other necessary information. If you have any questions or need assistance, feel free to contact us at <a href="mailto:support@yourcompany.com">support@yourcompany.com</a>.</p>
+     
+     <p>We look forward to your valuable contributions to our community.</p>
+     
+     <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
+
+     <p>Follow us on Social Meadia :<br/>
+     <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+     <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+     <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+   
+      </p>
+     <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+ 
+      `,
+             attachments: [
+                 {
+                     filename: 'insta_logo.png',
+                     path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                     cid: 'insta'
+                 },
+                 {
+                     filename: 'fb_logo.png',
+                     path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                     cid: 'fb'
+                 },
+                 {
+                     filename: 'yt_logo.png',
+                     path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                     cid: 'yt'
+                 }
+             ]
+
+
+            
         }
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -63,8 +104,45 @@ export const rejectDoctor = async (req, res) => {
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${rejected.email}`,
-            subject: `${rejected.username},Info. from Harmony`,
-            text: reason
+            subject: 'Application Status: Your Request Has Been Rejected',
+            html:
+                  `
+      <p> Dear Dr. ${rejected.doctor_name}</p>
+      <p> We regret to inform you that your application has been rejected for the following reason: </p>
+      <p>${reason} </p>
+      <p>We understand that this may be disappointing news, and we encourage you to reach out if you have any questions or if you would like to discuss this decision further.Please do not hesitate to contact us for any assistance you may need.</p>
+
+      
+     <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
+
+    <p>Follow us on Social Meadia :<br/>
+    <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+    <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+    <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+  
+     </p>
+    <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+
+     `,
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
+
+                    
         }
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -519,7 +597,7 @@ export const register_manager = async (req, res) => {
     <p>Please let me know if you require any further information or assistance as you transition into your new role.</p>
     <p>Thank you for taking on this responsibility. I am confident you will excel in managing Harmony and look forward to seeing your contributions.</p>
            
-       <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
+    <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
 
     <p>Follow us on Social Meadia :<br/>
     <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
