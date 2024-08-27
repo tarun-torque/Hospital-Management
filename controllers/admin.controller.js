@@ -1252,7 +1252,7 @@ export const articleAction = async (req, res) => {
     try {
 
         const creatorId = +req.params.creatorId;
-        const blogId = +req.params.articleId;
+        const articleId = +req.params.articleId;
         const { action } = req.query;
 
         //get email of creator
