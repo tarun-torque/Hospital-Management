@@ -7,7 +7,18 @@ import bcrypt from 'bcryptjs'
 import vine from '@vinejs/vine'
 import contentCategory_validation from '../validations/validatons.js'
 import { messages } from '@vinejs/vine/defaults'
+import path from 'path'
 import { json } from 'express'
+
+
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import exp from 'constants'
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 // approve request of doctor
 export const approveDoctorRequest = async (req, res) => {
@@ -436,7 +447,7 @@ export const getService = async (req, res) => {
         const allCategory = await prisma.category.findMany()
         const serviceCount = allServices.length
         const categoriesCount = allCategory.length
-        const data = { serviceCount, categoriesCount, allServices,allCategory }
+        const data = { serviceCount, categoriesCount, allServices, allCategory }
 
         res.status(200).json({ data })
 
@@ -503,9 +514,41 @@ export const register_manager = async (req, res) => {
             from: process.env.ADMIN_EMAIL,
             to: email,
             subject: 'Congratulations from Harmony',
-            text: `You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `
-        }
+            text: `You are Manager in Harmony Your email is ${email} and Password is ${password}.Please Log in to start your journey `,
+            html:
+                `<p>Dear ${name} ,</p>
+    <p>I am pleased to inform you that you have been appointed as the new manager for the <strong>Harmony</strong></p>
+    <p>Account Credentials :<br/> <strong>Email:</strong> ${email} <br/><strong>Password:</strong> ${password}   </p>
+    <p>Please let me know if you require any further information or assistance as you transition into your new role.</p>
+    <p>Thank you for taking on this responsibility. I am confident you will excel in managing Harmony and look forward to seeing your contributions.</p>
+    <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
 
+    <p>Follow us on Social Meadia :<br/>
+    <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+    <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+    <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+  
+     </p>
+    <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+    `,
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
+        }
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log(error);
@@ -1166,7 +1209,7 @@ export const articleAction = async (req, res) => {
             })
         }
 
-        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action=='pending') {
+        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action == 'pending') {
             const mailOptions = {
                 from: process.env.ADMIN_EMAIL,
                 to: `${isCreator.email}`,
@@ -1235,7 +1278,7 @@ export const blogAction = async (req, res) => {
             })
         }
 
-        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action=='pending') {
+        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action == 'pending') {
             const mailOptions = {
                 from: process.env.ADMIN_EMAIL,
                 to: `${isCreator.email}`,
@@ -1302,7 +1345,7 @@ export const ytAction = async (req, res) => {
             })
         }
 
-        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action=='pending') {
+        if (action == 'publish' || action == 'rejected' || action == 'unpublish' || action == 'pending') {
             const mailOptions = {
                 from: process.env.ADMIN_EMAIL,
                 to: `${isCreator.email}`,
@@ -1383,3 +1426,21 @@ export const statusOfContent = async (req, res) => {
 
 
 
+
+// api to get  staff 
+export const staff = async(req,res)=>{
+    try {
+        
+        const creators = await prisma.creator.findMany()
+        const managers = await prisma.manager.findMany()
+        const doctors = await prisma.doctor.findMany()
+
+        const staff = { creators,managers,doctors}
+
+        res.status(200).json({staff})
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}

@@ -8,7 +8,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction} from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction, staff} from "../controllers/admin.controller.js";
 import { login_manager } from "../controllers/manager.controller.js";
 
 
@@ -174,6 +174,9 @@ router.put('/admin/update/remarks/:managerId',updateRemarks)
 // admin -patient routes
 router.get('/admin/filter/patient',filterPatient);
 router.get('/admin/all/patients',allPatient)
+
+// admin get Api of staff
+router.get('/admin/get/staff',staff)
 
 // manager API
 router.post('/manager/login',login_manager);
