@@ -516,7 +516,8 @@ export const eachBlog = async(req,res)=>{
             return res.status(404).json({msg:'No Blog Found'})
         }
 
-        const extractContent  = extractContent(blog.content)
+        const extractContent  = await extractContent(blog.content)
+
         const data = {
             id:blog.id,
             data:extractContent,
