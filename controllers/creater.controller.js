@@ -502,3 +502,58 @@ export const categoryContent = async (req, res) => {
 
 
 
+
+
+// get individual blogs
+export const eachBlog = async(req,res)=>{
+    try {
+        const blogId = +req.params.blogId;
+        const blog = await prisma.blog_content.findUnique({where:{id:blogId}})
+
+        if(!blog){
+            return res.status(404).json({msg:'No Blog Found'})
+        }
+
+        res.status(200).json({blog})
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
+}
+
+// get individual article
+export const eachArticle = async(req,res)=>{
+    try {
+        const articleId  = +req.params.articleId;
+        const article  = await prisma.article_content.findUnique({where:{id:articleId}})
+
+        if(!article){
+            return res.status(400).json({msg:'No Article Found'})
+        }
+
+        res.status(200).json({article})
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+    }
+}
+
+
+
+// // get individual yt content 
+export const eachYT = async(req,res)=>{
+    try {
+        const ytId = +req.params.ytId;
+
+        const yt = await prisma.yt_content.findUnique({where:{id:ytId}})
+
+        if(! yt){
+            return res.status(404).json({msg:'No Youtube content Found'})
+        }
+
+        res.status(200).json({yt})
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}

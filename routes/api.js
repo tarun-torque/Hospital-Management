@@ -5,7 +5,7 @@ import fs from 'fs'
 const router = Router()
 
 
-import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs } from "../controllers/creater.controller.js";
+import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction, staff} from "../controllers/admin.controller.js";
@@ -71,6 +71,7 @@ const fileFilter = function(req,file,cb){
 
 const upload = multer({storage:storage,fileFilter:fileFilter})
 
+
 // creator api
 router.post('/login/creator',login_creator)
 router.post('/user/:id/createYtContent', create_yt_Content)
@@ -89,7 +90,9 @@ router.get('/searchCreator', search_creator)
 router.get('/state/content',stateContent)
 router.get('/filter/language/content',languagePost)
 router.get('/filter/category/content',categoryContent)
-
+router.get('/get/blog/:blogId',eachBlog)
+router.get('/get/article/:articleId',eachArticle)
+router.get('/get/yt/:ytId',eachYT)
 
 
 // doctor api
@@ -156,6 +159,8 @@ router.get('/get/content/status',statusOfContent)
 router.put('/article/action/:creatorId/:articleId',articleAction)
 router.put('/blog/action/:creatorId/:blogId',blogAction)
 router.put('yt/action/:ytId/:ytId',ytAction)
+
+
 
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
