@@ -35,6 +35,32 @@ res.status(200).json({message:'Logged in Succesfully',token:token})
 
 }
 
+// get each manager profile
+export const eachManager = async(req,res)=>{
+    try {
+        const managerId = +req.params.managerId
+        const manager = await prisma.manager.findUnique({where:{id:managerId}})
+
+        if(! manager){
+            return res.status(404).json({msg:'No Manager found'})
+        }
+ 
+        res.status(200).json({manager})
+        
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+
+
+
+
+
+
+
+
+
 // get creator of state
 // approve creator
 // approve their content 

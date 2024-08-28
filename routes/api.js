@@ -5,11 +5,11 @@ import fs from 'fs'
 const router = Router()
 
 
-import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT } from "../controllers/creater.controller.js";
+import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, post_support, registerPatient, update_support } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction, staff} from "../controllers/admin.controller.js";
-import { login_manager } from "../controllers/manager.controller.js";
+import { eachManager, login_manager } from "../controllers/manager.controller.js";
 
 
 // to make dynamic directory
@@ -93,6 +93,7 @@ router.get('/filter/category/content',categoryContent)
 router.get('/get/blog/:blogId',eachBlog)
 router.get('/get/article/:articleId',eachArticle)
 router.get('/get/yt/:ytId',eachYT)
+router.get('/get/creator/profile/:creatorId',eachCreator)
 
 
 // doctor api
@@ -162,6 +163,7 @@ router.put('yt/action/:ytId/:ytId',ytAction)
 
 
 
+
 // admin----manager api
 router.post('/admin/create/manager',upload.single('managerProfile'),register_manager); 
 router.delete('/admin/delete/manager/:managerId',delete_manager)
@@ -185,6 +187,8 @@ router.get('/admin/get/staff',staff)
 
 // manager API
 router.post('/manager/login',login_manager);
+router.get('/get/manager/profile/:managerId',eachManager)
+
 
 
 export default router

@@ -556,7 +556,7 @@ export const eachArticle = async(req,res)=>{
 
 
 
-// // get individual yt content 
+// get individual yt content 
 export const eachYT = async(req,res)=>{
     try {
         const ytId = +req.params.ytId;
@@ -572,3 +572,23 @@ export const eachYT = async(req,res)=>{
         res.status(400).json({ message: error.message })
     }
 }
+
+
+// get each creator 
+export const eachCreator = async(req,res)=>{
+    try {
+        const creatorId = +req.params.creatorId;
+        const creator = await prisma.creator.findUnique({where:{id:creatorId}})
+
+        if(! creator){
+            return res.json({msg:'No creator Found'})
+        }
+
+        res.status(200).json({creator})
+
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+
