@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { messages } from '@vinejs/vine/defaults';
 import extractContent from '../utils/htmlExtractor.js';
-import extractContent from '../utils/htmlExtractor.js';
+
 
 
 // login creator
