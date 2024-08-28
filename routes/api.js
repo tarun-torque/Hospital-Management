@@ -96,6 +96,7 @@ router.get('/get/yt/:ytId',eachYT)
 router.get('/get/creator/profile/:creatorId',eachCreator)
 
 
+
 // doctor api
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
 router.post('/doctor/login',doctorLogin)
