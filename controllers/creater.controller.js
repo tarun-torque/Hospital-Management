@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { messages } from '@vinejs/vine/defaults';
 import extractContent from '../utils/htmlExtractor.js';
+import extractContent from '../utils/htmlExtractor.js';
+
 
 // login creator
 export const login_creator = async (req, res) => {
@@ -514,7 +516,19 @@ export const eachBlog = async(req,res)=>{
             return res.status(404).json({msg:'No Blog Found'})
         }
 
-        res.status(200).json({blog})
+        const extractContent  = extractContent(blog.content)
+        const data = {
+            id:blog.id,
+            data:extractContent,
+            tags:blog.tags,
+            category:blog.category,
+            verified:blog.verified,
+            blog_creatorId:blog.blog_creatorId,
+            createdAt:blog.createdAt,
+            updatedAt:blog.updatedAt
+        }
+
+        res.status(200).json({data})
 
     } catch (error) {
         console.log(error)
