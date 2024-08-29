@@ -116,7 +116,7 @@ export const otpSend = async (req, res) => {
         const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
         // store otp in db
-        const saveOtp = await prisma.patient.update({ where: { email }, data: { otp } })
+        const saveOtp = await prisma.patient.update({ where: { email }, data: { otp:otpToken} })
 
         // send OTP via mail
         const mailOptions = {
@@ -176,6 +176,44 @@ export const otpSend = async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: 'Something went wromg' })
         console.log(error)
+    }
+}
+
+// reset password succesfully 
+export const resetPassword = async(req,res)=>{
+    try {
+
+        const {otp,email,newPassword} = req.body;
+
+        const checkOtp =  await prisma.patient.findUnique({where:{email}})
+
+        if(!checkOtp){
+            return res.status(400).json({msg:'Invalid Email or OTP'})
+        }
+
+        if(checkOtp.otp === null){
+            return res.status(400).json({msg:'Invalid Email or OTP'})
+        }
+
+        // verify otp
+        const decodedOtp = jwt.verify(checkOtp.otp,process.env.SECRET_KEY)
+
+        if(decodedOtp.otp !== otp){
+            return res.status(400).json({msg:'Invalid OTP'}) 
+        }
+
+        // hash password
+        const salt  = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(newPassword,salt)
+
+        // update password in database 
+        const updatePassword  = await prisma.patient.update({where:{email},data:{password:hash_pass}})
+ 
+        res.status(200).json({msg:'Password reset successful'})
+     
+    } catch (error) {
+        res.status(400).json({ message: 'Invalid or expired OTP' })
+        console.log(error) 
     }
 }
 
