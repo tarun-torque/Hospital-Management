@@ -1039,7 +1039,7 @@ export const getCreators = async (req, res) => {
 export const deleteCreator = async (req, res) => {
     try {
         const creatorId = +req.params.creatorId;
-        const deleteManager = await prisma.manager.delete({ where: { id: creatorId } })
+        const deleteManager = await prisma.creator.delete({ where: { id: creatorId } })
         res.status(200).json({ message: 'Creator has been deleted' })
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
