@@ -118,6 +118,7 @@ router.get('/get/:patientId/mood',get_mood)
 router.post('/forgot/password',otpSend)
 router.post('/reset/password',resetPassword)
 
+
 // admin routes
 //-----doctor api
 router.put('/admin/approveDoctorRequest/:DoctorId',approveDoctorRequest)

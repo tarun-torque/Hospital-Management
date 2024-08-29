@@ -45,9 +45,11 @@ export const eachManager = async(req,res)=>{
             return res.status(404).json({msg:'No Manager found'})
         }
         
-        const assignedCreator = await prisma.creator.findMany({where:{assignedManager:manager.username}})
+        const assignedCreators = await prisma.creator.findMany({where:{assignedManager:manager.username}})
+        const assignedDoctors = await prisma.doctor.findMany({where:{assignedManager:manager.username}})
+        const assignedServices = await prisma.service.findMany({where:{assignedManager:manager.username}})
 
-        res.status(200).json({manager,assignedCreator})
+        res.status(200).json({manager,assignedCreators,assignedDoctors,assignedServices})
         
     } catch (error) {
         res.status(400).json({ message: error.message })

@@ -45,6 +45,8 @@ model Service {
   categories           Category[]
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
+  manager              manager?   @relation(fields: [assignedManager], references: [username])
+  assignedManager      String
 }
 
 model Category {
@@ -206,6 +208,7 @@ model manager {
   remarks        String?   @default("I am active")
   creators       Creator[]
   doctors        Doctor[]
+  service        Service[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }

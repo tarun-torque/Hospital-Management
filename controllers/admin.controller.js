@@ -372,7 +372,7 @@ export const getContentCategory = async (req, res) => {
 // create service 
 export const createService = async (req, res) => {
     try {
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration,assignedManager } = req.body;
         const file = req.file;
         const intDuration = parseInt(duration)
 
@@ -385,7 +385,7 @@ export const createService = async (req, res) => {
         }
 
 
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration: intDuration, imagePath: file.path }
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration: intDuration, imagePath: file.path,assignedManager }
 
         const createService = await prisma.service.create({ data })
         res.status(201).json({ createService })
