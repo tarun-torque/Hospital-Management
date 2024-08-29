@@ -510,11 +510,15 @@ export const categoryContent = async (req, res) => {
 export const eachBlog = async(req,res)=>{
     try {
         const blogId = +req.params.blogId;
-        const blog = await prisma.blog_content.findUnique({where:{id:blogId}})
 
+        const blog = await prisma.blog_content.findUnique({where:{id:blogId}})
         if(!blog){
             return res.status(404).json({msg:'No Blog Found'})
         }
+
+        // to find name and username of creator 
+        const creator  = await prisma.creator.findUnique({where:{id:blog.blog_creatorId}})
+
 
         const extract =  extractContent(blog.content)
 
@@ -525,6 +529,7 @@ export const eachBlog = async(req,res)=>{
             category:blog.category,
             verified:blog.verified,
             blog_creatorId:blog.blog_creatorId,
+            creator_username:creator.username,
             createdAt:blog.createdAt,
             updatedAt:blog.updatedAt
         }
@@ -547,7 +552,12 @@ export const eachArticle = async(req,res)=>{
             return res.status(400).json({msg:'No Article Found'})
         }
 
-        res.status(200).json({article})
+        const creator  =await prisma.creator.findUnique({where:{id:article.article_creatorId}})
+
+        
+
+        res.status(200).json({article,creator_username:creator.username})
+
     } catch (error) {
         console.log(error)
         res.status(400).json({ message: error.message })
@@ -567,7 +577,10 @@ export const eachYT = async(req,res)=>{
             return res.status(404).json({msg:'No Youtube content Found'})
         }
 
-        res.status(200).json({yt})
+        const creator =  await prisma.creator.findUnique({where:{id:yt.yt_creatorId}})
+
+
+        res.status(200).json({yt,creator_username:creator.username})
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
