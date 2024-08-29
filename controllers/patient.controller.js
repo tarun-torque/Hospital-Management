@@ -1,8 +1,13 @@
-import { messages } from "@vinejs/vine/defaults";
 import prisma from "../DB/db.config.js";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { json } from "express";
+import 'dotenv/config'
+import transporter from "../utils/transporter.js";
+import path from 'path'
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 
 // register patient 
@@ -92,6 +97,89 @@ export const loginPatient = async (req, res) => {
     }
 
 }
+
+// ////// forgot password implementation
+// ------ send otp
+export const otpSend = async (req, res) => {
+    try {
+
+        const { email } = req.body;
+
+        const isPatient = await prisma.patient.findUnique({ where: { email } })
+
+        if(! isPatient){
+            return res.status(404).json({msg:"User not Found"})
+        }
+
+        // otp
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
+
+        // store otp in db
+        const saveOtp = await prisma.patient.update({ where: { email }, data: { otp } })
+
+        // send OTP via mail
+        const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: `${email}`,
+            subject: 'OTP to reset Password',
+            html:
+                `
+            Dear ${isPatient.patient_name},
+
+            <p>We received a request to change your password.To proceed, please use the One-Time Password (OTP) provided below. </p>
+
+            <h3>Your OTP is ${otp}</h3>
+
+            <p>This OTP is valid for the next 2 minutes. Please do not share this OTP with anyone, as it is for your personal use only.</p>
+
+            <p>If you did not request, please contact our support team immediately at @example.com.</p>
+
+             <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
+
+                      <p>Follow us on Social Meadia :<br/>
+                     <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+                      <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+                      <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+                          </p>
+                      <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+
+            `,
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
+
+        }
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.status(500).json({ msg: 'OTP not Sent' })
+            }
+            else {
+                res.status(200).json({ msg: 'OTP sent Successfully' })
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({ message: 'Something went wromg' })
+        console.log(error)
+    }
+}
+
+
 
 // update patient profile
 
@@ -188,55 +276,55 @@ export const delete_support = async (req, res) => {
         const delete_support = await prisma.support.delete({ where: { id: supportId } })
         res.status(200).json({ message: 'Support deleted succesfully' })
     }
-    
-    catch (error) {
-    console.log(error)
-    res.status(400).json({message:error.message})
 
-}
+    catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+
+    }
 }
 
 // post mood of patient
-export const mood  = async(req,res)=>{
-  try {
-      // get info
-      const patientId = +req.params.patientId
-      const {your_mood_today,title} = req.body;
-  
-      // check patient present or not 
-      const isPatient = await prisma.patient.findUnique({where:{patientId}})
-      if(! isPatient){
-        return res.status(404).json({message:'Patient is not found'})
-      }
-      // save in db 
-      const info = await prisma.mood.create({where:{patientId},data:{your_mood_today,title}})
-      // send succesfull note 
-      res.status(201).json({message:'Thank you'})
-    
-  } catch (error) {
-    console.log(error)
-    res.status(400).json({message:error.message})
-    
-  }
+export const mood = async (req, res) => {
+    try {
+        // get info
+        const patientId = +req.params.patientId
+        const { your_mood_today, title } = req.body;
+
+        // check patient present or not 
+        const isPatient = await prisma.patient.findUnique({ where: { patientId } })
+        if (!isPatient) {
+            return res.status(404).json({ message: 'Patient is not found' })
+        }
+        // save in db 
+        const info = await prisma.mood.create({ where: { patientId }, data: { your_mood_today, title } })
+        // send succesfull note 
+        res.status(201).json({ message: 'Thank you' })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+
+    }
 }
 // get mood patient
-export const get_mood = async(req,res)=>{
-   try {
-    const patientId = +req.params.patientId;
-    const isPatient = await prisma.mood.findUnique({where:{patientId}})
-    if(! isPatient){
-        return res.status(404).json({message:'Patient is not found'})
+export const get_mood = async (req, res) => {
+    try {
+        const patientId = +req.params.patientId;
+        const isPatient = await prisma.mood.findUnique({ where: { patientId } })
+        if (!isPatient) {
+            return res.status(404).json({ message: 'Patient is not found' })
         }
 
-    const mood = await prisma.mood.findMany({where:{patientId}})
-    if(mood.length==0){
-        return res.status(404).json({message:'No mood is post by the patient till now'})
+        const mood = await prisma.mood.findMany({ where: { patientId } })
+        if (mood.length == 0) {
+            return res.status(404).json({ message: 'No mood is post by the patient till now' })
+        }
+        res.status(200).json({ message: mood })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: error.message })
+
     }
-    res.status(200).json({message:mood})
-    
-   } catch (error) {
-    console.log(error)
-    res.status(400).json({message:error.message})
-    
-   }
 }

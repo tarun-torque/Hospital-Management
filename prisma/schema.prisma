@@ -33,7 +33,7 @@ model ContentCategory {
 // service model 
 model Service {
   id                   Int        @id @default(autoincrement())
-  title                String @unique
+  title                String     @unique
   imagePath            String
   description          String
   tags                 String[]
@@ -136,6 +136,7 @@ model Patient {
   dob            String //selectd dob from calender(dd-mm-yy) to wish birthday of user
   gender         String //male female others
   new_patient    String
+  otp            String?
   password       String
   support        Support[]
   mood           Mood[]
