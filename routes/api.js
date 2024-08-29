@@ -194,4 +194,6 @@ router.get('/get/manager/profile/:managerId',eachManager)
 
 
 
+
+
 export default router
