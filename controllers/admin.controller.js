@@ -89,8 +89,6 @@ export const approveDoctorRequest = async (req, res) => {
     }
 }
 
-// assign manager to approve doctors
-
 
 // reject doctor request
 export const rejectDoctor = async (req, res) => {
