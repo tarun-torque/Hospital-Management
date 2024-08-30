@@ -374,6 +374,10 @@ export const createService = async (req, res) => {
         const file = req.file;
         const intDuration = parseInt(duration)
 
+    if(  (!title) ||  (!description) || (!tags) || (!subtitle) || (!what_we_will_discuss) || (!benefits) || (!languages) ||  (!duration) || (!assignedManager)    ){
+        return res.status(400).json({msg:'All fields are required'})
+    }
+
         // check service image
         const type = file.mimetype;
         const size = file.size / (1024 * 1024)  //size in MB
@@ -411,11 +415,11 @@ export const servieCategory = async (req, res) => {
             return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
         if(!file){
-            return res.json({msg:'File is required'})
+            return resstatus(400).json({msg:'File is required'})
         }
 
         if( (!name) || (!description) || (!serviceId)  ){
-            return res.status(200).json({msg:'Each field is required'})
+            return res.status(400).json({msg:'All fields are required'})
         }
 
 

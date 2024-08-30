@@ -46,7 +46,7 @@ model Service {
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
   manager              manager?   @relation(fields: [assignedManager], references: [username])
-  assignedManager      String
+  assignedManager      String 
 }
 
 model Category {
