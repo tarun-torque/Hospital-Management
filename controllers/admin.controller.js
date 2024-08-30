@@ -395,6 +395,7 @@ export const createService = async (req, res) => {
     }
 }
 
+
 // create category of service
 export const servieCategory = async (req, res) => {
     try {
@@ -409,6 +410,14 @@ export const servieCategory = async (req, res) => {
         if (!checkFile) {
             return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
         }
+        if(!file){
+            return res.json({msg:'File is required'})
+        }
+
+        if( (!name) || (!description) || (!serviceId)  ){
+            return res.status(200).json({msg:'Each field is required'})
+        }
+
 
         const data = { serviceId: serviceId, name, description, coverPath: file.path }
         const Category = await prisma.category.create({ data })
@@ -425,7 +434,7 @@ export const update_service = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
         const fileInfo = req.file;
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration } = req.body;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration,assignedManager } = req.body;
 
         const updatedData = {}
 
@@ -461,6 +470,10 @@ export const update_service = async (req, res) => {
             updatedData.duration = parseInt(duration)
         }
 
+        if(assignedManager){
+            updatedData.assignedManager=assignedManager
+        }
+
         if (fileInfo) {
 
             // check service image
@@ -473,7 +486,6 @@ export const update_service = async (req, res) => {
             updatedData.imagePath = fileInfo.path
         }
 
-        console.log('Updated Data:', updatedData);
 
         if (Object.keys(updatedData).length === 0) {
             return res.status(404).json({ message: 'No valid field to update' })

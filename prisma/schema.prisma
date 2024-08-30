@@ -51,7 +51,7 @@ model Service {
 
 model Category {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String   @unique
   coverPath   String
   description String
   Service     Service? @relation(fields: [serviceId], references: [id])
