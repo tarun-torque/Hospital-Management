@@ -1538,7 +1538,7 @@ export const updateService = async (req, res) => {
         }
 
         // update service
-        const updateService = await prisma.service.update({where:{id:serviceId}},data:{updatedData})
+        const updateService = await prisma.service.update({where:{id:serviceId},data:{updatedData})
 
         res.status(200).json({status:200,json:'Service Updated Successfully'})
 
@@ -1589,7 +1589,7 @@ export const getServiceFromCategoryId = async(req,res)=>{
     res.status(200).json({status:200,msg:category})
 
   } catch (error) {
-    res.status(500).json(status:500,msg:'Something went wrong')
+    res.status(500).json({status:500,msg:'Something went wrong'})
   }
 }
 
