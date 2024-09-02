@@ -1538,7 +1538,7 @@ export const updateService = async (req, res) => {
         }
 
         // update service
-        const updateService = await prisma.service.update({where:{id:serviceId},data:{updatedData})
+        const updateService = await prisma.service.update({where:{id:serviceId},data:{updatedData}})
 
         res.status(200).json({status:200,json:'Service Updated Successfully'})
 
@@ -1546,6 +1546,8 @@ export const updateService = async (req, res) => {
            res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
+
+
 
 // to delete service
 export const deleteService = async(req,res)=>{
