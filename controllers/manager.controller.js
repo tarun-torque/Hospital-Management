@@ -66,7 +66,7 @@ export const getContentByManager = async (req, res) => {
             return res.status(400).json({ status: 400, msg: "Manager username is required" });
         }
 
-        const allContent = await prisma.creator.findUnique({
+        const allContent = await prisma.creator.findMany({
             where: { assignedManager: managerUsername },
             include: {
                 yt_contents: true,
