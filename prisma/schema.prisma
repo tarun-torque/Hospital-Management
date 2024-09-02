@@ -30,32 +30,28 @@ model ContentCategory {
   image_path  String
 }
 
-// service model 
+model Category {
+  id              Int       @id @default(autoincrement())
+  name            String
+  imagePath       String
+  services        Service[]
+  manager         manager?  @relation(fields: [assignedManager], references: [username])
+  assignedManager String
+}
+
 model Service {
-  id                   Int        @id @default(autoincrement())
-  title                String     @unique
+  id                   Int       @id @default(autoincrement())
+  title                String
   imagePath            String
   description          String
   tags                 String[]
   subtitle             String[]
   what_we_will_discuss String[]
   benefits             String[]
-  languages            String[]
+  language             String
   duration             Int
-  categories           Category[]
-  createdAt            DateTime   @default(now())
-  updatedAt            DateTime   @updatedAt
-  manager              manager?   @relation(fields: [assignedManager], references: [username])
-  assignedManager      String 
-}
-
-model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  coverPath   String
-  description String
-  Service     Service? @relation(fields: [serviceId], references: [id])
-  serviceId   Int?
+  Category             Category? @relation(fields: [categoryId], references: [id])
+  categoryId           Int
 }
 
 // creator model
@@ -128,9 +124,9 @@ model Blog_content {
 //patient models
 model Patient {
   id             Int       @id @default(autoincrement())
-  username       String?    @unique
+  username       String?   @unique
   patient_name   String?
-  email          String?    @unique
+  email          String?   @unique
   profile_path   String?
   profileType    String?
   country        String?
@@ -195,20 +191,20 @@ model Doctor {
 
 // manager model
 model manager {
-  id             Int       @id @default(autoincrement())
-  name           String
-  username       String    @unique
-  email          String    @unique
-  states         String[]
-  countries      String[]
-  profile_path   String
-  contact_number String
-  password       String
-  status         String?   @default("active")
-  remarks        String?   @default("I am active")
-  creators       Creator[]
-  doctors        Doctor[]
-  service        Service[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               Int        @id @default(autoincrement())
+  name             String
+  username         String     @unique
+  email            String     @unique
+  states           String[]
+  countries        String[]
+  profile_path     String
+  contact_number   String
+  password         String
+  status           String?    @default("active")
+  remarks          String?    @default("I am active")
+  creators         Creator[]
+  doctors          Doctor[]
+  assignedCategory Category[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 }

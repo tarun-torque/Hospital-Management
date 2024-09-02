@@ -8,10 +8,8 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction, staff, allContentAdmin} from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category} from "../controllers/admin.controller.js";
 import { allContentManager, eachManager, login_manager } from "../controllers/manager.controller.js";
-
-
 
 
 // to make dynamic directory
@@ -28,14 +26,11 @@ const storage  = multer.diskStorage({
     destination:function(req,file,cb){
         let uploadPath = './uploads';
 
-        if(req.baseUrl==='/api//admin/create/service'){
-            uploadPath = path.join(uploadPath,'serviceImage')
-        }
-        else if(req.baseUrl==='/api/admin/create/content/category'){
+         if(req.baseUrl==='/api/admin/create/content/category'){
             uploadPath = path.join(uploadPath,'contentCategoryImage')
         }
-        else if(req.baseUrl==='/api/admin/create/service/:serviceId/category'){
-            uploadPath = path.join(uploadPath,'serviceCategoryImage')
+        else if(req.baseUrl==='/api/admin/create/category'){
+            uploadPath = path.join(uploadPath,'category')
         }
         else if(req.baseUrl==='/api/admin/create/manager'){
             uploadPath = path.join(uploadPath,'managerProfile')
@@ -142,19 +137,13 @@ router.get('/admin/get/inactive/doctors',getInactiveDoctors)
 router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
 
 
-//admin -----service/service category and content category
+//admin -----category/category services and content category
 router.post('/admin/create/content/category',upload.single('contentCategoryImage'),contentCategory)
 router.get('/all/content/categories',getContentCategory)
 router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',upload.single('contentCategoryImage'),update_ContentCategory)
 
-
-router.post('/admin/create/service',upload.single('serviceImage'),createService)
-router.put('/admin/update/service/:serviceId',upload.single('serviceImage'),update_service)
-router.post('/admin/create/service/:serviceId/category',upload.single('serviceCategoryImage'),servieCategory)
-router.get('/admin/get/service/stats',getService)
-router.delete('/admin/delete/service/:serviceId',deleteService)
-router.delete('/admin/delete/category/:serviceId/:categoryId',deleteCategoryService)
+router.post('/admin/create/category',upload.single('categoryImage'),category)
 
 
 // admin-----creator api
@@ -202,10 +191,6 @@ router.get('/admin/get/staff',staff)
 router.post('/manager/login',login_manager);
 router.get('/get/manager/profile/:managerId',eachManager)
 router.get('/manager/get/content',allContentManager)
-
-
-
-
 
 
 export default router

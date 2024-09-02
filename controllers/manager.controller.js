@@ -63,10 +63,9 @@ export const allContentManager = async(req,res)=>{
 
         const managerUsername =  req.query.managerUsername
         const allContent  = prisma.creator.findUnique({where:{assignedManager:managerUsername},include:{yt_contents:true,blog_contents:true,article_content:true}})
- 
-        
+        res.status(200).json({status:200,msg:allContent})
     } catch (error) {
-        
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
 

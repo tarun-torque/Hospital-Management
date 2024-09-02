@@ -28,9 +28,9 @@ export const approveDoctorRequest = async (req, res) => {
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: `${verify.email}`,
-            subject:'Congratulations! Your Application Has Been Approved',
+            subject: 'Congratulations! Your Application Has Been Approved',
             html:
-    `Congratulations, Dr. ${verify.doctor_name}!
+                `Congratulations, Dr. ${verify.doctor_name}!
 
      <p>We are pleased to inform you that your application has been approved by our team.</p>
 
@@ -51,26 +51,26 @@ export const approveDoctorRequest = async (req, res) => {
      <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
  
       `,
-             attachments: [
-                 {
-                     filename: 'insta_logo.png',
-                     path: path.join(__dirname, 'attachements', 'insta_logo.png'),
-                     cid: 'insta'
-                 },
-                 {
-                     filename: 'fb_logo.png',
-                     path: path.join(__dirname, 'attachements', 'fb_logo.png'),
-                     cid: 'fb'
-                 },
-                 {
-                     filename: 'yt_logo.png',
-                     path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
-                     cid: 'yt'
-                 }
-             ]
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
 
 
-            
+
         }
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -104,7 +104,7 @@ export const rejectDoctor = async (req, res) => {
             to: `${rejected.email}`,
             subject: 'Application Status: Your Request Has Been Rejected',
             html:
-                  `
+                `
       <p> Dear Dr. ${rejected.doctor_name}</p>
       <p> We regret to inform you that your application has been rejected for the following reason: </p>
       <p>${reason} </p>
@@ -140,7 +140,7 @@ export const rejectDoctor = async (req, res) => {
                 }
             ]
 
-                    
+
         }
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -367,212 +367,8 @@ export const getContentCategory = async (req, res) => {
     }
 }
 
-// create service 
-export const createService = async (req, res) => {
-    try {
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration,assignedManager } = req.body;
-        const file = req.file;
-        const intDuration = parseInt(duration)
-
-    if(  (!title) ||  (!description) || (!tags) || (!subtitle) || (!what_we_will_discuss) || (!benefits) || (!languages) ||  (!duration) || (!assignedManager)    ){
-        return res.status(400).json({msg:'All fields are required'})
-    }
-
-        // check service image
-        const type = file.mimetype;
-        const size = file.size / (1024 * 1024)  //size in MB
-        const checkFile = ((type == 'image/jpeg' || type == 'image/png') && (size <= 2))
-        if (!checkFile) {
-            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
-        }
 
 
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration: intDuration, imagePath: file.path,assignedManager }
-
-        const createService = await prisma.service.create({ data })
-        res.status(201).json({ msg:'Service is created' })
-    }
-
-    catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-
-// create category of service
-export const servieCategory = async (req, res) => {
-    try {
-        const serviceId = +req.params.serviceId;
-        const { name, description } = req.body;
-        const file = req.file;
-
-        // check file
-        const type = file.mimetype;
-        const size = file.size / (1024 * 1024)  //size in MB
-        const checkFile = ((type == 'image/jpeg' || type == 'image/png') && (size <= 2))
-        if (!checkFile) {
-            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
-        }
-        if(!file){
-            return resstatus(400).json({msg:'File is required'})
-        }
-
-        if( (!name) || (!description) || (!serviceId)  ){
-            return res.status(400).json({msg:'All fields are required'})
-        }
-
-
-        const data = { serviceId: serviceId, name, description, coverPath: file.path }
-        const Category = await prisma.category.create({ data })
-        res.status(201).json({ message: 'Service Category has been added' })
-
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-// update service 
-export const update_service = async (req, res) => {
-    try {
-        const serviceId = +req.params.serviceId;
-        const fileInfo = req.file;
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, languages, duration,assignedManager } = req.body;
-
-        const updatedData = {}
-
-        if (title) {
-            updatedData.title = title
-        }
-
-        if (description) {
-            updatedData.description = description
-        }
-
-        if (tags) {
-            updatedData.tags = tags
-        }
-
-        if (subtitle) {
-            updatedData.subtitle = subtitle
-        }
-
-        if (what_we_will_discuss) {
-            updatedData.what_we_will_discuss = what_we_will_discuss
-        }
-
-        if (benefits) {
-            updatedData.benefits = benefits
-        }
-
-        if (languages) {
-            updatedData.languages = languages
-        }
-
-        if (duration) {
-            updatedData.duration = parseInt(duration)
-        }
-
-        if(assignedManager){
-            updatedData.assignedManager=assignedManager
-        }
-
-        if (fileInfo) {
-
-            // check service image
-            const type = file.mimetype;
-            const size = file.size / (1024 * 1024)  //size in MB
-            const checkFile = ((type == 'image/jpeg' || type == 'image/png') && (size <= 2))
-            if (!checkFile) {
-                return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
-            }
-            updatedData.imagePath = fileInfo.path
-        }
-
-
-        if (Object.keys(updatedData).length === 0) {
-            return res.status(404).json({ message: 'No valid field to update' })
-        }
-
-        const updateService = await prisma.service.update({ where: { id: serviceId }, data: updatedData })
-        res.status(200).json({ message: 'service has been updated' })
-
-
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-// update category of service
-export const update_serviceCategory = async (req, res) => {
-    try {
-        const serviceId = +req.params.serviceId;
-        const { name, description } = req.body;
-        const file = req.file;
-        // check image
-        const type = file.mimetype;
-        const size = file.size / (1024 * 1024)  //size in MB
-        const checkFile = ((type == 'image/jpeg' || type == 'image/png') && (size <= 2))
-        if (!checkFile) {
-            return res.status(400).json({ message: 'File Must be jpg/png and size less than 2MB' })
-        }
-
-        const data = { serviceId: serviceId, name, description, coverPath: file.path }
-        const updatedData = await prisma.category.update({ where: { serviceId }, data: { data } })
-        res.status(200).json({ message: 'Service category has been updated' })
-
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-// get all service/categories and stats
-export const getService = async (req, res) => {
-    try {
-        const allServices = await prisma.service.findMany()
-        const allCategory = await prisma.category.findMany()
-        const serviceCount = allServices.length
-        const categoriesCount = allCategory.length
-        const data = { serviceCount, categoriesCount, allServices, allCategory }
-
-        res.status(200).json({status:200,data:data})
-
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-// delete service 
-export const deleteService = async (req, res) => {
-    try {
-        const serviceId = +req.params.serviceId;
-        const deleteService = await prisma.service.delete({ where: { id: serviceId } })
-        // const deleteCategory = await prisma.category.delete({ where: { serviceId } })
-        res.status(200).json({ message: `Service ${deleteService.title} has been deleted` })
-
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
-
-// delete category of service
-export const deleteCategoryService = async (req, res) => {
-    try {
-        const serviceId = +req.params.serviceId;
-        const categoryId = +req.params.categoryId;
-
-        const deleteCategory = await prisma.category.delete({ where: { serviceId: serviceId, id: categoryId } })
-        res.status(200).json({ message: `Service Category ${deleteCategory.name} has been deleted` })
-    } catch (error) {
-        res.status(400).json({ message: 'something went wrong' })
-        console.log(error)
-    }
-}
 
 //create manager
 export const register_manager = async (req, res) => {
@@ -1539,16 +1335,261 @@ export const staff = async (req, res) => {
 }
 
 
-export const allContentAdmin = async(req,res)=>{
+export const allContentAdmin = async (req, res) => {
     try {
 
-        const allYt  = await    prisma.yt_content.findMany()
-        const allArticle  = await prisma.article_content.findMany()
-        const allBlog =  await prisma.blog_content.findMany()
+        const allYt = await prisma.yt_content.findMany()
+        const allArticle = await prisma.article_content.findMany()
+        const allBlog = await prisma.blog_content.findMany()
 
-        res.status(200).json({allYt,allArticle,allBlog})
-        
+        res.status(200).json({ allYt, allArticle, allBlog })
+
     } catch (error) {
-        res.status(500).res({msg:'Something went wrong'})
+        res.status(500).res({ msg: 'Something went wrong' })
     }
 }
+
+
+// categories and their services
+// ---to create category
+export const category = async (req, res) => {
+    try {
+        const { name, assignedManager } = req.body
+        const fileInfo = req.file
+
+        const requiredField = ['name', 'assignedManager']
+        for (const field of requiredField) {
+            if (req.body[field] === undefined || req.body[field] === null || req.body[field] === '') {
+                return res.status(400).json({ status: 400, msg: `${requiredField} is required` })
+            }
+        }
+
+        const fileSize = fileInfo.size / 1024 * 1024
+        const fileType = fileInfo.mimetype
+
+        if ((fileSize <= 2) && (fileType == 'image/png' || fileType == 'image/jpeg')) {
+            return res.status(400).json({ status: 400, msg: 'File size must be less than 2MB and PNG/JPG' })
+        }
+
+        const data = { name, assignedManager, imagePath: fileInfo.path }
+
+        const saved = await prisma.category.create(data)
+        res.status(200).json({ status: 200, msg: 'Category is created Succesfully' })
+
+
+    } catch (error) {
+        return res.status(400).json({ msg: 'Something went wrong', err: error.message })
+    }
+}
+
+// to update category
+export const updateCategory = async (req, res) => {
+    try {
+        const { name, assignedManager } = req.body
+        const categoryId = +req.params.categoryId
+        const fileInfo = req.file;
+        const updatedData = {}
+        if (!id) {
+            return res.status(400).json({ status: 400, msg: 'Id is required' })
+        }
+        if (name) {
+            updatedData.name = name
+        }
+        if (assignedManager) {
+            updatedData.assignedManager = assignedManager
+        }
+        if (fileInfo) {
+            const fileSize = fileInfo.size / 1024 * 1024
+            const fileType = fileInfo.mimetype
+
+            if ((fileSize <= 2) && (fileType == 'image/png' || fileType == 'image/jpeg')) {
+                return res.status(400).json({ status: 400, msg: 'File size must be less than 2MB and PNG/JPG' })
+            }
+            updatedData.imagePath = fileInfo.path
+        }
+
+        // update category
+        const updateData = await prisma.category.update({ where: { id: categoryId }, data: { updatedData } })
+        res.status(200).json({ status: 200, msg: 'Catagory Updated Succesfully' })
+    } catch (error) {
+        return res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// get all category
+export const allCategory = async(req,res)=>{
+    try {
+        const allCategory  =  await prisma.category.findMany()
+        if(allCategory.length==0){
+            return res.status(404).json({status:400,msg:'No category found'})
+        }
+        const number = allCategory.length
+        const data = {allCategory,number}
+        res.status(200).json({status:200,msg:data})
+        
+    } catch (error) {
+        
+    }
+}
+
+
+// to delete category
+export const categoryDelete = async (req, res) => {
+    try {
+        const categoryId = +req.params.categoryId
+
+        const delCategory = await prisma.category.delete({ where: { id: categoryId } })
+
+        if (!delCategory) {
+            return res.status(404).json({ status: 404, msg: 'Category does not exist' })
+        }
+
+        res.status(200).json({ status: 200, msg: 'Catagory deleted successfully' })
+
+    } catch (error) {
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+// to create service of category
+export const createService = async (req, res) => {
+    try {
+        const categoryId = +req.params.categoryId;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration } = req.body;
+        const fileInfo = req.file;
+
+        const requiredField = ['title', 'description', 'tags', 'subtitle', 'what_we_will_discuss', 'benefits', 'language', 'duration']
+        for (const field of requiredField) {
+            if (req.body[field] === undefined || req.body[field] === null || req.body[field] === '') {
+                return res.status(400).json({ status: 400, msg: `{} is required` })
+            }
+        }
+
+        if (!fileInfo) {
+            return res.status(400).json({ status: 400, msg: 'File is required' })
+        }
+
+        const fileSize = fileInfo.size / 1024 * 1024
+        const fileType = fileInfo.mimetype
+
+        if ((fileSize <= 2) && (fileType == 'image/png' || fileType == 'image/jpeg')) {
+            return res.status(400).json({ status: 400, msg: 'File size must be less than 2MB and PNG/JPG' })
+        }
+
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration, categoryId, imagePath: fileInfo.path }
+
+        const saveService = await prisma.service.create({ data })
+
+    } catch (error) {
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+// to update service of category
+export const updateService = async (req, res) => {
+    try {
+        const serviceId = +req.params.serviceId;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration } = req.body;
+        const fileInfo = req.file;
+
+        const updatedData = {}
+
+        if (title) {
+            updatedData.title = title
+        }
+
+        if (description) {
+            updatedData.description = description
+        }
+
+        if (tags) {
+            updatedData.tags = tags
+        }
+
+        if (subtitle) {
+            updatedData.subtitle = subtitle
+        }
+
+        if (what_we_will_discuss) {
+            updatedData.what_we_will_discuss = what_we_will_discuss
+        }
+
+        if (benefits) {
+            updatedData.benefits = benefits
+        }
+
+        if (language) {
+            updatedData.language = language
+        }
+
+        if (duration) {
+            updatedData.duration = duration
+        }
+
+        if (fileInfo) {
+            const fileSize = fileInfo.size / 1024 * 1024
+            const fileType = fileInfo.mimetype
+            if ((fileSize <= 2) && (fileType == 'image/png' || fileType == 'image/jpeg')) {
+                return res.status(400).json({ status: 400, msg: 'File size must be less than 2MB and PNG/JPG' })
+            }
+            updatedData.imagePath=fileInfo.path
+        }
+
+        // update service
+        const updateService = await prisma.service.update({where:{id:serviceId}},data:{updatedData})
+
+        res.status(200).json({status:200,json:'Service Updated Successfully'})
+
+    } catch (error) {
+           res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// to delete service
+export const deleteService = async(req,res)=>{
+    try {
+
+        const serviceId = +req.query.params
+        const deleteService = await prisma.service.delete({where:{id:serviceId}})
+        res.status(200).json({status:200,msg:'Service deleted successfully'})
+        
+    } catch (error) {
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// get all service 
+export const allService = async(req,res)=>{
+    try {
+        const allService = await prisma.service.findMany()
+        const number = allService.length
+
+        const data = {allService,number}
+
+        if(allService.length == 0){
+            return res.status(404).json({status:404,msg:data})
+        }
+
+
+        
+    } catch (error) {
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+
+// get service by category 
+export const getServiceFromCategoryId = async(req,res)=>{
+  try {
+    const categoryId  = +req.params.categoryId;
+    const category   = await prisma.service.findUnique({where:{categoryId}})
+
+    res.status(200).json({status:200,msg:category})
+
+  } catch (error) {
+    res.status(500).json(status:500,msg:'Something went wrong')
+  }
+}
+
