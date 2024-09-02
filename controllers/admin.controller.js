@@ -1538,3 +1538,14 @@ export const staff = async (req, res) => {
     }
 }
 
+
+export const allYtContent = async(req,res)=>{
+    try {
+
+        const allYt  = await    prisma.yt_content.findMany()
+        res.status(200).json({allYt})
+        
+    } catch (error) {
+        res.status(500).res({msg:'Something went wrong'})
+    }
+}
