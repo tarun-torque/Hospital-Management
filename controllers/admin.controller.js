@@ -538,7 +538,7 @@ export const getService = async (req, res) => {
         const categoriesCount = allCategory.length
         const data = { serviceCount, categoriesCount, allServices, allCategory }
 
-        res.status(200).json({ data })
+        res.status(200).json({status:200,data:data})
 
     } catch (error) {
         res.status(400).json({ message: 'something went wrong' })
@@ -1539,11 +1539,14 @@ export const staff = async (req, res) => {
 }
 
 
-export const allYtContent = async(req,res)=>{
+export const allContentAdmin = async(req,res)=>{
     try {
 
         const allYt  = await    prisma.yt_content.findMany()
-        res.status(200).json({allYt})
+        const allArticle  = await prisma.article_content.findMany()
+        const allBlog =  await prisma.blog_content.findMany()
+
+        res.status(200).json({allYt,allArticle,allBlog})
         
     } catch (error) {
         res.status(500).res({msg:'Something went wrong'})

@@ -19,8 +19,6 @@ const extractContent = (htmlContent) => {
         return Array.from(ol.querySelectorAll('li')).map(li => li.textContent.trim());
     });
     
-
-
     return {
         headings,
         paragraphs,

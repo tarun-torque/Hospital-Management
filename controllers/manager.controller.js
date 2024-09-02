@@ -57,6 +57,19 @@ export const eachManager = async(req,res)=>{
 }
 
 
+// all content for manager only assigned creators
+export const allContentManager = async(req,res)=>{
+    try {
+
+        const managerUsername =  req.query.managerUsername
+        const allContent  = prisma.creator.findUnique({where:{assignedManager:managerUsername},include:{yt_contents:true,blog_contents:true,article_content:true}})
+ 
+        
+    } catch (error) {
+        
+    }
+}
+
 
 
 
