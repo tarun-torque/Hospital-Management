@@ -58,7 +58,7 @@ export const eachManager = async(req,res)=>{
 
 
 // all content for manager only assigned creators
-const getContentByManager = async (req, res) => {
+export const getContentByManager = async (req, res) => {
     try {
         const managerUsername = req.query.managerUsername;
         

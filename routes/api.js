@@ -9,7 +9,7 @@ import {create_yt_Content, create_blog_content, create_arcticle_content, get_all
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category} from "../controllers/admin.controller.js";
-import { allContentManager, eachManager, login_manager } from "../controllers/manager.controller.js";
+import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
 
 
 // to make dynamic directory
@@ -190,7 +190,7 @@ router.get('/admin/get/staff',staff)
 // manager API
 router.post('/manager/login',login_manager);
 router.get('/get/manager/profile/:managerId',eachManager)
-router.get('/manager/get/content',allContentManager)
+router.get('/manager/get/content',getContentByManager)
 
 
 export default router
