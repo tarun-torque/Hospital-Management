@@ -58,16 +58,34 @@ export const eachManager = async(req,res)=>{
 
 
 // all content for manager only assigned creators
-export const allContentManager = async(req,res)=>{
+const getContentByManager = async (req, res) => {
     try {
+        const managerUsername = req.query.managerUsername;
+        
+        if (!managerUsername) {
+            return res.status(400).json({ status: 400, msg: "Manager username is required" });
+        }
 
-        const managerUsername =  req.query.managerUsername
-        const allContent  = prisma.creator.findUnique({where:{assignedManager:managerUsername},include:{yt_contents:true,blog_contents:true,article_content:true}})
-        res.status(200).json({status:200,msg:allContent})
+        const allContent = await prisma.creator.findUnique({
+            where: { assignedManager: managerUsername },
+            include: {
+                yt_contents: true,
+                blog_contents: true,
+                article_content: true
+            }
+        });
+
+        if (!allContent) {
+            return res.status(404).json({ status: 404, msg: "No content found for this manager" });
+        }
+
+        res.status(200).json({ status: 200, msg: allContent });
     } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        console.error(error);
+        res.status(500).json({ status: 500, msg: "Internal server error" });
     }
-}
+};
+
 
 
 
