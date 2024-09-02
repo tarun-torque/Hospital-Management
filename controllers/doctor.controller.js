@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 //  requst for approval
 export const CreateDoctor_profile = async (req, res) => {
     try {
-
+        
         // gather info from the doctor 
         const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education,pricePerSession,gender} = req.body
         const fileInfo = req.files;

@@ -6,68 +6,276 @@ import transporter from "../utils/transporter.js";
 import path from 'path'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import exp from "constants";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-// register patient 
-export const registerPatient = async (req, res) => {
+// send OTP and verify OTP and then register user from a single route
+export const test  = async(req,res)=>{
     try {
 
-        // get fields
-        const { username, patient_name, email, country, contact_number, dob, gender, new_patient, password } = req.body;
-        const fileInfo = req.file;
+        const {email,otp,patient_name,username,country,contact_number,dob,gender,new_patient,password  } = req.body;
 
-        // check patient is present or not
-        const isUsername = await prisma.patient.findUnique({ where: { username } })
-        if (isUsername) {
-            return res.status(409).json({ message: `Username ${username} is not available` })
-        }
-        const isEmail = await prisma.patient.findUnique({ where: { email } })
-        if (isEmail) {
-            return res.status(409).json({ message: `Email ${email} is already registered` })
+        
+        if(!email && !otp && !patient_name  ){
+            return res.send('enter email')
         }
 
-        // validate file
-        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpg') && ((req.file.size) / 1024 * 1024 <= 20)
-        if (isFile) {
-            return res.send(400).json({ message: 'Profile Picture must be png/jpg and size less than 2MB' })
+        // for sending email
+         if( 
+            (email !==undefined && email !== null && email !=='') 
+            && (otp===undefined || otp === null || otp ==='')
+            && (patient_name===undefined || patient_name === null || patient_name ==='')
+        ){
+
+            const isEmail = await prisma.patient.findUnique({where:{email}})
+            if(isEmail){
+                    await prisma.patient.delete({where:{email}})
+                    return res.status(400).json({msg:'Try again'})
+            }
+ 
+
+            const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
+            const otpToken = jwt.sign({otpNumber},process.env.SECRET_KEY,{expiresIn:'2m'})
+
+            const saveEmail = await prisma.patient.create({data:{email}})
+            const saveOtpToken =  await prisma.patient.update({where:{email},data:{otp:otpToken}})
+              
+        const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: email,
+            subject: 'Your One-Time Password (OTP) for Verification',
+            html: `
+                <p>Hello</p>
+                <p>Thank you for signing up. Please use the following OTP to verify your email address. This OTP is valid for 2 minutes.</p>
+                <h3>${otpNumber}</h3>
+                <p>If you did not request this, please contact our support team immediately at support@example.com.</p>
+                <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</a></p>
+                <p>Follow us on Social Media:<br/>
+                <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+                <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+                <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+                </p>
+                <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+            `,
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
         }
-        // hash password
-        const salt = bcrypt.genSaltSync(10)
-        const hash_pass = bcrypt.hashSync(password, salt)
-        // create data object 
-        const data = {
-            username,
-            password: hash_pass,
-            email,
-            gender,
-            patient_name,
-            country,
-            contact_number,
-            dob,
-            new_patient,
-            profile_path: req.file.path,
-            profileType: req.file.mimetype
-        }
-        // save info. in db
-        const info = await prisma.patient.create({ data })
-        // generate token
-        const forClient =
-        {
-            id: info.id,
-            username,
-            patient_name,
-            profile_path: info.profile_path
-        }
-        const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(201).json({ message: 'Patient Profile is created', token })
-    } catch (error) {
-        console.log(error)
-        res.status(400).json({ message: error.message })
+
+        transporter.sendMail (mailOptions, async(error, info) => {
+            if (error) {
+                await prisma.patient.delete({where:{email}})
+                return res.status(400).json({msg:'OTP not sent'})
+            } else {
+                // await prisma.patient.update({where:{email},data:{email:null}})
+                return res.status(200).json({msg:'OTP sent check your Email'})
+            }
+        });
+        
     }
+    
 
+    // verify OTP
+    else if(  
+        (email !==undefined  && email !== null && email !=='') 
+        && (otp!==undefined || otp !== null || otp !=='')
+        && (patient_name===undefined || patient_name === null || patient_name ==='')
+    ){
+           try {
+            const findOtp  = await prisma.patient.findUnique({where:{email}})
+            const realOtp = findOtp.otp
+            
+            const decode = jwt.verify(realOtp,process.env.SECRET_KEY)
+            if(decode.otpNumber==otp){
+                return res.status(200).json({msg:`Email verified ${decode.otpNumber}` })
+            }
+            if(decode.otpNumber !== otp){
+                return res.status(400).json({msg:'OTP is invalid or expired'})
+            }
+            
+           } catch (error) {
+                  return res.status(400).json({msg:'OTP is invalid or expired'})
+           }
+        }
+
+    // then register patient
+        else if(  
+            (email ===undefined || email === null || email ==='') 
+            && (otp===undefined || otp === null || otp ==='')
+            && (patient_name!==undefined)
+        ){
+            const requiredField  = ['patient_name','username','country','contact_number','dob','gender','new_patient','password']
+            for(const field of requiredField){
+                if(req.body[field] === undefined || req.body[field]==='' || req.body[field]===null){
+                    return res.status(400).json({msg:`${field} is required`})
+                }
+            }
+
+            return res.send("patient registered")
+        }
+        
+        
+    } catch (error) {
+
+        res.send(error.message)
+        
+    }
 }
+
+
+// verify email
+// -------- sent email
+export const verifyPatientEmail = async (req, res, next) => {
+    const { email } = req.body;
+    try {
+        if (!email) {
+            return res.status(400).json({ msg: 'Email is required' });
+        }
+
+        const isEmail = await prisma.patient.findUnique({ where: { email } });
+        if (isEmail) {
+            return res.status(400).json({ msg: 'Email is already present' });
+        }
+
+        const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' });
+
+        
+        const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: email,
+            subject: 'Your One-Time Password (OTP) for Verification',
+            html: `
+                <p>Hello</p>
+                <p>Thank you for signing up. Please use the following OTP to verify your email address. This OTP is valid for 2 minutes.</p>
+                <h3>${otpNumber}</h3>
+                <p>If you did not request this, please contact our support team immediately at support@example.com.</p>
+                <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</a></p>
+                <p>Follow us on Social Media:<br/>
+                <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+                <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+                <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+                </p>
+                <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+            `,
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
+        };
+
+
+      const mailSent =   transporter.sendMail (mailOptions, async(error, info) => {
+            if (error) {
+                return res.status(400).json({msg:'OTP not sent'})
+            } else {
+                return res.status(200).json({msg:'OTP sent check your Email'})
+            }
+        });
+
+
+
+
+    } catch (error) {
+        return res.status(500).json({ msg: error.message });
+    }
+};
+
+
+// verify otp
+export const verifyPatientOTP = async (req, res, next) => {
+    const email = req.params.email
+    try {
+        const { otp } = req.body;
+
+        if (!otp) {
+            return res.status(400).json({ msg: 'OTP is required' });
+        }
+
+        const retrieveOtp = await prisma.patient.findUnique({ where: { email } });
+    
+        const realOtp = retrieveOtp.otp;
+        const payload = jwt.verify(realOtp, process.env.SECRET_KEY);
+
+        if (payload.otpNumber === otp) {
+            return res.status(200).json({ msg: 'Email is verified' });
+           
+        } else {
+            return res.status(400).json({ msg: 'OTP is invalid or expired' });
+        }
+    } catch (error) {
+
+        return res.status(400).json({ msg: 'Something went wrong' });
+    }
+};
+
+
+// register patient
+export const registerPatient = async(req,res)=>{
+    try {
+        
+        const {username,patient_name,country,contact_number,dob,gender,new_patient,password} = req.body
+        const fileInfo =  req.file;
+        const email = req.params.email
+
+        const requiredField = ['username', 'patient_name', 'country', 'contact_number', 'dob', 'gender', 'new_patient', 'password']
+        for (const field of requiredField){
+            if(req.body[field]===undefined || req.body[field]==='' || req.body ===null ){
+                return res.status(400).json({msg:`${field} is required`})
+            }
+        }
+
+        const fileType = fileInfo.mimetype =='image/jpeg' || fileInfo.mimetype =='image/png'
+        const fileSize = fileInfo.size / (1024 * 1024) <=2 
+
+
+        if(!fileType || !fileSize){
+            return res.status(400).json({msg:'File size must be less than 2 MB and PNG or JPG type'})
+        }
+
+        // hash password 
+        const salt =  bcrypt.genSaltSync(10)
+        const hash_pass=bcrypt.hashSync(password,salt)
+
+        const data = {username,patient_name,country,contact_number,dob,gender,new_patient,password:hash_pass,profile_path:fileInfo.path,profileType:fileInfo.mimetype}
+        const saveData = await prisma.patient.update({where:{email},data:{data}})
+
+        res.send("saved")
+
+    } catch (error) {
+        res.status(400).json({msg:error.message})
+    }
+}
+
 
 
 // login patient 
@@ -179,10 +387,9 @@ export const otpSend = async (req, res) => {
     }
 }
 
-// reset password succesfully 
+// reset patient password  
 export const resetPassword = async(req,res)=>{
     try {
-
         const {otp,email,newPassword} = req.body;
 
         const checkOtp =  await prisma.patient.findUnique({where:{email}})

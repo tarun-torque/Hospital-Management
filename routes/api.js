@@ -7,9 +7,11 @@ const router = Router()
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
-import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, update_support } from "../controllers/patient.controller.js";
+import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction, staff} from "../controllers/admin.controller.js";
 import { eachManager, login_manager } from "../controllers/manager.controller.js";
+
+
 
 
 // to make dynamic directory
@@ -78,7 +80,7 @@ router.post('/user/:id/createYtContent', create_yt_Content)
 router.post('/user/:id/createBlogContent', create_blog_content)
 router.post('/user/:id/createArticleContent',upload.single('articleImage') , create_arcticle_content)
 router.get('/user/:id/getProfile',get_profile)
-router.get('/user/:id/getAllContent', get_all_content)
+router.get('/user/:id/getAllContent', get_all_content)   //except blog content 
 router.get('/user/get/blogs/:id',get_blogs)
 router.put('/user/:userId/updateArticle/:articleId',upload.single('articleImage'),update_article)
 router.put('/user/:creatorId/updateYt/:ytId', update_yt)
@@ -107,7 +109,15 @@ router.put('/update/remarks/:DoctorId',updateDoctorRemarks)
 
 
 // patient api
-router.post('/create/patient/profile',upload.single('patientProfile'),registerPatient)
+
+router.post('/test',test)
+
+
+router.post('/verify/patient/mail',verifyPatientEmail)
+router.post('/verify/patient/otp/:email',verifyPatientOTP)
+router.post('/create/patient/profile/:email',registerPatient)
+
+
 router.post('/login/patient',loginPatient)
 router.post('/:patientId/support',post_support)
 router.put('/update/:patientId/:supportId',update_support)
