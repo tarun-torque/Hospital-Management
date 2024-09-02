@@ -9,7 +9,7 @@ import {create_yt_Content, create_blog_content, create_arcticle_content, get_all
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
 import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, createService, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, servieCategory, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, getService, deleteService, deleteCategoryService, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , update_service, articleAction, blogAction, ytAction, staff, allContentAdmin} from "../controllers/admin.controller.js";
-import { eachManager, login_manager } from "../controllers/manager.controller.js";
+import { allContentManager, eachManager, login_manager } from "../controllers/manager.controller.js";
 
 
 
@@ -173,7 +173,7 @@ router.get('/get/content/status',statusOfContent)
 router.put('/article/action/:creatorId/:articleId',articleAction)
 router.put('/blog/action/:creatorId/:blogId',blogAction)
 router.put('/yt/action/:ytId/:ytId',ytAction)
-router.get('/admin/get/all/yt/content',allContentAdmin)
+router.get('/admin/get/all/content',allContentAdmin)
 
 
 
@@ -201,7 +201,7 @@ router.get('/admin/get/staff',staff)
 // manager API
 router.post('/manager/login',login_manager);
 router.get('/get/manager/profile/:managerId',eachManager)
-// router.get('/manager/get')
+router.get('/manager/get/content',allContentManager)
 
 
 
