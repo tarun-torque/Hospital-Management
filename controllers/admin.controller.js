@@ -1373,7 +1373,7 @@ export const category = async (req, res) => {
 
         const data = { name, assignedManager, imagePath: fileInfo.path }
 
-        const saved = await prisma.category.create(data)
+        const saved = await prisma.category.create({data})
         res.status(200).json({ status: 200, msg: 'Category is created Succesfully' })
 
 
