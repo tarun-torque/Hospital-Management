@@ -1477,7 +1477,8 @@ export const createService = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'File size must be less than 2MB and PNG/JPG' })
         }
 
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration, categoryId, imagePath: fileInfo.path }
+        const intDuration = parseInt(duration)
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration:intDuration, categoryId, imagePath: fileInfo.path }
 
         const saveService = await prisma.service.create({ data })
 
