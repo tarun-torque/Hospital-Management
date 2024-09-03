@@ -1481,6 +1481,7 @@ export const createService = async (req, res) => {
         const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration:intDuration, categoryId, imagePath: fileInfo.path }
 
         const saveService = await prisma.service.create({ data })
+        res.status(200).json({status:200,msg:'Service Created Successfully'})
 
     } catch (error) {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
