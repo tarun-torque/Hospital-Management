@@ -1576,7 +1576,7 @@ export const allService = async(req,res)=>{
             return res.status(404).json({status:404,msg:data})
         }
 
-
+        res.status(200).json({status:200,msg:data})
         
     } catch (error) {
         res.status(500).json({status:500,msg:'Something went wrong'})
@@ -1588,7 +1588,7 @@ export const allService = async(req,res)=>{
 export const getServiceFromCategoryId = async(req,res)=>{
   try {
     const categoryId  = +req.params.categoryId;
-    const category   = await prisma.service.findUnique({where:{categoryId}})
+    const category   = await prisma.service.findMany({where:{categoryId}})
 
     res.status(200).json({status:200,msg:category})
 
