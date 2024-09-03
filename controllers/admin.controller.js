@@ -13,6 +13,7 @@ import footer from './mailComponents/footer.js'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from 'constants'
+import { stat } from 'fs'
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -1597,5 +1598,16 @@ export const getServiceFromCategoryId = async(req,res)=>{
   }
 }
 
+// get service from service id
+export const getServiceFromServiceId = async(req,res)=>{
+    try {
+        const serviceId =  +req.params.serviceId;
+        const service =  await prisma.service.findUnique({where:{id:serviceId}})
+        res.status(200).json({status:200,msg:service})
+        
+    } catch (error) {
+        res.status(400).json({status:400,msg:'Something went wrong'})
+    }
+}
 
 
