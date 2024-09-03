@@ -173,7 +173,7 @@ router.put('/admin/update/remarks/:creatorId',updateRemarkCreator)
 router.get('/get/content/status',statusOfContent)
 router.put('/article/action/:creatorId/:articleId',articleAction)
 router.put('/blog/action/:creatorId/:blogId',blogAction)
-router.put('/yt/action/:ytId/:ytId',ytAction)
+router.put('/yt/action/:creatorId/:ytId',ytAction)
 router.get('/admin/get/all/content',allContentAdmin)
 
 
