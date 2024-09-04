@@ -527,10 +527,11 @@ export const eachBlog = async (req, res) => {
         const creator = await prisma.creator.findUnique({ where: { id: blog.blog_creatorId } })
 
 
-        const extract = extractContent(blog.content)
+        const extract = extractContent(updateViews.content)
 
         const data = {
             id: blog.id,
+            views:updateViews.views,
             data: extract,
             tags: blog.tags,
             category: blog.category,
@@ -554,8 +555,6 @@ export const eachArticle = async (req, res) => {
     try {
         const articleId = +req.params.articleId;
         const article = await prisma.article_content.findUnique({ where: { id: articleId } })
-
-       
 
         if (!article) {
             return res.status(400).json({ msg: 'No Article Found' })
@@ -582,21 +581,19 @@ export const eachArticle = async (req, res) => {
 export const eachYT = async (req, res) => {
     try {
         const ytId = +req.params.ytId;
-
         const yt = await prisma.yt_content.findUnique({ where: { id: ytId } })
     
         if (!yt) {
             return res.status(404).json({ msg: 'No Youtube content Found' })
         }
 
-        if(yt.verified==='publish'){
+        if(yt.verified === 'publish'){
             const views = yt.views + 1
             const updateViews  = await prisma.yt_content.update({where:{id:ytId},data:{views:views}})
+            console.log("updated view")
         }
 
         const creator = await prisma.creator.findUnique({ where: { id: yt.yt_creatorId } })
-
-
         res.status(200).json({ yt, creator_username: creator.username })
     } catch (error) {
         res.status(400).json({ message: error.message })
