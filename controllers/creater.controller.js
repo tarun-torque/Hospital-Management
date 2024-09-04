@@ -193,6 +193,7 @@ export const get_blogs = async (req, res) => {
             };
         });
 
+        
         return res.status(200).json({ blogData: blogDataArray });
 
     } catch (error) {
