@@ -513,11 +513,14 @@ export const eachBlog = async (req, res) => {
         const blogId = +req.params.blogId;
 
         const blog = await prisma.blog_content.findUnique({ where: { id: blogId } })
-        const views = blog.views + 1
-
-
+       
         if (!blog) {
             return res.status(404).json({ msg: 'No Blog Found' })
+        }
+
+        if(blog.views==='publish'){
+            const views = blog.views + 1
+            const updateViews = await prisma.blog_content.update({where:{id:blogId},data:{views:views}})
         }
 
         // to find name and username of creator 
@@ -581,10 +584,14 @@ export const eachYT = async (req, res) => {
         const ytId = +req.params.ytId;
 
         const yt = await prisma.yt_content.findUnique({ where: { id: ytId } })
-        const views = yt.views + 1
-
+    
         if (!yt) {
             return res.status(404).json({ msg: 'No Youtube content Found' })
+        }
+
+        if(yt.views==='publish'){
+            const views = yt.views + 1
+            const updateViews  = await prisma.yt_content.update({where:{id:ytId},data:{views:views}})
         }
 
         const creator = await prisma.creator.findUnique({ where: { id: yt.yt_creatorId } })
