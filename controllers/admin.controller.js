@@ -1364,7 +1364,7 @@ export const allContentAdmin = async (req, res) => {
         res.status(200).json({ allYt, allArticle, allBlog:blogDataArray })
 
     } catch (error) {
-        res.status(500).res({ msg: 'Something went wrong' })
+        res.status(500).json({ msg: 'Something went wrong' })
     }
 }
 
