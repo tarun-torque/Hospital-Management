@@ -1336,16 +1336,14 @@ export const staff = async (req, res) => {
 
 export const allContentAdmin = async (req, res) => {
     try {
+        const allYt = await prisma.yt_content.findMany();
+        const allArticle = await prisma.article_content.findMany();
+        const allBlog = await prisma.blog_content.findMany();
 
-        const allYt = await prisma.yt_content.findMany()
-        const allArticle = await prisma.article_content.findMany()
-        const allBlog = await prisma.blog_content.findMany()
+       
 
-        if(! allBlog || allBlog.length==0){
-            return res.status(404).json({status:404,msg:'No Blogs found'})
-        }
 
-        const blogDataArray = blogs.map(blog => {
+        const blogDataArray = allBlog.map(blog => {
             const extractedContent = extractContent(blog.content);
             return {
                 id: blog.id,
@@ -1359,14 +1357,13 @@ export const allContentAdmin = async (req, res) => {
             };
         });
 
-
-
-        res.status(200).json({ allYt, allArticle, allBlog:blogDataArray })
+        res.status(200).json({ status: 200, allYt, allArticle, allBlog: blogDataArray });
 
     } catch (error) {
-        res.status(500).json({ msg: 'Something went wrong' })
+        console.error('Error:', error);
+        res.status(500).json({ msg: 'Something went wrong' });
     }
-}
+};
 
 
 // categories and their services
