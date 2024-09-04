@@ -552,14 +552,15 @@ export const eachArticle = async (req, res) => {
         const articleId = +req.params.articleId;
         const article = await prisma.article_content.findUnique({ where: { id: articleId } })
 
-
-        if (article.verified == 'publish') {
-            const views = article.views + 1
-            const updateViews = await prisma.article_content.update({ where: { id: articleId }, data: { views: views } })
-        }
+       
 
         if (!article) {
             return res.status(400).json({ msg: 'No Article Found' })
+        }
+
+        if (article.verified === 'publish') {
+            const views = article.views + 1
+            const updateViews = await prisma.article_content.update({ where: { id: articleId }, data: { views: views } })
         }
 
         const creator = await prisma.creator.findUnique({ where: { id: article.article_creatorId } })
