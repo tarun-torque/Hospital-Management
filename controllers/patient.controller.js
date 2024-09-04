@@ -34,7 +34,7 @@ try {
     const token = jwt.sign({data},process.env.SECRET_KEY,{expiresIn:'999h'})
     const save = await prisma.patientGoogleSingIn.create({data})
 
-    res.status(200).json({status:200,msg:'Profile created Succesfully',token})
+    res.status(201).json({status:201,msg:'Profile created Succesfully',token})
     
 } catch (error) {
     res.status(500).json({status:500,msg:error.message})
