@@ -13,33 +13,40 @@ const __dirname = dirname(__filename);
 
 
 // signIn patient from google
-export const signInPatientFromGoogle  = async(req,res)=>{
-    const {username,email,profileUrl,fcmToken} = req.body
-try {
+export const signInPatientFromGoogle = async (req, res) => {
+    const { username, email, profileUrl, fcmToken } = req.body;
 
-    const requiredField = ['username','email','fcmToken']
-    for(const field of requiredField){
-        if(req.body[field]===undefined || req.body[field]===null || req.body[field]===''){
-            return res.status(400).json({status:400,msg:`${field} is required`})
+    try {
+        const requiredFields = ['username', 'email', 'fcmToken'];
+        for (const field of requiredFields) {
+            if (!req.body[field]) {
+                return res.status(400).json({ status: 400, msg: `${field} is required` });
+            }
         }
+
+        let patient = await prisma.patientGoogleSingIn.findUnique({ where: { email } });
+
+        const data = { username, email, profileUrl, fcmToken };
+        const token = jwt.sign({ data }, process.env.SECRET_KEY, { expiresIn: '999h' });
+
+        if (patient) {
+            // Email exists, update token
+            await prisma.patientGoogleSingIn.update({
+                where: { email },
+                data: { fcmToken }
+            });
+            return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
+        } else {
+            // New patient, create record
+            await prisma.patientGoogleSingIn.create({ data });
+            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token });
+        }
+
+    } catch (error) {
+        res.status(500).json({ status: 500, msg: error.message });
     }
-    const isEmail = await prisma.patientGoogleSingIn.findUnique({where:{email}})
-    if(isEmail){
-        return res.status(400).json({status:400,msg:'Patient is already registered'})
-    }
+};
 
-    const data = {username,email,profileUrl,fcmToken}
-
-    // send token
-    const token = jwt.sign({data},process.env.SECRET_KEY,{expiresIn:'999h'})
-    const save = await prisma.patientGoogleSingIn.create({data})
-
-    res.status(201).json({status:201,msg:'Profile created Succesfully',token})
-    
-} catch (error) {
-    res.status(500).json({status:500,msg:error.message})
-}
-}
 
 export const getGooglePatientProfile = async(req,res)=>{
     const patinetId =  +req.params.patinetId;
