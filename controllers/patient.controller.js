@@ -17,15 +17,24 @@ export const signInPatientFromGoogle  = async(req,res)=>{
     const {username,email,profileUrl,fcmToken} = req.body
 try {
 
-    const requiredField = ['username','email','profileUrl','fcmToken']
+    const requiredField = ['username','email','fcmToken']
     for(const field of requiredField){
         if(req.body[field]===undefined || req.body[field]===null || req.body[field]===''){
             return res.status(400).json({status:400,msg:`${field} is required`})
         }
     }
+    const isEmail = await prisma.patientGoogleSingIn.findUnique({where:{email}})
+    if(isEmail){
+        return res.status(400).json({status:400,msg:'Patient is already registered'})
+    }
+
     const data = {username,email,profileUrl,fcmToken}
+
+    // send token
+    const token = jwt.sign({data},process.env.SECRET_KEY,{expiresIn:'999h'})
     const save = await prisma.patientGoogleSingIn.create({data})
-    res.status(200).json({status:200,msg:'Profile created Succesfully'})
+
+    res.status(200).json({status:200,msg:'Profile created Succesfully',token})
     
 } catch (error) {
     res.status(500).json({status:500,msg:error.message})
