@@ -67,11 +67,33 @@ export const getContentByManager = async (req, res) => {
             return res.status(400).json({ status: 400, msg: "Manager username is required" });
         }
 
-        const allYt =  await prisma.yt_content.findMany({where:{assignedManager:managerUsername}})
-        const allArticle =  await prisma.article_content.findMany({where:{assignedManager:managerUsername}})
+        const allArticle = await prisma.article_content.findMany({
+            where: {
+                creator: {
+                    assignedManager: managerUsername
+                }
+            }
+        });
+
+        const allYt = await prisma.yt_content.findMany({
+            where: {
+                creator: {
+                    assignedManager: managerUsername
+                }
+            }
+        });
+
+
+        const allBlog = await prisma.blog_content.findMany({
+            where: {
+                creator: {
+                    assignedManager: managerUsername
+                }
+            }
+        });
         
-        const allBlog =  await prisma.blog_content.findMany({where:{assignedManager:managerUsername}})
-        const blogDataArray = blogs.map(blog => {
+    
+        const blogDataArray = allBlog.map(blog => {
             const extractedContent = extractContent(blog.content);
             return {
                 id: blog.id,
@@ -85,12 +107,11 @@ export const getContentByManager = async (req, res) => {
             };
         });
 
+       if(allArticle.length==0 && allBlog.length==0 && allYt.length==0){
+        return res.status(404).json({status:404,msg:"No Content Found"})
+       }
+
         const data = {allYt,allArticle,allBlog:blogDataArray}
-
-
-        if (!allContent) {
-            return res.status(404).json({ status: 404, msg: "No content found for this manager" });
-        }
 
         res.status(200).json({ status: 200, msg: data });
     } catch (error) {
