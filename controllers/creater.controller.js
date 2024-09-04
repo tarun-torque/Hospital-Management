@@ -518,20 +518,20 @@ export const eachBlog = async (req, res) => {
             return res.status(404).json({ msg: 'No Blog Found' })
         }
 
-        if(blog.verified==='publish'){
+        if(blog.verified === 'publish'){
             const views = blog.views + 1
             const updateViews = await prisma.blog_content.update({where:{id:blogId},data:{views:views}})
+            console.log("updated view")
         }
 
         // to find name and username of creator 
         const creator = await prisma.creator.findUnique({ where: { id: blog.blog_creatorId } })
 
-
-        const extract = extractContent(updateViews.content)
+        const extract = extractContent(blog.content)
 
         const data = {
             id: blog.id,
-            views:updateViews.views,
+            views:blog.views,
             data: extract,
             tags: blog.tags,
             category: blog.category,
@@ -590,7 +590,7 @@ export const eachYT = async (req, res) => {
         if(yt.verified === 'publish'){
             const views = yt.views + 1
             const updateViews  = await prisma.yt_content.update({where:{id:ytId},data:{views:views}})
-            console.log("updated view")
+            
         }
 
         const creator = await prisma.creator.findUnique({ where: { id: yt.yt_creatorId } })
