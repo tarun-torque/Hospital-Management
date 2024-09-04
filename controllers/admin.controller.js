@@ -1629,7 +1629,7 @@ export const getServiceFromServiceId = async(req,res)=>{
 
 
 
-// top content categories 
+// top art 
 export const topContentCategories = async(req,res)=>{
     try {
         

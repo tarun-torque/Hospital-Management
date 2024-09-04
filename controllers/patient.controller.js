@@ -11,6 +11,28 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
+
+// signIn patient from google
+export const signInPatientFromGoogle  = async(req,res)=>{
+    const {username,email,profileUrl,fcmToken} = req.body
+try {
+
+    const requiredField = ['username','email','profileUrl','fcmToken']
+    for(const field of requiredField){
+        if(req.body[field]===undefined || req.body[field]===null || req.body[field]===''){
+            return res.status(400).json({status:400,msg:`${field} is required`})
+        }
+    }
+    const data = {username,email,profileUrl,fcmToken}
+    const save = await prisma.patientGoogleSingIn.create({data})
+    res.status(200).json({status:200,msg:'Profile created Succesfully'})
+    
+} catch (error) {
+    res.status(500).json({status:500,msg:error.message})
+}
+}
+
+
 // send OTP and verify OTP and then register user from a single route
 export const test  = async(req,res)=>{
     try {
