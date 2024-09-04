@@ -1,19 +1,17 @@
 import jwt from 'jsonwebtoken'
 import prisma from '../DB/db.config.js'
-import nodemailer from 'nodemailer'
 import 'dotenv/config'
 import transporter from '../utils/transporter.js'
 import bcrypt from 'bcryptjs'
 import vine from '@vinejs/vine'
 import contentCategory_validation from '../validations/validatons.js'
-import { messages } from '@vinejs/vine/defaults'
 import path from 'path'
 import { json } from 'express'
-import footer from './mailComponents/footer.js'
+import extractContent from '../utils/htmlExtractor.js'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import exp from 'constants'
-import { stat } from 'fs'
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -1343,7 +1341,27 @@ export const allContentAdmin = async (req, res) => {
         const allArticle = await prisma.article_content.findMany()
         const allBlog = await prisma.blog_content.findMany()
 
-        res.status(200).json({ allYt, allArticle, allBlog })
+        if(! allBlog || allBlog.length==0){
+            return res.status(404).json({status:404,msg:'No Blogs found'})
+        }
+
+        const blogDataArray = blogs.map(blog => {
+            const extractedContent = extractContent(blog.content);
+            return {
+                id: blog.id,
+                tags: blog.tags,
+                category: blog.category,
+                data: extractedContent,
+                verified: blog.verified,
+                createdAt: blog.createdAt,
+                updatedAt: blog.updatedAt,
+                blog_creatorId: blog.blog_creatorId
+            };
+        });
+
+
+
+        res.status(200).json({ allYt, allArticle, allBlog:blogDataArray })
 
     } catch (error) {
         res.status(500).res({ msg: 'Something went wrong' })

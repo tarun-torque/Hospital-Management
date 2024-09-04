@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import prisma from '../DB/db.config.js'
+import extractContent from '../utils/htmlExtractor.js'
 
 // login manager
 export const login_manager = async(req,res)=>{
@@ -66,20 +67,32 @@ export const getContentByManager = async (req, res) => {
             return res.status(400).json({ status: 400, msg: "Manager username is required" });
         }
 
-        const allContent = await prisma.creator.findMany({
-            where: { assignedManager: managerUsername },
-            include: {
-                yt_contents: true,
-                blog_contents: true,
-                article_content: true
-            }
+        const allYt =  await prisma.yt_content.findMany({where:{assignedManager:managerUsername}})
+        const allArticle =  await prisma.article_content.findMany({where:{assignedManager:managerUsername}})
+        
+        const allBlog =  await prisma.blog_content.findMany({where:{assignedManager:managerUsername}})
+        const blogDataArray = blogs.map(blog => {
+            const extractedContent = extractContent(blog.content);
+            return {
+                id: blog.id,
+                tags: blog.tags,
+                category: blog.category,
+                data: extractedContent,
+                verified: blog.verified,
+                createdAt: blog.createdAt,
+                updatedAt: blog.updatedAt,
+                blog_creatorId: blog.blog_creatorId
+            };
         });
+
+        const data = {allYt,allArticle,allBlog:blogDataArray}
+
 
         if (!allContent) {
             return res.status(404).json({ status: 404, msg: "No content found for this manager" });
         }
 
-        res.status(200).json({ status: 200, msg: allContent });
+        res.status(200).json({ status: 200, msg: data });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: "Internal server error" });

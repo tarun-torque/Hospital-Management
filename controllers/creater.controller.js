@@ -178,7 +178,7 @@ export const get_blogs = async (req, res) => {
             return res.status(404).json({ msg: 'No Blogs found' });
         }
 
-        // Loop through blogs and extract content
+      
         const blogDataArray = blogs.map(blog => {
             const extractedContent = extractContent(blog.content);
             return {
