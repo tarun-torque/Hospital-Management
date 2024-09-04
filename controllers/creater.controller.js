@@ -92,9 +92,9 @@ export const create_blog_content = async (req, res) => {
 
 
     } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Failed to create blog content' });
-}
+        console.log(error)
+        res.status(500).json({ error: 'Failed to create blog content' });
+    }
 
 }
 
@@ -178,7 +178,7 @@ export const get_blogs = async (req, res) => {
             return res.status(404).json({ msg: 'No Blogs found' });
         }
 
-      
+
         const blogDataArray = blogs.map(blog => {
             const extractedContent = extractContent(blog.content);
             return {
@@ -193,7 +193,7 @@ export const get_blogs = async (req, res) => {
             };
         });
 
-        
+
         return res.status(200).json({ blogData: blogDataArray });
 
     } catch (error) {
@@ -290,8 +290,8 @@ export const update_blog = async (req, res) => {
     try {
         const creatorId = +req.params.creatorId;
         const blogId = +req.params.blogId
-        const {content, tags, category } = req.body;
-     
+        const { content, tags, category } = req.body;
+
 
         const updatedData = {}
 
@@ -508,37 +508,37 @@ export const categoryContent = async (req, res) => {
 
 
 // get individual blogs
-export const eachBlog = async(req,res)=>{
+export const eachBlog = async (req, res) => {
     try {
         const blogId = +req.params.blogId;
 
-        const blog = await prisma.blog_content.findUnique({where:{id:blogId}})
-        const views = blog.views+1
+        const blog = await prisma.blog_content.findUnique({ where: { id: blogId } })
+        const views = blog.views + 1
 
-        
-        if(!blog){
-            return res.status(404).json({msg:'No Blog Found'})
+
+        if (!blog) {
+            return res.status(404).json({ msg: 'No Blog Found' })
         }
 
         // to find name and username of creator 
-        const creator  = await prisma.creator.findUnique({where:{id:blog.blog_creatorId}})
+        const creator = await prisma.creator.findUnique({ where: { id: blog.blog_creatorId } })
 
 
-        const extract =  extractContent(blog.content)
+        const extract = extractContent(blog.content)
 
         const data = {
-            id:blog.id,
-            data:extract,
-            tags:blog.tags,
-            category:blog.category,
-            verified:blog.verified,
-            blog_creatorId:blog.blog_creatorId,
-            creator_username:creator.username,
-            createdAt:blog.createdAt,
-            updatedAt:blog.updatedAt
+            id: blog.id,
+            data: extract,
+            tags: blog.tags,
+            category: blog.category,
+            verified: blog.verified,
+            blog_creatorId: blog.blog_creatorId,
+            creator_username: creator.username,
+            createdAt: blog.createdAt,
+            updatedAt: blog.updatedAt
         }
 
-        res.status(200).json({data})
+        res.status(200).json({ data })
 
     } catch (error) {
         console.log(error)
@@ -547,21 +547,24 @@ export const eachBlog = async(req,res)=>{
 }
 
 // get individual article
-export const eachArticle = async(req,res)=>{
+export const eachArticle = async (req, res) => {
     try {
-        const articleId  = +req.params.articleId;
-        const article  = await prisma.article_content.findUnique({where:{id:articleId}})
-        const views = article.views+1
+        const articleId = +req.params.articleId;
+        const article = await prisma.article_content.findUnique({ where: { id: articleId } })
 
-        const updateViews = await prisma.article_content.update({where:{id:articleId},data:{views:views}})
-        
-        if(!article){
-            return res.status(400).json({msg:'No Article Found'})
+
+        if (article.verified == 'publish') {
+            const views = article.views + 1
+            const updateViews = await prisma.article_content.update({ where: { id: articleId }, data: { views: views } })
         }
 
-        const creator  =await prisma.creator.findUnique({where:{id:article.article_creatorId}})
-    
-        res.status(200).json({status:200,article,creator_username:creator.username})
+        if (!article) {
+            return res.status(400).json({ msg: 'No Article Found' })
+        }
+
+        const creator = await prisma.creator.findUnique({ where: { id: article.article_creatorId } })
+
+        res.status(200).json({ status: 200, article, creator_username: creator.username })
 
     } catch (error) {
         console.log(error)
@@ -572,21 +575,21 @@ export const eachArticle = async(req,res)=>{
 
 
 // get individual yt content 
-export const eachYT = async(req,res)=>{
+export const eachYT = async (req, res) => {
     try {
         const ytId = +req.params.ytId;
 
-        const yt = await prisma.yt_content.findUnique({where:{id:ytId}})
-        const views  = yt.views+1
+        const yt = await prisma.yt_content.findUnique({ where: { id: ytId } })
+        const views = yt.views + 1
 
-        if(! yt){
-            return res.status(404).json({msg:'No Youtube content Found'})
+        if (!yt) {
+            return res.status(404).json({ msg: 'No Youtube content Found' })
         }
 
-        const creator =  await prisma.creator.findUnique({where:{id:yt.yt_creatorId}})
+        const creator = await prisma.creator.findUnique({ where: { id: yt.yt_creatorId } })
 
 
-        res.status(200).json({yt,creator_username:creator.username})
+        res.status(200).json({ yt, creator_username: creator.username })
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
@@ -594,16 +597,16 @@ export const eachYT = async(req,res)=>{
 
 
 // get each creator 
-export const eachCreator = async(req,res)=>{
+export const eachCreator = async (req, res) => {
     try {
         const creatorId = +req.params.creatorId;
-        const creator = await prisma.creator.findUnique({where:{id:creatorId}})
+        const creator = await prisma.creator.findUnique({ where: { id: creatorId } })
 
-        if(! creator){
-            return res.json({msg:'No creator Found'})
+        if (!creator) {
+            return res.json({ msg: 'No creator Found' })
         }
 
-        res.status(200).json({creator})
+        res.status(200).json({ creator })
 
     } catch (error) {
         res.status(400).json({ message: error.message })
