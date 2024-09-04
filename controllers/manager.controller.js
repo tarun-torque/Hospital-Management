@@ -69,7 +69,7 @@ export const getContentByManager = async (req, res) => {
 
         const allArticle = await prisma.article_content.findMany({
             where: {
-                creator: {
+                Creator: {
                     assignedManager: managerUsername
                 }
             }
@@ -77,7 +77,7 @@ export const getContentByManager = async (req, res) => {
 
         const allYt = await prisma.yt_content.findMany({
             where: {
-                creator: {
+                Creator: {
                     assignedManager: managerUsername
                 }
             }
@@ -86,7 +86,7 @@ export const getContentByManager = async (req, res) => {
 
         const allBlog = await prisma.blog_content.findMany({
             where: {
-                creator: {
+                Creator: {
                     assignedManager: managerUsername
                 }
             }
