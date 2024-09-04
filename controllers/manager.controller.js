@@ -77,7 +77,7 @@ export const getContentByManager = async (req, res) => {
 
         const allYt = await prisma.yt_content.findMany({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: managerUsername
                 }
             }
