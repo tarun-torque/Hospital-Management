@@ -37,6 +37,8 @@ const sendNotification = async (tokens, title, body, data = {}) => {
 };
 
 
+
+// register notification
 const registerNotificationToken = async(req,res)=>{
     const { userId, token, userType } = req.body; 
 
@@ -66,14 +68,15 @@ const registerNotificationToken = async(req,res)=>{
     }
 }
 
+
 // send notifications to doctor or patients
-const sendNotifications = async(req,res)=>{
+export const sendNotificationsPatientDoctor = async(req,res)=>{
     const { userId, userType, title, body, data } = req.body;
 
     if (!userId || !userType || !title || !body) {
         return res.status(400).json({ message: 'userId, userType, title, and body are required.' });
     }
-
+    
     try {
         let tokens = [];
 

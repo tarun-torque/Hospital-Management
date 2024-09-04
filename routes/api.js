@@ -7,10 +7,10 @@ const router = Router()
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
 import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus } from "../controllers/doctor.controller.js";
-import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, signInPatientFromGoogle, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
+import { delete_support, get_mood, get_support, getGooglePatientProfile, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, signInPatientFromGoogle, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
-import { testFirbase } from "../controllers/push_notification/notification.js";
+import { sendNotificationsPatientDoctor, testFirbase } from "../controllers/push_notification/notification.js";
 
 
 // to make dynamic directory
@@ -117,6 +117,8 @@ router.post('/verify/patient/otp/:email',verifyPatientOTP)
 router.post('/create/patient/profile/:email',registerPatient)
 
 router.post('/patient/signIn/google',signInPatientFromGoogle)
+router.get('/get/patient/from/google/:patinetId',getGooglePatientProfile)
+
 router.post('/login/patient',loginPatient)
 router.post('/:patientId/support',post_support)
 router.put('/update/:patientId/:supportId',update_support)
@@ -209,6 +211,7 @@ router.get('/manager/get/content',getContentByManager)
 
 // notification
 router.get('/test/firebase',testFirbase)
+router.post('/send/notification/patient/doctor',sendNotificationsPatientDoctor)
 
 
 export default router

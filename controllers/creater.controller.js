@@ -518,7 +518,7 @@ export const eachBlog = async (req, res) => {
             return res.status(404).json({ msg: 'No Blog Found' })
         }
 
-        if(blog.views==='publish'){
+        if(blog.verified==='publish'){
             const views = blog.views + 1
             const updateViews = await prisma.blog_content.update({where:{id:blogId},data:{views:views}})
         }
@@ -589,7 +589,7 @@ export const eachYT = async (req, res) => {
             return res.status(404).json({ msg: 'No Youtube content Found' })
         }
 
-        if(yt.views==='publish'){
+        if(yt.verified==='publish'){
             const views = yt.views + 1
             const updateViews  = await prisma.yt_content.update({where:{id:ytId},data:{views:views}})
         }

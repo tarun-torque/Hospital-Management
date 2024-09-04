@@ -32,6 +32,20 @@ try {
 }
 }
 
+export const getGooglePatientProfile = async(req,res)=>{
+    const patinetId =  +req.params.patinetId;
+    try {
+
+        if(!patinetId){
+            return res.status(400).json({status:400,msg:'Patinet id is required'})
+        }
+        const profile  = await prisma.patientGoogleSingIn.findUnique({where:{id:patinetId}})
+        res.status(200).json({status:200,msg:profile})
+    } catch (error) {
+        
+    }
+}
+
 
 // send OTP and verify OTP and then register user from a single route
 export const test  = async(req,res)=>{
