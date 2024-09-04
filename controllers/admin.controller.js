@@ -1626,3 +1626,14 @@ export const getServiceFromServiceId = async(req,res)=>{
 }
 
 
+
+
+
+// top content categories 
+export const topContentCategories = async(req,res)=>{
+    try {
+        
+    } catch (error) {
+        
+    }
+}

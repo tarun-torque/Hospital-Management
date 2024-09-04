@@ -513,6 +513,9 @@ export const eachBlog = async(req,res)=>{
         const blogId = +req.params.blogId;
 
         const blog = await prisma.blog_content.findUnique({where:{id:blogId}})
+        const views = blog.views+1
+
+        
         if(!blog){
             return res.status(404).json({msg:'No Blog Found'})
         }
@@ -548,16 +551,17 @@ export const eachArticle = async(req,res)=>{
     try {
         const articleId  = +req.params.articleId;
         const article  = await prisma.article_content.findUnique({where:{id:articleId}})
+        const views = article.views+1
 
+        const updateViews = await prisma.article_content.update({where:{id:articleId},data:{views:views}})
+        
         if(!article){
             return res.status(400).json({msg:'No Article Found'})
         }
 
         const creator  =await prisma.creator.findUnique({where:{id:article.article_creatorId}})
-
-        
-
-        res.status(200).json({article,creator_username:creator.username})
+    
+        res.status(200).json({status:200,article,creator_username:creator.username})
 
     } catch (error) {
         console.log(error)
@@ -573,6 +577,7 @@ export const eachYT = async(req,res)=>{
         const ytId = +req.params.ytId;
 
         const yt = await prisma.yt_content.findUnique({where:{id:ytId}})
+        const views  = yt.views+1
 
         if(! yt){
             return res.status(404).json({msg:'No Youtube content Found'})

@@ -85,6 +85,7 @@ model Yt_content {
   content      String
   tags         String[]
   category     String[]
+  views             Int @default(0)
   verified     String   @default("pending") //active,pending,unpublish,rejected,need improvement
   creator      Creator  @relation(fields: [yt_creatorId], references: [id])
   yt_creatorId Int
@@ -100,6 +101,7 @@ model Article_content {
   articleImagePath  String
   articleImageType  String
   tags              String[]
+  views             Int @default(0)
   category          String[]
   verified          String   @default("pending") //active,pending,unpublish,rejected,need improvement
   Creator           Creator  @relation(fields: [article_creatorId], references: [id])
@@ -117,16 +119,17 @@ model Blog_content {
   verified       String   @default("pending") //active,pending,unpublish,rejected,need improvement
   Creator        Creator  @relation(fields: [blog_creatorId], references: [id])
   blog_creatorId Int
+   views             Int @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
 
 //patient models
 model Patient {
-  id             Int       @id @default(autoincrement())
-  username       String?   @unique
+  id             Int            @id @default(autoincrement())
+  username       String?        @unique
   patient_name   String?
-  email          String?   @unique
+  email          String?        @unique
   profile_path   String?
   profileType    String?
   country        String?
@@ -138,8 +141,9 @@ model Patient {
   password       String?
   support        Support[]
   mood           Mood[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  deviceTokens   deviceTokens[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 }
 
 model Support {
@@ -162,13 +166,13 @@ model Mood {
 
 // doctor model
 model Doctor {
-  id                Int      @id @default(autoincrement())
-  username          String   @unique
-  verified          String   @default("no")
+  id                Int            @id @default(autoincrement())
+  username          String         @unique
+  verified          String         @default("no")
   profile_pic       String
   profile_picType   String
   doctor_name       String
-  email             String   @unique
+  email             String         @unique
   password          String
   country           String
   contact_number    String
@@ -181,12 +185,13 @@ model Doctor {
   documents         String
   documents_type    String
   pricePerSession   Int
-  status            String?  @default("active")
-  remarks           String?  @default("I am active")
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  manager           manager? @relation(fields: [assignedManager], references: [username])
+  status            String?        @default("active")
+  remarks           String?        @default("I am active")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  manager           manager?       @relation(fields: [assignedManager], references: [username])
   assignedManager   String?
+  deviceTokens      deviceTokens[]
 }
 
 // manager model
@@ -207,4 +212,13 @@ model manager {
   assignedCategory Category[]
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
+}
+
+model deviceTokens {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  Doctor    Doctor?  @relation(fields: [doctorId], references: [id])
+  doctorId  Int?
+  Patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId Int?
 }

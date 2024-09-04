@@ -10,6 +10,7 @@ import { CreateDoctor_profile, deleteDoctor_profile, doctorLogin, updateDoctorPr
 import { delete_support, get_mood, get_support, loginPatient, mood, otpSend, post_support, registerPatient, resetPassword, test, update_support, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
+import { testFirbase } from "../controllers/push_notification/notification.js";
 
 
 // to make dynamic directory
@@ -204,6 +205,10 @@ router.get('/admin/get/staff',staff)
 router.post('/manager/login',login_manager);
 router.get('/get/manager/profile/:managerId',eachManager)
 router.get('/manager/get/content',getContentByManager)
+
+
+// notification
+router.get('/test/firebase',testFirbase)
 
 
 export default router
