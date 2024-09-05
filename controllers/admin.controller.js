@@ -372,7 +372,6 @@ export const getContentCategory = async (req, res) => {
 //create manager
 export const register_manager = async (req, res) => {
     try {
-
         // get info.
         const { name, username, email, states, countries, contact_number, password } = req.body;
         const fileInfo = req.file;
@@ -1564,7 +1563,6 @@ export const updateService = async (req, res) => {
            res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
-
 
 
 // to delete service
