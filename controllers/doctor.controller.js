@@ -361,7 +361,9 @@ export const getAvailableSlots = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { patientId, doctorId, slotStart, slotEnd,channelName } = req.body;
+    const { slotStart, slotEnd, channelName } = req.body;
+    const patientId = +req.params.patientId
+    const doctorId = +req.params.doctorId
     try {
         const slotStartTime = new Date(slotStart);
         const slotEndTime = new Date(slotEnd);
@@ -386,7 +388,7 @@ export const bookSlot = async (req, res) => {
         if (existingBooking) {
             return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         }
-    
+
         // Create a booking for the patient with the specified doctor and time slot
         const booking = await prisma.booking.create({
             data: {
@@ -404,14 +406,14 @@ export const bookSlot = async (req, res) => {
 
         // Respond with a success message and booking details, including the next available time
         res.status(200).json({
-            status:200,
+            status: 200,
             msg: 'Slot booked successfully',
             booking,
             nextAvailableTime: nextAvailableTime.toISOString(),
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({status:200, msg: 'Error booking slot' });
+        res.status(500).json({ status: 200, msg: 'Error booking slot' });
     }
 }
 
