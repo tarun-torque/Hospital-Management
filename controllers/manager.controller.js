@@ -44,8 +44,8 @@ export const eachManager = async(req,res)=>{
             {where:{id:managerId},
             include:{
                 creators:true,
-                category:true,
-                doctors:true
+                doctors:true,
+                assignedCategory:true
             }
         })
         
