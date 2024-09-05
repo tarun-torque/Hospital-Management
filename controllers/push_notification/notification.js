@@ -134,7 +134,7 @@ export async function toDoctor(title,body){
                     title,
                     body,
                 },
-                token: 'c_ud1WzKRXOBhaZ9S11WuF:APA91bGSofhwfpXkpQSBadt2HJZIkragKRehku7SzhWNz7ij5oLa334BnnWUo5MxL8YgQwiGTiYuTiQBamsMFpLSrwMh2isIlxu8Yov0iE_3nX3jQ9cILN75bmsLCeYSvLrd0Iv7FYa-', // Replace with a valid device token
+                token: 'fUKE6JUSTUmsfa-72dPsST:APA91bF-cQDEY1XljcKkbt7PaP38mfIAYR0guk-uJ9cWb_fKuGBBq_npPj8s0uCC0VgBCKT5WGvgqOFI96fClvcZRj_e0NgegCCCX5BlFBHb2f_gtWsCwXeR8KRjv1IjhxhepldUKfaK', // Replace with a valid device token
             };
         
             const response = await admin.messaging().send(message);
@@ -146,3 +146,4 @@ export async function toDoctor(title,body){
         }
     
 }
+

@@ -112,7 +112,6 @@ router.get('/get/all/slots',getAllAvailableSlots)
 
 
 // patient api
-
 router.post('/test',test)
 
 
