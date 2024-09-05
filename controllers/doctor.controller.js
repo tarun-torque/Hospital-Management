@@ -244,6 +244,8 @@ export const updateAvailability = async (req, res) => {
     const doctorId = +req.params.doctorId;
     const { availability } = req.body;
 
+    //  `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
+
     try {
         if (!availability) {
             return res.status(400).json({ status: 400, msg: 'Availability is required' });
