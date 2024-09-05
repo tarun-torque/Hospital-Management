@@ -128,7 +128,7 @@ export const testFirbase  = async(req,res)=>{
 
 
 
-export async function toDoctor(title,body){
+export async function toDoctor(title,body,channelName){
         try {
             const message = {
                 notification: {
@@ -140,7 +140,6 @@ export async function toDoctor(title,body){
                 },
                 token: 'fUKE6JUSTUmsfa-72dPsST:APA91bF-cQDEY1XljcKkbt7PaP38mfIAYR0guk-uJ9cWb_fKuGBBq_npPj8s0uCC0VgBCKT5WGvgqOFI96fClvcZRj_e0NgegCCCX5BlFBHb2f_gtWsCwXeR8KRjv1IjhxhepldUKfaK', 
             };
-        
             const response = await admin.messaging().send(message);
             console.log('Test message sent successfully:', response);
             // res.status(200).json({ message: 'Firebase test message sent successfully.', response });
@@ -148,6 +147,4 @@ export async function toDoctor(title,body){
             console.error('Error sending test message:', error);
             // res.status(500).json({ message: 'Error sending test message.', error });
         }
-    
 }
-
