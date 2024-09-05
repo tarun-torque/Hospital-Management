@@ -329,7 +329,7 @@ export const updateAvailability = async (req, res) => {
 
 
 // get available slots of particular docotor
-export const getAvailableSlots = async (req, res) => {
+export const getAvailableSlotsDoctor = async (req, res) => {
     const doctorId = +req.params.doctorId;
     const today = new Date();
     const nextWeek = new Date(today)
@@ -421,6 +421,80 @@ export const bookSlot = async (req, res) => {
         res.status(500).json({ status: 200, msg: 'Error booking slot' });
     }
 }
+
+
+// get all available slots
+export const getAllAvailableSlots = async (req, res) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7); // End date (7 days from today)
+
+    try {
+        // Get all booked slots for the upcoming 7 days
+        const bookedSlots = await prisma.booking.findMany({
+            where: {
+                slotStart: {
+                    gte: today,
+                    lt: nextWeek
+                },
+            },
+            orderBy: {
+                slotStart: 'asc'
+            }
+        });
+
+        const availableSlots = [];
+        const startHour = 9; // Start slots at 9 AM each day
+        const endHour = 17; // End slots by 5 PM each day
+
+        let currentDay = new Date(today);
+
+        while (currentDay < nextWeek) {
+            let currentStartTime = new Date(currentDay);
+            currentStartTime.setHours(startHour, 0, 0, 0); // Set to 9:00 AM
+            let currentEndTime = new Date(currentStartTime);
+            currentEndTime.setHours(currentStartTime.getHours() + 1); // Slot duration is 1 hour
+
+            // Loop through the day from 9 AM to 5 PM
+            while (currentStartTime.getHours() < endHour) {
+                const slotAvailable = bookedSlots.every(booked => {
+                    const bookedStart = new Date(booked.slotStart);
+                    const bookedEnd = new Date(booked.slotEnd);
+                    
+                    return (
+                        currentEndTime <= bookedStart || currentStartTime >= bookedEnd
+                    );
+                });
+
+                if (slotAvailable) {
+                    availableSlots.push({
+                        startTime: currentStartTime.toISOString(),
+                        endTime: currentEndTime.toISOString(),
+                    });
+                }
+
+                // Move to the next slot with a 2-minute buffer
+                currentStartTime = new Date(currentEndTime);
+                currentStartTime.setMinutes(currentStartTime.getMinutes() + 2);
+                currentEndTime = new Date(currentStartTime);
+                currentEndTime.setHours(currentStartTime.getHours() + 1);
+            }
+
+            // Move to the next day
+            currentDay.setDate(currentDay.getDate() + 1);
+        }
+
+        res.status(200).json({
+            status: 200,
+            availableSlots,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Error fetching available slots' });
+    }
+};
 
 
 
