@@ -246,11 +246,16 @@ export const updateAvailability = async (req, res) => {
 
     try {
         if (!availability) {
-            return res.status(400).json({ status: 400, msg: 'availability is required' });
+            return res.status(400).json({ status: 400, msg: 'Availability is required' });
         }
 
         // Parse availability if it is a string
-        const parsedAvailability = JSON.parse(availability);
+        let parsedAvailability;
+        try {
+            parsedAvailability = JSON.parse(availability);
+        } catch (e) {
+            return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
+        }
 
         // Get current date and time
         const now = new Date();
@@ -276,7 +281,7 @@ export const updateAvailability = async (req, res) => {
             if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
                 return res.status(400).json({
                     status: 400,
-                    msg: `Cannot book past time ${slot.startTime} for today`
+                    msg: `Cannot update past time ${slot.startTime} for today`
                 });
             }
 
@@ -318,6 +323,7 @@ export const updateAvailability = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Error updating availability' });
     }
 };
+
 
 
 
