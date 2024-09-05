@@ -4,6 +4,7 @@ import prisma from "../DB/db.config.js";
 import { messages } from "@vinejs/vine/defaults";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { testFirbase, toDoctor } from './push_notification/notification.js';
 
 
 //  requst for approval
@@ -399,6 +400,10 @@ export const bookSlot = async (req, res) => {
                 channelName
             },
         });
+
+        const title = `Your slot ${slotEndTime} - ${slotEndTime} booked !!!`
+        const body = `${channelName}`
+       await toDoctor(title,body)
 
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);

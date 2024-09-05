@@ -124,3 +124,25 @@ export const testFirbase  = async(req,res)=>{
         res.status(500).json({ message: 'Error sending test message.', error });
     }
 }
+
+
+
+export async function toDoctor(title,body){
+        try {
+            const message = {
+                notification: {
+                    title,
+                    body,
+                },
+                token: 'c_ud1WzKRXOBhaZ9S11WuF:APA91bGSofhwfpXkpQSBadt2HJZIkragKRehku7SzhWNz7ij5oLa334BnnWUo5MxL8YgQwiGTiYuTiQBamsMFpLSrwMh2isIlxu8Yov0iE_3nX3jQ9cILN75bmsLCeYSvLrd0Iv7FYa-', // Replace with a valid device token
+            };
+        
+            const response = await admin.messaging().send(message);
+            console.log('Test message sent successfully:', response);
+            res.status(200).json({ message: 'Firebase test message sent successfully.', response });
+        } catch (error) {
+            console.error('Error sending test message:', error);
+            res.status(500).json({ message: 'Error sending test message.', error });
+        }
+    
+}
