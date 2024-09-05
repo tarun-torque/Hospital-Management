@@ -148,8 +148,8 @@ model Patient {
 
 model patientGoogleSingIn {
   id         Int      @id @default(autoincrement())
-  username   String 
-  email      String @unique
+  username   String
+  email      String   @unique
   profileUrl String?
   fcmToken   String
   createdAt  DateTime @default(now())
@@ -176,32 +176,51 @@ model Mood {
 
 // doctor model
 model Doctor {
-  id                Int            @id @default(autoincrement())
-  username          String         @unique
-  verified          String         @default("no")
-  profile_pic       String
-  profile_picType   String
-  doctor_name       String
-  email             String         @unique
-  password          String
-  country           String
-  contact_number    String
-  gender            String
-  state             String
-  languages         String[]
-  specialities      String[]
-  experience        Int
-  maximum_education String
-  documents         String
-  documents_type    String
-  pricePerSession   Int
-  status            String?        @default("active")
-  remarks           String?        @default("I am active")
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  manager           manager?       @relation(fields: [assignedManager], references: [username])
-  assignedManager   String?
-  deviceTokens      deviceTokens[]
+  id                 Int                  @id @default(autoincrement())
+  username           String               @unique
+  verified           String               @default("no")
+  profile_pic        String
+  profile_picType    String
+  doctor_name        String
+  email              String               @unique
+  password           String
+  country            String
+  contact_number     String
+  gender             String
+  state              String
+  languages          String[]
+  specialities       String[]
+  experience         Int
+  maximum_education  String
+  documents          String
+  documents_type     String
+  pricePerSession    Int
+  status             String?              @default("active")
+  remarks            String?              @default("I am active")
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  manager            manager?             @relation(fields: [assignedManager], references: [username])
+  assignedManager    String?
+  deviceTokens       deviceTokens[]
+  doctorAvailability DoctorAvailability[]
+}
+
+model DoctorAvailability {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  Doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  slotStart DateTime
+  slotEnd   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // manager model

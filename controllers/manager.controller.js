@@ -40,17 +40,20 @@ res.status(200).json({message:'Logged in Succesfully',token:token})
 export const eachManager = async(req,res)=>{
     try {
         const managerId = +req.params.managerId
-        const manager = await prisma.manager.findUnique({where:{id:managerId}})
+        const manager = await prisma.manager.findUnique(
+            {where:{id:managerId},
+            include:{
+                creators:true,
+                category:true,
+                doctors:true
+            }
+        })
         
         if(! manager){
             return res.status(404).json({msg:'No Manager found'})
         }
         
-        const assignedCreators = await prisma.creator.findMany({where:{assignedManager:manager.username}})
-        const assignedDoctors = await prisma.doctor.findMany({where:{assignedManager:manager.username}})
-        const assignedServices = await prisma.service.findMany({where:{assignedManager:manager.username}})
-
-        res.status(200).json({manager,assignedCreators,assignedDoctors,assignedServices})
+        res.status(200).json({manager})
         
     } catch (error) {
         res.status(400).json({ message: error.message })
