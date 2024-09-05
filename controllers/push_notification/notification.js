@@ -2,6 +2,7 @@ import admin from 'firebase-admin'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url';
+import { channel } from 'diagnostics_channel';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -134,7 +135,10 @@ export async function toDoctor(title,body){
                     title,
                     body,
                 },
-                token: 'fUKE6JUSTUmsfa-72dPsST:APA91bF-cQDEY1XljcKkbt7PaP38mfIAYR0guk-uJ9cWb_fKuGBBq_npPj8s0uCC0VgBCKT5WGvgqOFI96fClvcZRj_e0NgegCCCX5BlFBHb2f_gtWsCwXeR8KRjv1IjhxhepldUKfaK', // Replace with a valid device token
+                data:{
+                     channelName
+                },
+                token: 'fUKE6JUSTUmsfa-72dPsST:APA91bF-cQDEY1XljcKkbt7PaP38mfIAYR0guk-uJ9cWb_fKuGBBq_npPj8s0uCC0VgBCKT5WGvgqOFI96fClvcZRj_e0NgegCCCX5BlFBHb2f_gtWsCwXeR8KRjv1IjhxhepldUKfaK', 
             };
         
             const response = await admin.messaging().send(message);

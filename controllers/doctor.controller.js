@@ -401,9 +401,10 @@ export const bookSlot = async (req, res) => {
             },
         });
 
-        const title = `Your slot ${slotEndTime} - ${slotEndTime} booked !!!`
-        const body = `${channelName}`
-       await toDoctor(title,body)
+        const title = 'New Slot Booking';
+        const body = `Slot booked from ${slotStartTime.toLocaleTimeString()} to ${slotEndTime.toLocaleTimeString()}.`;
+        const channelName  = `${channelName}`
+         await toDoctor(title,body,channelName)
 
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);
