@@ -401,9 +401,12 @@ export const bookSlot = async (req, res) => {
             },
         });
 
+        const token = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
+        const fcmToken = token.fcmToken
+
         const title = 'New Slot Booking';
         const body = `Slot booked from ${slotStartTime.toLocaleTimeString()} to ${slotEndTime.toLocaleTimeString()}.`;
-         await toDoctor(title,body,channelName)
+         await toDoctor(title,body,channelName,token)
 
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);
