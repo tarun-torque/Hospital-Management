@@ -326,7 +326,6 @@ export const updateAvailability = async (req, res) => {
 
 
 
-
 // get available slots of particular docotor
 export const getAvailableSlots = async (req, res) => {
     const doctorId = +req.params.doctorId;
