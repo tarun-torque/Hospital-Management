@@ -239,35 +239,57 @@ export const updateDoctorRemarks = async (req, res) => {
     }
 }
 
-
-// doctor update availability for a given day 
+// doctor update avalabilty
 export const updateAvailability = async (req, res) => {
-    const doctorId  = +req.params.doctorId
-    const { availability } = req.body
-    // `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
+    const doctorId = +req.params.doctorId;
+    const { availability } = req.body;
+
     try {
         if (!availability) {
-            return res.status(400).json({ status: 400, msg: 'availability is required' })
+            return res.status(400).json({ status: 400, msg: 'availability is required' });
         }
-
         const parsedAvailability = JSON.parse(availability);
 
+        // Check for overlap for each slot before inserting new availability
+        for (const slot of parsedAvailability) {
+            const existingSlot = await prisma.doctorAvailability.findFirst({
+                where: {
+                    doctorId,
+                    startTime: {
+                        lte: new Date(slot.endTime),  // Overlap if new slot's end is greater or equal to an existing slot's start
+                    },
+                    endTime: {
+                        gte: new Date(slot.startTime), // Overlap if new slot's start is less or equal to an existing slot's end
+                    }
+                }
+            });
+
+            // If overlap found
+            if (existingSlot) {
+                return res.status(400).json({ 
+                    status: 400, 
+                    msg: `Availability conflict: ${slot.startTime} - ${slot.endTime} is already booked`
+                });
+            }
+        }
+
+        // If no conflicts
         const availableSlots = await prisma.doctorAvailability.createMany({
             data: parsedAvailability.map(slot => ({
                 doctorId,
                 startTime: new Date(slot.startTime),
                 endTime: new Date(slot.endTime)
             }))
-        })
-        res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots })
+        });
+
+        res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Error updating availability' });
     }
+};
 
-
-}
 
 // get available slots of particular docotor
 export const getAvailableSlots = async (req, res) => {
