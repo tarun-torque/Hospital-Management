@@ -139,10 +139,10 @@ export async function toDoctor(title,body){
         
             const response = await admin.messaging().send(message);
             console.log('Test message sent successfully:', response);
-            res.status(200).json({ message: 'Firebase test message sent successfully.', response });
+            // res.status(200).json({ message: 'Firebase test message sent successfully.', response });
         } catch (error) {
             console.error('Error sending test message:', error);
-            res.status(500).json({ message: 'Error sending test message.', error });
+            // res.status(500).json({ message: 'Error sending test message.', error });
         }
     
 }
