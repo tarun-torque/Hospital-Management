@@ -292,35 +292,85 @@ export const updateAvailability = async (req, res) => {
 
 
 // get available slots of particular docotor
-export const getAvailableSlots = async (req, res) => {
+export const updateAvailability = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    const today = new Date();
-    const nextWeek = new Date(today)
-    nextWeek.setDate(today.getDate() + 7)
+    const { availability } = req.body;
 
     try {
-
-        const availableSlots = await prisma.doctorAvailability.findMany({
-            where: {
-                doctorId,
-                startTime: {
-                    gte: today,
-                    lte: nextWeek
-                }
-            }
-        })
-
-        if (availableSlots.length == 0) {
-            return res.status(400).json({ status: 200, msg: 'No Slots are available' })
+        if (!availability) {
+            return res.status(400).json({ status: 400, msg: 'availability is required' });
         }
 
-        res.status(200).json({ status: 200, msg: availableSlots });
+        // Parse availability if it is a string
+        const parsedAvailability = JSON.parse(availability);
+
+        // Get current date and time
+        const now = new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Start of the current day
+        const nextWeek = new Date(today);
+        nextWeek.setDate(today.getDate() + 7);
+
+        // Check if all slots are within the upcoming 7 days
+        for (const slot of parsedAvailability) {
+            const slotStart = new Date(slot.startTime);
+            const slotEnd = new Date(slot.endTime);
+
+            // Check if slot is within the next 7 days
+            if (slotStart < today || slotEnd > nextWeek) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
+                });
+            }
+
+            // Prevent updating availability for past times on the current day
+            if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: `Cannot book past time ${slot.startTime} for today`
+                });
+            }
+
+            // Check for overlap for each slot before inserting new availability
+            const existingSlot = await prisma.doctorAvailability.findFirst({
+                where: {
+                    doctorId,
+                    startTime: {
+                        lte: slotEnd,  // Overlap if new slot's end is greater or equal to an existing slot's start
+                    },
+                    endTime: {
+                        gte: slotStart, // Overlap if new slot's start is less or equal to an existing slot's end
+                    }
+                }
+            });
+
+            // If an overlap is found, return an error
+            if (existingSlot) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: `Availability conflict: ${slot.startTime} - ${slot.endTime} is already booked`
+                });
+            }
+        }
+
+        // If no conflicts, proceed to create the new availability
+        const availableSlots = await prisma.doctorAvailability.createMany({
+            data: parsedAvailability.map(slot => ({
+                doctorId,
+                startTime: new Date(slot.startTime),
+                endTime: new Date(slot.endTime)
+            }))
+        });
+
+        res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching available slots' });
-        console.log(error.message)
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Error updating availability' });
     }
-}
+};
+
 
 
 // to book slot 
