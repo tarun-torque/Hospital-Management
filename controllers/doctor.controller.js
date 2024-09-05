@@ -248,58 +248,6 @@ export const updateAvailability = async (req, res) => {
         if (!availability) {
             return res.status(400).json({ status: 400, msg: 'availability is required' });
         }
-        const parsedAvailability = JSON.parse(availability);
-
-        // Check for overlap for each slot before inserting new availability
-        for (const slot of parsedAvailability) {
-            const existingSlot = await prisma.doctorAvailability.findFirst({
-                where: {
-                    doctorId,
-                    startTime: {
-                        lte: new Date(slot.endTime),  // Overlap if new slot's end is greater or equal to an existing slot's start
-                    },
-                    endTime: {
-                        gte: new Date(slot.startTime), // Overlap if new slot's start is less or equal to an existing slot's end
-                    }
-                }
-            });
-
-            // If overlap found
-            if (existingSlot) {
-                return res.status(400).json({ 
-                    status: 400, 
-                    msg: `Availability conflict: ${slot.startTime} - ${slot.endTime} is already booked`
-                });
-            }
-        }
-
-        // If no conflicts
-        const availableSlots = await prisma.doctorAvailability.createMany({
-            data: parsedAvailability.map(slot => ({
-                doctorId,
-                startTime: new Date(slot.startTime),
-                endTime: new Date(slot.endTime)
-            }))
-        });
-
-        res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ status: 500, msg: 'Error updating availability' });
-    }
-};
-
-
-// get available slots of particular docotor
-export const updateAvailability = async (req, res) => {
-    const doctorId = +req.params.doctorId;
-    const { availability } = req.body;
-
-    try {
-        if (!availability) {
-            return res.status(400).json({ status: 400, msg: 'availability is required' });
-        }
 
         // Parse availability if it is a string
         const parsedAvailability = JSON.parse(availability);
@@ -371,6 +319,38 @@ export const updateAvailability = async (req, res) => {
     }
 };
 
+
+
+// get available slots of particular docotor
+export const getAvailableSlots = async (req, res) => {
+    const doctorId = +req.params.doctorId;
+    const today = new Date();
+    const nextWeek = new Date(today)
+    nextWeek.setDate(today.getDate() + 7)
+
+    try {
+
+        const availableSlots = await prisma.doctorAvailability.findMany({
+            where: {
+                doctorId,
+                startTime: {
+                    gte: today,
+                    lte: nextWeek
+                }
+            }
+        })
+
+        if (availableSlots.length == 0) {
+            return res.status(400).json({ status: 200, msg: 'No Slots are available' })
+        }
+
+        res.status(200).json({ status: 200, msg: availableSlots });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching available slots' });
+        console.log(error.message)
+    }
+}
 
 
 // to book slot 
