@@ -249,8 +249,11 @@ export const updateAvailability = async (req, res) => {
         if (!availability) {
             return res.status(400).json({ status: 400, msg: 'availability is required' })
         }
+
+        const parsedAvailability = JSON.parse(availability);
+
         const availableSlots = await prisma.doctorAvailability.createMany({
-            data: availability.map(slot => ({
+            data: parsedAvailability.map(slot => ({
                 doctorId,
                 startTime: new Date(slot.startTime),
                 endTime: new Date(slot.endTime)
