@@ -136,7 +136,7 @@ export async function toDoctor(title,body,channelName){
                 data:{
                      channelName
                 },
-                token: 'dWaTBkzhT9--7y2wFtc5p3:APA91bFlhIvt2WIR83t1zpoTgAQ1iZ0n0GOLI6MVZePdJxOv9leh4IoBos_EW1izkgm6QrDFsOuXAV7v4MFA-D3ZDO3HS92s5DR__BpE1OzLFRTLg6faxbAgIZXbBlWdmz3IkaAoL9rE', 
+                token: 'UKE6JUSTUmsfa-72dPsST:APA91bF-cQDEY1XljcKkbt7PaP38mfIAYR0guk-uJ9cWb_fKuGBBq_npPj8s0uCC0VgBCKT5WGvgqOFI96fClvcZRj_e0NgegCCCX5BlFBHb2f_gtWsCwXeR8KRjv1IjhxhepldUKfaK', 
             };
             const response = await admin.messaging().send(message);
             console.log('Test message sent successfully:', response);
