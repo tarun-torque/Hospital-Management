@@ -59,7 +59,6 @@ const storage  = multer.diskStorage({
     }
 })
 
-
 // filter file types 
 const fileFilter = function(req,file,cb){
     if(file.mimetype==='image/jpeg' ||file.mimetype==='image/png' || file.mimetype==='application/zip'){
@@ -71,7 +70,6 @@ const fileFilter = function(req,file,cb){
 
 
 const upload = multer({storage:storage,fileFilter:fileFilter})
-
 
 // creator api
 router.post('/login/creator',login_creator)
@@ -95,7 +93,6 @@ router.get('/get/blog/:blogId',eachBlog)
 router.get('/get/article/:articleId',eachArticle)
 router.get('/get/yt/:ytId',eachYT)
 router.get('/get/creator/profile/:creatorId',eachCreator)
-
 
 
 // doctor api

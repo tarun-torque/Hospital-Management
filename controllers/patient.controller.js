@@ -30,7 +30,7 @@ export const signInPatientFromGoogle = async (req, res) => {
         const token = jwt.sign({ data }, process.env.SECRET_KEY, { expiresIn: '999h' });
 
         if (patient) {
-            // Email exists, update token
+          
             await prisma.patientGoogleSingIn.update({
                 where: { email },
                 data: { fcmToken }
