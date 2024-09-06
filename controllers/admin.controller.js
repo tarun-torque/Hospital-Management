@@ -591,7 +591,7 @@ export const setOffManager = async (req, res) => {
                 res.status(500).json({ message: `Status of ${updateStatus.name} changed but Email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({ message: `Now manager ${updateStatus.name} changed to Temporay off ` })
+                res.status(200).json({ message: `Now manager ${updateStatus.name} changed to Temporary off ` })
             }
         })
 
