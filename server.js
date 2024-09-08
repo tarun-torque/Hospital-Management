@@ -4,10 +4,28 @@ import ApiRoutes from './routes/api.js'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import os from 'os'
+import numCPUs from 'os'
+import cluster from 'cluster'
+import http from 'http'
+import process from 'process'
 
-const num = os.cpus.length
-console.log(num)
+if (cluster.isMaster) {
+  console.log(`Master process is running with PID: ${process.pid}`);
+
+  // Fork workers
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  // Restart a worker if it dies
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died, starting a new one...`);
+    cluster.fork();
+  });
+}
+
+
+
 
 const __fileName = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__fileName)
@@ -28,7 +46,6 @@ app.get('/',(req,res)=>{
   res.send('Hello server')
 })
 
-app.listen(PORT,()=>{
-    console.log(`server is listening on port ${PORT}`);
-})
-
+app.listen(PORT, () => {
+  console.log(`Worker ${process.pid} is listening on port ${PORT}`);
+});

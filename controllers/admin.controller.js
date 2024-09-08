@@ -1652,7 +1652,24 @@ export const topBlogs = async(req,res)=>{
             orderBy:{views:'desc'}
         })
 
+        res.status(200).json({status:200,blogs})
+
     } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+export const topYt = async(req,res)=>{
+    try {
+        const yt  = await prisma.yt_content.findMany({
+            where:{verified:'publish'},
+            orderBy:{views:'desc'}
+        })
+        res.status(200).json({status:200,yt})
         
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
