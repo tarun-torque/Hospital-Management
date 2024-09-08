@@ -9,43 +9,37 @@ import cluster from 'cluster'
 import http from 'http'
 import process from 'process'
 
-if (cluster.isMaster) {
-  console.log(`Master process is running with PID: ${process.pid}`);
+const ncpus = numCPUs.cpus().length
+console.log(ncpus)
 
-  // Fork workers
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
+
+if(cluster.isPrimary){
+  for(let i=0;i<ncpus;i++){
+    cluster.fork()
   }
+}else{
 
-  // Restart a worker if it dies
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died, starting a new one...`);
-    cluster.fork();
+
+  const __fileName = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__fileName)
+  
+  const app = express()
+  
+  app.use('/uploads',express.static(path.join(__dirname,'uploads')))
+  
+  
+  app.use(cors())
+  app.use(express.json())
+  app.use(express.urlencoded({extended:false}))
+  app.use('/api',ApiRoutes)
+  
+  const PORT = process.env.PORT || 4000
+  
+  app.get('/',(req,res)=>{
+    res.send(`hello world on process id  ${process.pid}`)
+  })
+  
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
   });
 }
-
-
-
-
-const __fileName = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__fileName)
-
-const app = express()
-
-app.use('/uploads',express.static(path.join(__dirname,'uploads')))
-
-
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({extended:false}))
-app.use('/api',ApiRoutes)
-
-const PORT = process.env.PORT || 4000
-
-app.get('/',(req,res)=>{
-  res.send('Hello server')
-})
-
-app.listen(PORT, () => {
-  console.log(`Worker ${process.pid} is listening on port ${PORT}`);
-});

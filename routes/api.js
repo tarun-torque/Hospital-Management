@@ -215,6 +215,7 @@ router.post('/manager/login',login_manager);
 router.get('/get/manager/profile/:managerId',eachManager)
 router.get('/manager/get/content',getContentByManager)
 
+
 // admin login 
 router.post('/admin/login',adminLogin)
 
