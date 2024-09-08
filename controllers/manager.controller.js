@@ -20,9 +20,8 @@ if(!isEmail || ! isPassword){
     id:isEmail.id,
     username:isEmail.username,
     profile_path:isEmail.profile_path,
-    state:isEmail.state,
+    states:isEmail.states,
     country:isEmail.country,
-    state:isEmail.state
 }
 // send token
 const token  = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
