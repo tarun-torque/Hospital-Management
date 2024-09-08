@@ -10,7 +10,7 @@ import http from 'http'
 import process from 'process'
 
 const ncpus = numCPUs.cpus().length
-console.log(ncpus)
+// console.log(ncpus)
 
 
 if(cluster.isPrimary){
