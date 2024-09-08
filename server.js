@@ -4,6 +4,10 @@ import ApiRoutes from './routes/api.js'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import os from 'os'
+
+const num = os.cpus.length
+console.log(num)
 
 const __fileName = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__fileName)

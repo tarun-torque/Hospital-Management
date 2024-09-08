@@ -1632,7 +1632,7 @@ export const topArticle = async(req,res)=>{
     try {
 
         const article = await prisma.article_content.findMany({
-            where:{verified:publish},
+            where:{verified:'publish'},
             orderBy:{views:'desc'}
         })
 
@@ -1647,12 +1647,11 @@ export const topArticle = async(req,res)=>{
 // top blogs 
 export const topBlogs = async(req,res)=>{
     try {
-
         const blogs = await prisma.blog_content.findMany({
-            where:{verified:publish},
+            where:{verified:'publish'},
             orderBy:{views:'desc'}
         })
-        
+
     } catch (error) {
         
     }
