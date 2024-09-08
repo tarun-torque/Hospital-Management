@@ -1431,8 +1431,8 @@ export const updateCategory = async (req, res) => {
         const updateData = await prisma.category.update({ where: { id: categoryId }, data: { updatedData } })
         res.status(200).json({ status: 200, msg: 'Catagory Updated Succesfully' })
     } catch (error) {
-        return res.status(500).json({ status: 500, msg: 'Something went wrong' })
         console.log(error)
+        return res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -1509,7 +1509,7 @@ export const createService = async (req, res) => {
 export const updateService = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration } = req.body;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration,price } = req.body;
         const fileInfo = req.file;
 
         const updatedData = {}
@@ -1545,6 +1545,9 @@ export const updateService = async (req, res) => {
         if (duration) {
             updatedData.duration = duration
         }
+        if(price){
+            updatedData.price = price
+        }
 
         if (fileInfo) {
             const fileSize = fileInfo.size / 1024 * 1024
@@ -1555,13 +1558,20 @@ export const updateService = async (req, res) => {
             updatedData.imagePath=fileInfo.path
         }
 
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({ message: 'No valid fields to update' });
+        }
+        
+
         // update service
         const updateService = await prisma.service.update({where:{id:serviceId},data:{updatedData}})
 
         res.status(200).json({status:200,json:'Service Updated Successfully'})
 
     } catch (error) {
+        console.log(error)
            res.status(500).json({status:500,msg:'Something went wrong'})
+           
     }
 }
 
@@ -1570,7 +1580,7 @@ export const updateService = async (req, res) => {
 export const deleteService = async(req,res)=>{
     try {
 
-        const serviceId = +req.query.params
+        const serviceId = +req.params.serviceId
         const deleteService = await prisma.service.delete({where:{id:serviceId}})
         res.status(200).json({status:200,msg:'Service deleted successfully'})
         
