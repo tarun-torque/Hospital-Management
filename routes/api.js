@@ -162,6 +162,7 @@ router.get('/get/service/by/:categoryId',getServiceFromCategoryId)
 router.get('/get/service/:serviceId',getServiceFromServiceId)
 
 
+
 // admin-----creator api
 router.post('/admin/creatorProfile',upload.single('creator_picture'),creator_profile)
 router.put('/admin/update/creator/profile/:creatorId',upload.single('creator_picture'),updateCreatorProfile)
