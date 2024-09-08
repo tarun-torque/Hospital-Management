@@ -27,7 +27,7 @@ export const adminLogin  = async(req,res)=>{
         if(!password){
             return res.status(400).json({status:400,msg:'Password is required'})
         }
-        
+
         if(!secretKey){
             return res.status(400).json({status:400,msg:'Secret Key is required'})
         }
@@ -37,7 +37,7 @@ export const adminLogin  = async(req,res)=>{
 
         const token = jwt.sign({data},process.env.SECRET_KEY,{expiresIn:'999h'})
 
-        if(email===isAdmin && password===isAdmin.password && secretKey===isAdmin){
+        if(email===isAdmin.email && password===isAdmin.password && secretKey===isAdmin.secretKey){
             return res.status(200).json({status:200,msg:'LoggedIn',token})
         }
 
