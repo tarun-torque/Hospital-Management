@@ -348,7 +348,7 @@ export const getAvailableSlotsDoctor = async (req, res) => {
         })
 
         if (availableSlots.length == 0) {
-            return res.status(400).json({ status: 200, msg: 'No Slots are available' })
+            return res.status(400).json({ status: 400, msg: 'No Slots are available' })
         }
 
         res.status(200).json({ status: 200, msg: availableSlots });
