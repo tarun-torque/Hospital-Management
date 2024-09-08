@@ -1627,11 +1627,18 @@ export const getServiceFromServiceId = async(req,res)=>{
 
 
 
-// top art 
-export const topContentCategories = async(req,res)=>{
+// top articles 
+export const topArticle = async(req,res)=>{
     try {
+
+        const article = await prisma.article_content.findMany({
+            where:{verified:publish},
+            orderBy:{views:'desc'}
+        })
+
+        res.status(200).json({status:200,article})
         
     } catch (error) {
-        
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
