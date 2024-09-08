@@ -1404,7 +1404,7 @@ export const updateCategory = async (req, res) => {
         const categoryId = +req.params.categoryId
         const fileInfo = req.file;
         const updatedData = {}
-        if (!id) {
+        if (!categoryId) {
             return res.status(400).json({ status: 400, msg: 'Id is required' })
         }
         if (name) {
@@ -1561,7 +1561,7 @@ export const updateService = async (req, res) => {
         if (Object.keys(updatedData).length === 0) {
             return res.status(400).json({ message: 'No valid fields to update' });
         }
-        
+
 
         // update service
         const updateService = await prisma.service.update({where:{id:serviceId},data:{updatedData}})
