@@ -1639,6 +1639,21 @@ export const topArticle = async(req,res)=>{
         res.status(200).json({status:200,article})
         
     } catch (error) {
+        console.log(error)
         res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// top blogs 
+export const topBlogs = async(req,res)=>{
+    try {
+
+        const blogs = await prisma.blog_content.findMany({
+            where:{verified:publish},
+            orderBy:{views:'desc'}
+        })
+        
+    } catch (error) {
+        
     }
 }
