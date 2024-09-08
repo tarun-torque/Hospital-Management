@@ -224,5 +224,4 @@ router.post('/admin/login',adminLogin)
 router.get('/test/firebase',testFirbase)
 router.post('/send/notification/patient/doctor',sendNotificationsPatientDoctor)
 
-
 export default router
