@@ -1673,3 +1673,30 @@ export const topYt = async(req,res)=>{
         res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
+
+export const consultants  = async(req,res)=>{
+    try {
+        const consultant = await prisma.doctor.findMany({where:{verified:'yes'}})
+        const certifiedConsultants = consultant.length
+
+        const con = await prisma.doctor.findMany({where:{verified:'no'}})
+        const pendingConsultants = con.length
+
+        res.status(200).json({status:200,certifiedConsultants,pendingConsultants})
+
+    } catch (error) {
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+export const registeredUser = async(req,res)=>{
+    try {
+        const user  = await prisma.patient.findMany()
+        const registeredUser = user.length
+
+        res.status(200).json({status:200,registeredUser})
+        
+    } catch (error) {
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
