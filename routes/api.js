@@ -154,6 +154,7 @@ router.put('/admin/update/service/category/:categoryId',upload.single('categoryI
 router.get('/get/all/category',allCategory)
 router.delete('/admin/delete/category/:categoryId',categoryDelete)
 
+
 router.post('/admin/create/service/:categoryId',upload.single('serviceImage'),createService)
 router.put('/admin/update/service/:serviceId',upload.single('serviceImage'),updateService)
 router.delete('/admin/delte/service/:serviceId',deleteService)
