@@ -12,7 +12,7 @@ const {email,password} = req.body;
 const isEmail = await prisma.manager.findUnique({where:{email}})
 const isPassword = bcrypt.compareSync(password,isEmail.password)
 
-if(isEmail || isPassword){
+if(!isEmail || ! isPassword){
     return res.status(400).json({message:'Invalid Credentials'})
 }
 
