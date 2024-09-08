@@ -16,6 +16,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
+// admin 
+
+
+
+
+
 // approve request of doctor
 export const approveDoctorRequest = async (req, res) => {
     try {

@@ -211,7 +211,7 @@ router.get('/admin/all/patients',allPatient)
 router.get('/admin/get/staff',staff)
 
 // manager API
-router.post('/manager/login',login_manager);
+router.put('/manager/login',login_manager);
 router.get('/get/manager/profile/:managerId',eachManager)
 router.get('/manager/get/content',getContentByManager)
 

@@ -6,8 +6,14 @@ import extractContent from '../utils/htmlExtractor.js'
 // login manager
 export const login_manager = async(req,res)=>{
 try {
-    // get data
 const {email,password} = req.body;
+if(!email){
+    return res.status(400).json({status:400,msg:'Email is required'})
+}
+if(!password){
+    return res.status(400).json({status:400,msg:'Password is required'})
+}
+
 // check email and password
 const isEmail = await prisma.manager.findUnique({where:{email}})
 const isPassword = bcrypt.compareSync(password,isEmail.password)
