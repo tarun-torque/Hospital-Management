@@ -16,8 +16,40 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-// admin 
+// admin login
+export const adminLogin  = async(req,res)=>{
+    const {email,password,secretKey} = req.body
+    try {
+        if(!email){
+            return res.status(400).json({status:400,msg:'Email is required'})
+        }
 
+        if(!password){
+            return res.status(400).json({status:400,msg:'Password is required'})
+        }
+        
+        if(!secretKey){
+            return res.status(400).json({status:400,msg:'Secret Key is required'})
+        }
+
+        const isAdmin = await prisma.admin.findUnique({where:{id:1}})
+        const data = {name:isAdmin.name}
+
+        const token = jwt.sign({data},process.env.SECRET_KEY,{expiresIn:'999h'})
+
+        if(email===isAdmin && password===isAdmin.password && secretKey===isAdmin){
+            return res.status(200).json({status:200,msg:'LoggedIn',token})
+        }
+
+        else {
+            return res.status(400).json({status:400,msg:'Invalid Credentials'})
+        }
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
 
 
 
