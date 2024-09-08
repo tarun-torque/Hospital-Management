@@ -182,7 +182,6 @@ router.put('/blog/action/:creatorId/:blogId',blogAction)
 router.put('/yt/action/:creatorId/:ytId',ytAction)
 router.get('/admin/get/all/content',allContentAdmin)
 
-
 router.get('/admin/get/top/articles',topArticle)
 router.get('/admin/get/top/blogs',topBlogs)
 router.get('/admin/get/top/yt',topYt)
