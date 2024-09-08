@@ -1432,6 +1432,7 @@ export const updateCategory = async (req, res) => {
         res.status(200).json({ status: 200, msg: 'Catagory Updated Succesfully' })
     } catch (error) {
         return res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        console.log(error)
     }
 }
 
