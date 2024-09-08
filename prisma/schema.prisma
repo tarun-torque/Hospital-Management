@@ -50,6 +50,7 @@ model Service {
   benefits             String[]
   language             String
   duration             Int
+  price                Int
   Category             Category? @relation(fields: [categoryId], references: [id])
   categoryId           Int
 }

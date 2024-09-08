@@ -150,7 +150,7 @@ router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',upload.single('contentCategoryImage'),update_ContentCategory)
 
 router.post('/admin/create/category',upload.single('categoryImage'),category)
-router.put('/admin/update/category/:categoryId',upload.single('categoryImage'),updateCategory)
+router.put('/admin/update/service/category/:categoryId',upload.single('categoryImage'),updateCategory)
 router.get('/get/all/category',allCategory)
 router.delete('/admin/delete/category/:categoryId',categoryDelete)
 
@@ -185,7 +185,6 @@ router.get('/admin/get/top/blogs',topBlogs)
 router.get('/admin/get/top/yt',topYt)
 router.get('/admin/consultants/stats',consultants)
 router.get('/admin/registered/user',registeredUser)
-
 
 
 // admin----manager api

@@ -1423,6 +1423,10 @@ export const updateCategory = async (req, res) => {
             updatedData.imagePath = fileInfo.path
         }
 
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({ message: 'No valid fields to update' });
+        }
+
         // update category
         const updateData = await prisma.category.update({ where: { id: categoryId }, data: { updatedData } })
         res.status(200).json({ status: 200, msg: 'Catagory Updated Succesfully' })
@@ -1452,26 +1456,21 @@ export const allCategory = async(req,res)=>{
 export const categoryDelete = async (req, res) => {
     try {
         const categoryId = +req.params.categoryId
-
         const delCategory = await prisma.category.delete({ where: { id: categoryId } })
-
         if (!delCategory) {
             return res.status(404).json({ status: 404, msg: 'Category does not exist' })
         }
-
         res.status(200).json({ status: 200, msg: 'Catagory deleted successfully' })
-
     } catch (error) {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
-
 // to create service of category
 export const createService = async (req, res) => {
     try {
         const categoryId = +req.params.categoryId;
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration } = req.body;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration,price } = req.body;
         const fileInfo = req.file;
 
         const requiredField = ['title', 'description', 'tags', 'subtitle', 'what_we_will_discuss', 'benefits', 'language', 'duration']
@@ -1493,7 +1492,8 @@ export const createService = async (req, res) => {
         }
 
         const intDuration = parseInt(duration)
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration:intDuration, categoryId, imagePath: fileInfo.path }
+        const intPrice = parseInt(price)
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration:intDuration,price:intPrice, categoryId, imagePath: fileInfo.path }
 
         const saveService = await prisma.service.create({ data })
         res.status(200).json({status:200,msg:'Service Created Successfully'})
