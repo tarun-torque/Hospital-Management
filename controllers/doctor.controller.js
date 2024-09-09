@@ -51,7 +51,25 @@ export const addDoctorService = async (req, res) => {
     }
   };
 
-//   get doctor services
+//   get upcoming session of doctor
+export const upcomingSession = async(req,res)=>{
+    try {
+
+        const doctorId  = +req.params.doctorId;
+
+        const upcomingSession  = await prisma.booking.findMany({where:{doctorId}})
+        if(upcomingSession.length===0){
+            return res.status(400).json({status:400,msg:'No upcoming session'})
+        }
+
+        const name = await prisma.patient.findUnique({where:{id:upcomingSession.patientId}})
+        res.status(200).json({status:200,patientName:name.patient_name,upcomingSession})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
 
 // get service from its id :
 export const getServiceFromId= async(req,res)=>{
