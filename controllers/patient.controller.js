@@ -15,7 +15,6 @@ const __dirname = dirname(__filename);
 // signIn patient from google
 export const signInPatientFromGoogle = async (req, res) => {
     const { username, email, profileUrl, fcmToken } = req.body;
-
     try {
         const requiredFields = ['username', 'email', 'fcmToken'];
         for (const field of requiredFields) {
@@ -37,7 +36,7 @@ export const signInPatientFromGoogle = async (req, res) => {
             });
             return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
         } else {
-            // New patient, create record
+          
             await prisma.patientGoogleSingIn.create({ data });
             return res.status(201).json({ status: 201, msg: 'Profile created successfully', token });
         }
@@ -66,12 +65,10 @@ export const getGooglePatientProfile = async(req,res)=>{
 // send OTP and verify OTP and then register user from a single route
 export const test  = async(req,res)=>{
     try {
-
         const {email,otp,patient_name,username,country,contact_number,dob,gender,new_patient,password  } = req.body;
 
-        
         if(!email && !otp && !patient_name  ){
-            return res.send('enter email')
+            return res.status(400).json({status:400,msg:'Enter email'})
         }
 
         // for sending email
@@ -84,7 +81,7 @@ export const test  = async(req,res)=>{
             const isEmail = await prisma.patient.findUnique({where:{email}})
             if(isEmail){
                     await prisma.patient.delete({where:{email}})
-                    return res.status(400).json({msg:'Try again'})
+                    return res.status(400).json({status:400,msg:'Try again'})
             }
  
 
@@ -155,41 +152,50 @@ export const test  = async(req,res)=>{
             
             const decode = jwt.verify(realOtp,process.env.SECRET_KEY)
             if(decode.otpNumber==otp){
-                return res.status(200).json({msg:`Email verified ${decode.otpNumber}` })
+                await prisma.patient.update({where:{email},data:{emailVerified:'yes'}})
+                return res.status(200).json({status:200,msg:"Email verified" })
             }
             if(decode.otpNumber !== otp){
-                return res.status(400).json({msg:'OTP is invalid or expired'})
+                return res.status(400).json({status:400,msg:'OTP is invalid or expired'})
             }
             
            } catch (error) {
-                  return res.status(400).json({msg:'OTP is invalid or expired'})
+                  return res.status(400).json({status:400,msg:'OTP is invalid or expired'})
            }
         }
 
     // then register patient
         else if(  
-            (email ===undefined || email === null || email ==='') 
-            && (otp===undefined || otp === null || otp ==='')
+            (email !==undefined || email !== null || email !=='') 
+            && (otp!==undefined || otp !== null || otp !=='')
             && (patient_name!==undefined)
         ){
+           const isEmailVerified = await prisma.patient.findUnique({where:{email}})
+           if(isEmailVerified.emailVerified==='no'){
+            return res.status(400).json({status:400,msg:'verify email first'})
+           }
             const requiredField  = ['patient_name','username','country','contact_number','dob','gender','new_patient','password']
             for(const field of requiredField){
                 if(req.body[field] === undefined || req.body[field]==='' || req.body[field]===null){
-                    return res.status(400).json({msg:`${field} is required`})
+                    return res.status(400).json({status:400,msg:`${field} is required`})
                 }
             }
 
-            return res.send("patient registered")
+            const salt  = bcrypt.genSalt(10)
+            const hash_pass = bcrypt.hashSync(password,salt)
+
+            const data = {patient_name,username,country,contact_number,dob,gender,new_patient,password:hash_pass}
+
+            const token = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
+            const saveData = await prisma.patient.update({where:{email},data:data})
+            res.status(200).json({status:200,msg:'Profile created',token})
         }
         
         
     } catch (error) {
-
-        res.send(error.message)
-        
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
-
 
 // verify email
 // -------- sent email

@@ -13,8 +13,8 @@ datasource db {
 
 // admin model
 model admin {
-  id        Int      @id @default(autoincrement())
-  name      String   
+  id        Int    @id @default(autoincrement())
+  name      String
   email     String
   password  String
   secretKey String
@@ -137,6 +137,7 @@ model Patient {
   gender         String? //male female others
   new_patient    String?
   otp            String?
+  emailVerified  String?        @default("no")
   password       String?
   support        Support[]
   mood           Mood[]
@@ -179,29 +180,29 @@ model Doctor {
   id                 Int                  @id @default(autoincrement())
   username           String               @unique
   verified           String               @default("no")
-  profile_pic        String
-  profile_picType    String
-  doctor_name        String
+  profileUrl         String?
+  fcmToken           String
+  doctor_name        String?
   email              String               @unique
-  password           String
-  country            String
-  contact_number     String
-  gender             String
-  state              String
+  password           String?
+  country            String?
+  contact_number     String?
+  emailVerified      String?              @default("no")
+  gender             String?
+  state              String?
+  otp                String?
   languages          String[]
   specialities       String[]
-  experience         Int
-  maximum_education  String
-  documents          String
-  documents_type     String
-  pricePerSession    Int
+  experience         Int?
+  maximum_education  String?
+  documents          String?
+  pricePerSession    Int?
   status             String?              @default("active")
   remarks            String?              @default("I am active")
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   manager            manager?             @relation(fields: [assignedManager], references: [username])
   assignedManager    String?
-  deviceTokens       deviceTokens[]
   doctorAvailability DoctorAvailability[]
   booking            Booking[]
 }
@@ -252,8 +253,6 @@ model manager {
 model deviceTokens {
   id        Int      @id @default(autoincrement())
   token     String   @unique
-  Doctor    Doctor?  @relation(fields: [doctorId], references: [id])
-  doctorId  Int?
   Patient   Patient? @relation(fields: [patientId], references: [id])
   patientId Int?
 }
