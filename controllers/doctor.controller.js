@@ -22,7 +22,7 @@ export const getDoctorProfile = async(req,res)=>{
 // add service
 export const addDoctorService = async (req, res) => {
     try {
-      const { serviceId, doctorId } = +req.params;
+      const { serviceId, doctorId } = +req.body;
   
       // Validate that the doctorId and serviceId exist
       const doctor = await prisma.doctor.findUnique({ where: { id:doctorId  } });
