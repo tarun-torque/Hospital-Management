@@ -12,7 +12,7 @@ import { testFirbase, toDoctor } from './push_notification/notification.js';
 export const getDoctorProfile = async(req,res)=>{
     try {
         const doctorId = +req.params.doctorId;
-        const profile = await prisma.doctor.findUnique({where:{id:doctorId}})
+        const profile = await prisma.doctor.findUnique({where:{id:doctorId},include:{doctorServices:true}})
         res.status(200).json({status:200,profile})
     } catch (error) {
         console.log(error)
@@ -50,6 +50,29 @@ export const addDoctorService = async (req, res) => {
       return res.status(500).json({ status:500,msg: 'Internal server error' });
     }
   };
+
+//   get doctor services
+export const getDoctorServices = async(req,res)=>{
+    try {
+
+       const { doctorUsername } = req.query;
+
+       if(!doctorUsername){
+        return res.status(400).json({status:400,nsg:'Doctor username is required'})
+       }
+
+       const service =  await prisma.doctorService.findUnique({where:{doctorUsername}})
+       if(!service){
+        return res.status(404).json({status:404,msg:'Service with this username is not found'})
+       }
+
+       res.status(200).json({status:200,service})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
   
 
 

@@ -99,6 +99,8 @@ router.get('/get/creator/profile/:creatorId',eachCreator)
 router.get('/get/doctor/profile/:doctorId',getDoctorProfile)
 router.post('/doctor/google/signIn',signInDoctorFromGoogle)
 router.post('/doctor/add/service',addDoctorService)
+router.get('/doctor/services',getDoctorServices)
+
 
 
 
