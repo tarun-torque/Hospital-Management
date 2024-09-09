@@ -98,8 +98,9 @@ router.get('/get/creator/profile/:creatorId',eachCreator)
 // doctor api
 router.get('/get/doctor/profile/:doctorId',getDoctorProfile)
 router.post('/doctor/google/signIn',signInDoctorFromGoogle)
-router.post('/doctor/add/service/:doctorId/:serviceId',addDoctorService)
+router.post('/doctor/add/service',addDoctorService)
 router.get('/get/service/:serviceId',getServiceFromId)
+
 
 
 

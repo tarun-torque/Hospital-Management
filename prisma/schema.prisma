@@ -233,8 +233,6 @@ model Booking {
   servicTitle String
   slotEnd     DateTime
   channelName String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   Doctor      Doctor   @relation(fields: [doctorId], references: [id])
   Patient     Patient  @relation(fields: [patientId], references: [id])
 }
