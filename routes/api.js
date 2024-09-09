@@ -104,6 +104,7 @@ router.post('/doctor/add/service',addDoctorService)
 
 
 
+
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
 router.post('/doctor/login',doctorLogin)
 router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
