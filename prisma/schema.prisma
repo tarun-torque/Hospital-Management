@@ -51,7 +51,7 @@ model Service {
   price                Int
   Category             Category? @relation(fields: [categoryId], references: [id])
   categoryId           Int
-  doctor               Doctor[]
+ doctorServices       DoctorService[]
 }
 
 // creator model
@@ -203,8 +203,16 @@ model Doctor {
   assignedManager    String?
   doctorAvailability DoctorAvailability[]
   booking            Booking[]
-  Service            Service             @relation(fields: [service], references: [title])
-  service            String
+  doctorServices     DoctorService[]
+}
+
+model DoctorService {
+  doctorId  Int
+  serviceId Int
+  doctor    Doctor  @relation(fields: [doctorId], references: [id])
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  @@id([doctorId, serviceId])  // Composite primary key
 }
 
 model DoctorAvailability {

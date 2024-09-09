@@ -20,7 +20,17 @@ export const getDoctorProfile = async(req,res)=>{
     }
 }
 
+// doctor add services
+export const addService = async(req,res)=>{
+    try {
 
+        const {serviceId,patientId} =+req.params
+        
+        
+    } catch (error) {
+        
+    }
+}
 
 
 
