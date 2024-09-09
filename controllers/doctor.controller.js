@@ -82,6 +82,55 @@ export const getServiceFromId= async(req,res)=>{
         res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
+
+// get service from doctor id 
+export const getServicesByDoctorId = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+
+    const doctorServices = await prisma.doctorService.findMany({
+      where: { doctorId: parseInt(doctorId) },
+      include: {
+        service: true, // Includes details of the related service
+      },
+    });
+
+    if (doctorServices.length === 0) {
+      return res.status(404).json({ message: 'No services found for this doctor' });
+    }
+
+    return res.status(200).json(doctorServices);
+  } catch (error) {
+    console.error('Error retrieving services by doctorId:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// get doctor by service id 
+export const getDoctorsByServiceId = async (req, res) => {
+    try {
+      const { serviceId } = req.params;
+  
+      // Find doctors related to the service
+      const serviceDoctors = await prisma.doctorService.findMany({
+        where: { serviceId: parseInt(serviceId) },
+        include: {
+          doctor: true, // Includes details of the related doctor
+        },
+      });
+  
+      if (serviceDoctors.length === 0) {
+        return res.status(404).json({ message: 'No doctors found for this service' });
+      }
+  
+      return res.status(200).json(serviceDoctors);
+    } catch (error) {
+      console.error('Error retrieving doctors by serviceId:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  
+
   
 
 
