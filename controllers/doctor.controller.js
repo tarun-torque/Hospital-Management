@@ -19,14 +19,14 @@ export const getDoctorProfile = async(req,res)=>{
         res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
-
+// add service
 export const addDoctorService = async (req, res) => {
     try {
-      const { doctorUsername, serviceTitle } = req.body;
+      const { serviceId, doctorId } = +req.params;
   
       // Validate that the doctorId and serviceId exist
-      const doctor = await prisma.doctor.findUnique({ where: { username:doctorUsername  } });
-      const service = await prisma.service.findUnique({ where: { title: serviceTitle } });
+      const doctor = await prisma.doctor.findUnique({ where: { id:doctorId  } });
+      const service = await prisma.service.findUnique({ where: { id: serviceId } });
   
       if (!doctor) {
         return res.status(404).json({ msg: 'Doctor not found' });
@@ -39,8 +39,8 @@ export const addDoctorService = async (req, res) => {
       // Create or connect the DoctorService relation
       const doctorService = await prisma.doctorService.create({
         data: {
-            doctorUsername,
-            serviceTitle
+            doctorId,
+            serviceId
         },
       });
 
@@ -52,25 +52,13 @@ export const addDoctorService = async (req, res) => {
   };
 
 //   get doctor services
-export const getDoctorServices = async(req,res)=>{
+
+// get service from its id :
+export const getServiceFromId= async(req,res)=>{
     try {
-
-       const { doctorUsername } = req.query;
-
-       if(!doctorUsername){
-        return res.status(400).json({status:400,nsg:'Doctor username is required'})
-       }
-
-       const service =  await prisma.doctorService.findUnique({where:{doctorUsername}})
-       if(!service){
-        return res.status(404).json({status:404,msg:'Service with this username is not found'})
-       }
-
-       res.status(200).json({status:200,service})
-
+        
     } catch (error) {
-        console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        
     }
 }
   

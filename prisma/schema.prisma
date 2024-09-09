@@ -207,12 +207,12 @@ model Doctor {
 }
 
 model DoctorService {
-  doctorUsername String
-  serviceTitle   String
-  doctor         Doctor  @relation(fields: [doctorUsername], references: [username])
-  service        Service @relation(fields: [serviceTitle], references: [title])
+  doctorId Int
+  serviceId   Int
+  doctor         Doctor  @relation(fields: [doctorId], references: [id])
+  service        Service @relation(fields: [serviceId], references: [id])
 
-  @@id([doctorUsername, serviceTitle]) // Composite primary key
+  @@id([doctorId, serviceId]) // Composite primary key
 }
 
 model DoctorAvailability {
@@ -230,6 +230,7 @@ model Booking {
   patientId   Int
   doctorId    Int
   slotStart   DateTime
+  servicTitle String
   slotEnd     DateTime
   channelName String
   createdAt   DateTime @default(now())
