@@ -56,9 +56,13 @@ export const addDoctorService = async (req, res) => {
 // get service from its id :
 export const getServiceFromId= async(req,res)=>{
     try {
-        
+        const serviceId = +req.params
+        const service = await prisma.doctorService.findUnique({where:{id:serviceId}})
+        res.status(200).json({status:200,service})
+
     } catch (error) {
-        
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
   
