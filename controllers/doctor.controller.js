@@ -75,7 +75,7 @@ export const upcomingSession = async(req,res)=>{
 export const getServiceFromId= async(req,res)=>{
     try {
         const serviceId = +req.params
-        const service = await prisma.doctorService.findUnique({where:{id:serviceId}})
+        const service = await prisma.service.findUnique({where:{id:serviceId}})
         res.status(200).json({status:200,service})
 
     } catch (error) {
