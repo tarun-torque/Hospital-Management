@@ -57,13 +57,12 @@ export const upcomingSession = async(req,res)=>{
 
         const doctorId  = +req.params.doctorId;
 
-        const upcomingSession  = await prisma.booking.findMany({where:{doctorId}})
+        const upcomingSession  = await prisma.booking.findMany({where:{doctorId},include:{Patient:true}})
         if(upcomingSession.length===0){
             return res.status(400).json({status:400,msg:'No upcoming session'})
         }
 
-        const name = await prisma.patient.findUnique({where:{id:upcomingSession.patientId}})
-        res.status(200).json({status:200,patientName:name.patient_name,upcomingSession})
+        res.status(200).json({status:200,upcomingSession})
         
     } catch (error) {
         console.log(error)
