@@ -106,8 +106,6 @@ router.put('/update/remarks/:DoctorId',updateDoctorRemarks)
 router.post('/doctor/:doctorId/availability',updateAvailability)
 router.get('/doctor/:doctorId/availability',getAvailableSlotsDoctor)
 router.post('/booking/:patientId/:doctorId',bookSlot)
-router.get('/get/all/slots',getAllAvailableSlots)
-
 
 
 // patient api

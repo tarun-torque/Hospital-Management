@@ -199,8 +199,6 @@ model Doctor {
   pricePerSession    Int?
   status             String?              @default("active")
   remarks            String?              @default("I am active")
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
   manager            manager?             @relation(fields: [assignedManager], references: [username])
   assignedManager    String?
   doctorAvailability DoctorAvailability[]
