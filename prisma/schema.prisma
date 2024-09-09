@@ -217,7 +217,6 @@ model DoctorService {
 
 
 
-
 model DoctorAvailability {
   id        Int      @id @default(autoincrement())
   startTime DateTime
