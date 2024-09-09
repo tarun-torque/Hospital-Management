@@ -215,6 +215,7 @@ model DoctorService {
   @@id([doctorId, serviceId])  // Composite primary key
 }
 
+
 model DoctorAvailability {
   id        Int      @id @default(autoincrement())
   startTime DateTime

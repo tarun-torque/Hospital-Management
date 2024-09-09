@@ -26,6 +26,7 @@ export const addService = async(req,res)=>{
 
         const {serviceId,patientId} =+req.params
         
+
         
     } catch (error) {
         
