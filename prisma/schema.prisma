@@ -39,7 +39,7 @@ model Category {
 
 model Service {
   id                   Int       @id @default(autoincrement())
-  title                String @unique
+  title                String    @unique
   imagePath            String
   description          String
   tags                 String[]
@@ -178,22 +178,21 @@ model Mood {
 
 // doctor model
 model Doctor {
-  id             Int      @id @default(autoincrement())
-  username       String   @unique
-  verified       String   @default("no")
-  profileUrl     String?
-  fcmToken       String
-  doctor_name    String?
-  email          String   @unique
-  password       String?
-  country        String?
-  contact_number String?
-  emailVerified  String?  @default("no")
-  gender         String?
-  state          String?
-  otp            String?
-  languages      String[]
-
+  id                 Int                  @id @default(autoincrement())
+  username           String               @unique
+  verified           String               @default("no")
+  profileUrl         String?
+  fcmToken           String
+  doctor_name        String?
+  email              String               @unique
+  password           String?
+  country            String?
+  contact_number     String?
+  emailVerified      String?              @default("no")
+  gender             String?
+  state              String?
+  otp                String?
+  languages          String[]
   experience         Int?
   maximum_education  String?
   documents          String?
@@ -204,8 +203,8 @@ model Doctor {
   assignedManager    String?
   doctorAvailability DoctorAvailability[]
   booking            Booking[]
-  Service            Service?             @relation(fields: [service], references: [title])
-  service          String?
+  Service            Service             @relation(fields: [service], references: [title])
+  service            String
 }
 
 model DoctorAvailability {

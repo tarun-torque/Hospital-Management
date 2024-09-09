@@ -1630,10 +1630,10 @@ export const deleteService = async(req,res)=>{
 // get all service 
 export const allService = async(req,res)=>{
     try {
-        const allService = await prisma.service.findMany()
-        const number = allService.length
+        const allService = await prisma.service.findMany({include:{doctor:true}})
+        const serviceCount = allService.length
 
-        const data = {allService,number}
+        const data = {allService,serviceCount}
 
         if(allService.length == 0){
             return res.status(404).json({status:404,msg:data})

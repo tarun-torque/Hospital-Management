@@ -7,6 +7,27 @@ import jwt from 'jsonwebtoken'
 import transporter from '../utils/transporter.js';
 import { testFirbase, toDoctor } from './push_notification/notification.js';
 
+
+//get doctor profile
+export const getDoctorProfile = async(req,res)=>{
+    try {
+        const doctorId = +req.params.doctorId;
+        const profile = await prisma.doctor.findUnique({where:{id:doctorId}})
+        res.status(200).json({status:200,profile})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+
+
+
+
+
+
+
+
 // sign in doctor from google 
 export const signInDoctorFromGoogle = async (req, res) => {
     const { username, email, profileUrl, fcmToken } = req.body;
