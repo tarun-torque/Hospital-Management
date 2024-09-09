@@ -109,6 +109,7 @@ router.post('/booking/:patientId/:doctorId',bookSlot)
 router.get('/get/all/slots',getAllAvailableSlots)
 
 
+
 // patient api
 router.post('/test',test)
 
