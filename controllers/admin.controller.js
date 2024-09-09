@@ -1630,7 +1630,7 @@ export const deleteService = async(req,res)=>{
 // get all service 
 export const allService = async(req,res)=>{
     try {
-        const allService = await prisma.service.findMany({include:{doctor:true}})
+        const allService = await prisma.service.findMany({include:{doctorServices:true}})
         const serviceCount = allService.length
 
         const data = {allService,serviceCount}
