@@ -20,18 +20,37 @@ export const getDoctorProfile = async(req,res)=>{
     }
 }
 
-// doctor add services
-export const addService = async(req,res)=>{
+export const addDoctorService = async (req, res) => {
     try {
+      const { doctorUsername, serviceTitle } = req.body;
+  
+      // Validate that the doctorId and serviceId exist
+      const doctor = await prisma.doctor.findUnique({ where: { username:doctorUsername  } });
+      const service = await prisma.service.findUnique({ where: { title: serviceTitle } });
+  
+      if (!doctor) {
+        return res.status(404).json({ msg: 'Doctor not found' });
+      }
+  
+      if (!service) {
+        return res.status(404).json({ msg: 'Service not found' });
+      }
+  
+      // Create or connect the DoctorService relation
+      const doctorService = await prisma.doctorService.create({
+        data: {
+            doctorUsername,
+            serviceTitle
+        },
+      });
 
-        const {serviceId,patientId} =+req.params
-        
-
-        
+      return res.status(201).json({status:201, message: 'Service added successfully', doctorService });
     } catch (error) {
-        
+      console.error('Error adding service:', error);
+      return res.status(500).json({ status:500,msg: 'Internal server error' });
     }
-}
+  };
+  
 
 
 
