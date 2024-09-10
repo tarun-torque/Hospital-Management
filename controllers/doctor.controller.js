@@ -103,7 +103,7 @@ export const patientSupport  = async(req,res)=>{
 export const deletePatientSupport  = async(req,res)=>{
     try {
         const supportId = +req.params.supportId
-        const deleteSupport = await prisma.support({where:{id:supportId}})
+        const deleteSupport = await prisma.support.delete({where:{id:supportId}})
         res.status(200).json({status:200,msg:'Support deleted'})
     } catch (error) {
         console.log(error)
