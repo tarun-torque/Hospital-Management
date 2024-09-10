@@ -140,9 +140,10 @@ model Patient {
   otp            String?
   emailVerified  String?        @default("no")
   password       String?
-  support        Support[]
+  review         Review[]
   mood           Mood[]
   booking        Booking[]
+  support        Support[]
   deviceTokens   deviceTokens[]
 }
 
@@ -156,12 +157,23 @@ model patientGoogleSingIn {
   updatedAt  DateTime @updatedAt
 }
 
-model Support {
+model Review {
   id          Int      @id @default(autoincrement())
   patientId   Int
   patient     Patient  @relation(fields: [patientId], references: [id])
   title       String
   description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Support {
+  int         Int      @id @default(autoincrement())
+  title       String
+  description String
+  image       String
+  Patient     Patient? @relation(fields: [patientId], references: [id])
+  patientId   Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -205,10 +217,10 @@ model Doctor {
 }
 
 model DoctorService {
-  doctorId Int
-  serviceId   Int
-  doctor         Doctor  @relation(fields: [doctorId], references: [id])
-  service        Service @relation(fields: [serviceId], references: [id])
+  doctorId  Int
+  serviceId Int
+  doctor    Doctor  @relation(fields: [doctorId], references: [id])
+  service   Service @relation(fields: [serviceId], references: [id])
 
   @@id([doctorId, serviceId]) // Composite primary key
 }

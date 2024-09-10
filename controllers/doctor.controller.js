@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken'
 import transporter from '../utils/transporter.js';
 import { testFirbase, toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
+import { allPatient } from './admin.controller.js';
 
 // get alll doctors
 export const allDoctors = async(req,res)=>{
@@ -70,6 +71,97 @@ export const searchDoctorAndServices  = async(req,res)=>{
     } catch (error) {
         console.log(error)
         res.status(500).json({ status:500,msg:'Something went wrong' })   
+    }
+}
+
+// support system 
+export const patientSupport  = async(req,res)=>{
+    try {
+        const patientId = +req.params.patientId;
+        const {title,description} = req.body;
+        const fileInfo = req.file;
+        if(!title){
+            return res.status(400).json({status:400,msg:'Title is required'})
+        }
+        const fileType = fileInfo.mimetype =='image/jpeg' || fileInfo.mimetype =='image/png'
+        const fileSize = fileInfo.size / (1024 * 1024) <=2 
+
+        if(!fileType || !fileSize){
+            return res.status(400).json({status:400,msg:'Image type must be JPG/PNG and size less than 2MB'})
+        }
+
+        const data = {patientId,title,description,image:fileInfo.path}
+        const saveData  =  await prisma.support.create({data})
+        res.status(201).json({status:201,msg:'Support Added',saveData})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+// to delete support 
+export const deletePatientSupport  = async(req,res)=>{
+    try {
+        const supportId = +req.params.supportId
+        const deleteSupport = await prisma.support({where:{id:supportId}})
+        res.status(200).json({status:200,msg:'Support deleted'})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+// get support patient specific
+export const  patientAllSupport = async(req,res)=>{
+    try {
+        const patientId  = +req.params.patientId
+        const allSupport = await prisma.support.findMany({where:{patientId}})
+        if(allSupport.length === 0 ){
+            return res.status(404).json({status:404,msg:'No Support Found'})
+        }
+        res.status(200).json({status:200,allSupport})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// to update support 
+export const updateSupport =  async(req,res)=>{
+    try {
+        const supportId  =+req.params.supportId
+        const {title,description}= req.body
+        const fileInfo = req.file
+
+        const updatedData  ={}
+        if(title){
+            updatedData.title = title
+        }
+        if(description){
+            updatedData.description = description
+        }
+        if(fileInfo){
+            const fileType = fileInfo.mimetype =='image/jpeg' || fileInfo.mimetype =='image/png'
+            const fileSize = fileInfo.size / (1024 * 1024) <=2 
+    
+            if(!fileType || !fileSize){
+                return res.status(400).json({status:400,msg:'Image type must be JPG/PNG and size less than 2MB'})
+            }
+
+            updatedData.image=fileInfo.path
+        }
+
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No valid fields to update' });
+          }
+
+          const updatedSupport = await prisma.support.update({
+            where: { id: supportId },
+            data: updatedData,
+          });
+
+          res.status(200).json({status:200,msg:'Support updated'});
+    } catch (error) {
+        res.status(500).json({ status: 500, msg: 'Something went wrong', error: error.message });
     }
 }
 
