@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import transporter from '../utils/transporter.js';
 import { testFirbase, toDoctor } from './push_notification/notification.js';
-
+import extractContent from '../utils/htmlExtractor.js';
 
 //get doctor profile
 export const getDoctorProfile = async(req,res)=>{
@@ -129,7 +129,52 @@ export const getDoctorsByServiceId = async (req, res) => {
       return res.status(500).json({ error: 'Internal server error' });
     }
   };
-  
+
+export const allYt = async(req,res)=>{
+    try {
+        const yt = await prisma.yt_content.findMany({where:{verified:'publish'}})
+        res.status(200).json({status:200,yt})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+export const allArticle = async(req,res)=>{
+    try {
+        const article = await prisma.article_content.findMany({where:{verified:'publish'}})
+        res.status(200).json({status:200,article})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+export const allBlog = async(req,res)=>{
+    try {
+        const blog = await prisma.blog_content.findMany({where:{verified:'publish'}})
+        const blogDataArray = blog.map(blog => {
+            const extractedContent = extractContent(blog.content);
+            return {
+                id: blog.id,
+                tags: blog.tags,
+                category: blog.category,
+                data: extractedContent,
+                verified: blog.verified,
+                createdAt: blog.createdAt,
+                updatedAt: blog.updatedAt,
+                blog_creatorId: blog.blog_creatorId
+            };
+        });
+
+        res.status(200).json({ status: 200,blog: blogDataArray });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500,msg:'Something went wrong' });
+
+    }
+}
 
   
 
