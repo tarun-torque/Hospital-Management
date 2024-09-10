@@ -27,7 +27,7 @@ export const allDoctors = async(req,res)=>{
     }
 }
 
-// search doctor and services
+// app --  search doctor and services
 export const searchDoctorAndServices  = async(req,res)=>{
     try {
         const {query} = req.query;
@@ -52,9 +52,9 @@ export const searchDoctorAndServices  = async(req,res)=>{
               OR: [
                 { title: { contains: query, mode: 'insensitive' } },
                 { description: { contains: query, mode: 'insensitive' } },
-                { tags: { hasSome: query.split('') } }, 
-                { benefits: { hasSome: query.split('') } }, 
-                { what_we_will_discuss: { hasSome: query.split('') } }, 
+                { tags: { has: query } }, 
+                { benefits: { has: query } }, 
+                { what_we_will_discuss: { has: query} }, 
               ],
             },
           });
@@ -72,6 +72,11 @@ export const searchDoctorAndServices  = async(req,res)=>{
         res.status(500).json({ status:500,msg:'Something went wrong' })   
     }
 }
+
+// admin dashboard search bar 
+// manager dashboard search bar 
+// creator dashboard search bar 
+
 
 //get doctor profile
 export const getDoctorProfile = async(req,res)=>{
