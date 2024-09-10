@@ -8,6 +8,80 @@ import transporter from '../utils/transporter.js';
 import { testFirbase, toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 
+// get alll doctors
+export const allDoctors = async(req,res)=>{
+    try {
+        const allDoctors = await prisma.doctor.findMany({where:{verified:'yes'}})
+        const doctorsCount = allDoctors.length
+        const data = {allDoctors,doctorsCount}
+
+        if(allDoctors.length===0){
+            return res.status(404).json({status:404,msg:'No Counsultant Found'})
+        }
+
+        res.status(200).json({status:200,data}) 
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+
+    }
+}
+
+// search doctor and services
+export const searchDoctorAndServices  = async(req,res)=>{
+    try {
+        const {query} = req.query;
+        if(! query){
+              res.status(400).json({status:400,msg:'Search query is required'})
+        }
+
+         // Search for doctors where doctor_name contains the query
+         const doctors  = await prisma.doctor.findMany({
+            where:{
+                doctor_name:{
+                    contains:query,
+                    mode:'insensitive'
+                }
+            },
+            include:{
+                doctorServices:{
+                    include:{
+                        service:true,
+                    }
+                }
+            }
+         })
+
+
+         // Search for services where title contains the query
+         const services = await prisma.service.findMany({
+            where:{
+                title:{
+                    contains:query,
+                    mode:'insensitive'
+                }
+            },
+            include:{
+                doctorServices:{
+                    include:{
+                        doctor:true
+                    }
+                }
+            }
+         })
+
+         if (doctors.length === 0 && services.length === 0) {
+            return res.status(404).json({status:404,msg:'No result found please try again'});
+          }
+
+          res.status(200).json({ status:200, doctors, services })
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status:500,msg:'Something went wrong' })   
+    }
+}
+
 //get doctor profile
 export const getDoctorProfile = async(req,res)=>{
     try {
