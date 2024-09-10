@@ -52,12 +52,12 @@ export const searchDoctorAndServices  = async(req,res)=>{
               OR: [
                 { title: { contains: query, mode: 'insensitive' } },
                 { description: { contains: query, mode: 'insensitive' } },
-                { tags: { has: query } },
-                { benefits: { has: query } },
-                { what_we_will_discuss: { has: query } }
+                { tags: { hasSome: query.split('') } }, 
+                { benefits: { hasSome: query.split('') } }, 
+                { what_we_will_discuss: { hasSome: query.split('') } }, 
               ],
             },
-          })
+          });
 
 
 
