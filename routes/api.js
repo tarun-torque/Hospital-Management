@@ -112,7 +112,7 @@ router.get('/get/all/blog',allBlog)
 router.get('/get/all/docotors',allDoctors)
 router.get('/search/doctors/services',searchDoctorAndServices)
 router.post('/add/support/:patientId',upload.single('supportImage'),patientSupport)
-router.delete('delete/support/:supportId',deletePatientSupport)
+router.delete('/delete/support/:supportId',deletePatientSupport)
 router.get('/get/patient/support/:patientId',patientAllSupport)
 router.put('/update/support/:supportId',upload.single('supportImage'),updateSupport)
 

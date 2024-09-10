@@ -168,7 +168,7 @@ model Review {
 }
 
 model Support {
-  int         Int      @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   title       String
   description String
   image       String
