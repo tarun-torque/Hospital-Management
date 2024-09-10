@@ -124,6 +124,17 @@ export const  patientAllSupport = async(req,res)=>{
         res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
+// get particular support 
+export const eachSupport = async(req,res)=>{
+    try {
+
+        const supportId = + req.params.supportId
+        const support = await prisma.support.findUnique({where:{id:supportId}})
+        res.status(200).json({status:200,support})
+    } catch (error) {
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
 
 // to update support 
 export const updateSupport =  async(req,res)=>{
@@ -164,6 +175,7 @@ export const updateSupport =  async(req,res)=>{
         res.status(500).json({ status: 500, msg: 'Something went wrong', error: error.message });
     }
 }
+
 
 // admin dashboard search bar 
 // manager dashboard search bar 
