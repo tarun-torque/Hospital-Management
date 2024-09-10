@@ -35,40 +35,31 @@ export const searchDoctorAndServices  = async(req,res)=>{
               res.status(400).json({status:400,msg:'Search query is required'})
         }
 
-         // Search for doctors where doctor_name contains the query
-         const doctors  = await prisma.doctor.findMany({
-            where:{
-                doctor_name:{
-                    contains:query,
-                    mode:'insensitive'
-                }
+         // Search for doctors 
+         const doctors = await prisma.doctor.findMany({
+            where: {
+              OR: [
+                { doctor_name: { contains: query, mode: 'insensitive' } },
+                { username: { contains: query, mode: 'insensitive' } }
+              ],
             },
-            include:{
-                doctorServices:{
-                    include:{
-                        service:true,
-                    }
-                }
-            }
-         })
+          });
 
 
-         // Search for services where title contains the query
+         // Search for services 
          const services = await prisma.service.findMany({
-            where:{
-                title:{
-                    contains:query,
-                    mode:'insensitive'
-                }
+            where: {
+              OR: [
+                { title: { contains: query, mode: 'insensitive' } },
+                { description: { contains: query, mode: 'insensitive' } },
+                { tags: { has: query } },
+                { benefits: { has: query } },
+                { what_we_will_discuss: { has: query } }
+              ],
             },
-            include:{
-                doctorServices:{
-                    include:{
-                        doctor:true
-                    }
-                }
-            }
-         })
+          })
+
+
 
          if (doctors.length === 0 && services.length === 0) {
             return res.status(404).json({status:404,msg:'No result found please try again'});
