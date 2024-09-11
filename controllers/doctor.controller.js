@@ -113,6 +113,7 @@ export const patientSupport = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
 // to delete support 
 export const deletePatientSupport = async (req, res) => {
     try {
@@ -191,9 +192,243 @@ export const updateSupport = async (req, res) => {
 }
 
 
-// admin dashboard search bar 
-// manager dashboard search bar 
-// creator dashboard search bar 
+// admin dashboard search bar (staff,services,content)
+export const adminSearchBar = async(req,res)=>{
+    try {
+
+        const {query} = req.query
+
+        if(!query){
+            return res.status(400).json({status:400,msg:'Search Query is required'})
+        }
+
+        const doctor  = await prisma.doctor.findMany({
+            where:{
+                  OR:[
+                    {doctor_name:{contains:query,mode:'insensitive'}},
+                    {username:{contains:query,mode:'insensitive'}},
+                  ]
+            }
+        })
+
+        const manager = await prisma.manager.findMany({
+            where:{
+                OR:[
+                    {name:{contains:query,mode:'insensitive'}},
+                    {username:{contains:query,mode:'insensitive'}},
+                    {states:{has:query}},
+                    {countries:{has:query}}
+                ]
+            }
+        })
+
+
+        const creator = await prisma.creator.findMany({
+            where:{
+                OR:[
+                    {username:{contains:query,mode:'insensitive'}},
+                    {country:{contains:query,mode:'insensitive'}},
+                    {state:{contains:query,mode:'insensitive'}},
+                    {language:{has:query}}
+                    
+                ]
+            }
+        })
+
+        const categories = await prisma.category.findMany({
+            where:{
+                OR:[
+                    {name:{contains:query,mode:'insensitive'}}
+                ]
+            }
+        })
+
+        const services = await prisma.service.findMany({
+            where:{
+                OR:[
+                    {title:{contains:query,mode:'insensitive'}},
+                    {description:{contains:query,mode:'insensitive'}},
+                    {tags:{has:query}},
+                    {subtitle:{has:query}},
+                    {what_we_will_discuss:{has:query}},
+                    {benefits:{has:query}},
+                    {language:{has:query}}
+                ]
+            }
+        })
+
+        const articles = await prisma.article_content.findMany({
+            where:{
+                OR:[
+                    {heading:{contains:query,mode:'insensitive'}},
+                    {content:{contains:query,mode:'insensitive'}},
+                    {tags:{has:query}},
+                    {category:{has:query}}
+                ]
+            }
+        })
+
+        const blogs = await prisma.blog_content.findMany({
+            where:{
+                OR:[
+                    {content:{contains:query,mode:'insensitive'}},
+                    {tags:{has:query}},
+                    {category:{has:query}}
+                ]
+            }
+        })
+
+        const ytContent = await prisma.yt_content.findMany({
+            where:{
+                OR:[
+                    {heading:{contains:query,mode:'insensitive'}},
+                    {content:{contains:query,mode:'insensitive'}},
+                    {tags:{has:query}},
+                    {category:{has:query}}
+                ]
+            }
+        })
+
+        if(doctor.length===0 && manager.length===0 && creator.length===0 && categories.length===0 && services.length===0 && articles.length===0 && blogs.length===0 && ytContent.length===0){
+            return res.status(404).json({status:404,msg:'No result found'})
+        }
+
+     res.status(200).json({status:200,doctor,manager,creator,categories,services,articles,blogs,ytContent,})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+
+// manager dashboard search bar
+ export const managerSearchBar = async(req,res)=>{
+    const { managerId } = req.params;
+    const { query } = req.query;  
+    
+    try {
+        const managerDetails = await prisma.manager.findUnique({
+            where: { id: parseInt(managerId) },
+            include: {
+                doctors: {
+                    where: {
+                        OR: [
+                            { doctor_name: { contains: query, mode: 'insensitive' } },
+                            { email: { contains: query, mode: 'insensitive' } },
+                            { doctorServices: { some: { service: { title: { contains: query, mode: 'insensitive' } } } } }
+                        ],
+                    },
+                    select: {
+                        doctor_name: true,
+                        email: true,
+                        noOfBooking: true,
+                        doctorServices: {
+                            include: { service: true }
+                        },
+                    },
+                },
+                creators: {
+                    where: {
+                        OR: [
+                            { username: { contains: query, mode: 'insensitive' } },
+                            { email: { contains: query, mode: 'insensitive' } },
+                            { yt_contents: { some: { heading: { contains: query, mode: 'insensitive' } } } },
+                            { blog_contents: { some: { tags: { has: query } } } },
+                            { article_content: { some: { heading: { contains: query, mode: 'insensitive' } } } },
+                        ],
+                    },
+                    select: {
+                        username: true,
+                        email: true,
+                        yt_contents: true,
+                        blog_contents: true,
+                        article_content: true,
+                    },
+                },
+            },
+        });
+    
+        if (!managerDetails) {
+            return res.status(404).json({ status: 404, msg: 'Results not found' });
+        }
+        res.status(200).json({ status: 200, managerDetails });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+}
+
+// creator dashboard search bar
+export const creatorSearchBar = async (req, res) => {
+    const { creatorId } = req.params;
+    const { query } = req.query;  
+
+    try {
+      
+        const creatorDetails = await prisma.creator.findUnique({
+            where: { id: parseInt(creatorId) },
+            include: {
+                yt_contents: {
+                    where: {
+                        OR: [
+                            { heading: { contains: query, mode: 'insensitive' } },
+                            { content: { contains: query, mode: 'insensitive' } },
+                            { tags: { has: query } }
+                        ],
+                    },
+                    select: {
+                        heading: true,
+                        content: true,
+                        views: true,
+                        tags: true,
+                        verified: true
+                    }
+                },
+                blog_contents: {
+                    where: {
+                        OR: [
+                            { content: { contains: query, mode: 'insensitive' } },
+                            { tags: { has: query } }
+                        ]
+                    },
+                    select: {
+                        content: true,
+                        tags: true,
+                        views: true,
+                        verified: true
+                    }
+                },
+                article_content: {
+                    where: {
+                        OR: [
+                            { heading: { contains: query, mode: 'insensitive' } },
+                            { content: { contains: query, mode: 'insensitive' } },
+                            { tags: { has: query } }
+                        ]
+                    },
+                    select: {
+                        heading: true,
+                        content: true,
+                        articleImagePath: true,
+                        views: true,
+                        verified: true
+                    }
+                }
+            }
+        });
+
+        if (!creatorDetails) {
+            return res.status(404).json({ status: 404, msg: 'No results found' });
+        }
+
+        res.status(200).json({ status: 200, creatorDetails });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+};
+
 
 
 //get doctor profile
