@@ -124,7 +124,7 @@ router.get('/manager/:managerId/search/bar',managerSearchBar)
 router.get('/creator/:creatorId/search/bar',creatorSearchBar)
 
 
-router.post('/post/recent/ticket',recentTicket)
+router.post('/post/recent/ticket/:patinetId',recentTicket)
 router.get('/get/all/recent/ticket',getAllRecentTicket)
 
 
