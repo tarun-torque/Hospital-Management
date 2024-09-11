@@ -877,7 +877,7 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName } = req.body;
+    const { slotStart, slotEnd, channelName,serviceTitle } = req.body;
     const patientId = +req.params.patientId
     const doctorId = +req.params.doctorId
     try {
@@ -915,7 +915,8 @@ export const bookSlot = async (req, res) => {
                 doctorId,
                 slotStart: slotStartTime,
                 slotEnd: slotEndTime,
-                channelName
+                channelName,
+                serviceTitle
             },
         });
 

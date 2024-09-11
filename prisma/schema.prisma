@@ -241,7 +241,7 @@ model Booking {
   patientId   Int
   doctorId    Int
   slotStart   DateTime
-  servicTitle String
+  serviceTitle String
   slotEnd     DateTime
   channelName String
   Doctor      Doctor   @relation(fields: [doctorId], references: [id])
