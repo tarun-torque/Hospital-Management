@@ -9,6 +9,20 @@ import { testFirbase, toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 
+
+// get trending consultant
+export const trendingConsultant = async(req,res)=>{
+    try {
+        const consultants = await prisma.doctor.findMany({where:{verified:'yes'},orderBy:{noOfBooking:'desc'}})
+        res.status(200).json({status:200,consultants})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,consultants})
+    }
+}
+
+
 // get alll doctors
 export const allDoctors = async (req, res) => {
     try {
