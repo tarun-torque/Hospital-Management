@@ -125,6 +125,7 @@ router.get('/creator/:creatorId/search/bar',creatorSearchBar)
 
 
 
+
 router.post('/doctor/google/signIn',signInDoctorFromGoogle)
 router.post('/doctor/add/service',addDoctorService)
 
