@@ -9,6 +9,51 @@ import { testFirbase, toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 
+// post ticket
+export const recentTicket = async(req,res)=>{
+    const {title,description} = req.body
+    const patinetId = +req.params.patientId
+    try {
+
+        if(!title || !description){
+            return res.status(400).json({msg:400,msg:'All fields are required'})
+        }
+
+        if(!patinetId){
+            return res.status(400).json({msg:400,msg:'Patient id is required'})
+        }
+
+        const patient=  await prisma.patient.findUnique({where:{id:patinetId}})
+
+        const data = {patinetId,title,description}
+        const save =  await prisma.recentTicket.create({data})
+        res.status(201).json({status:201,msg:'Ticket added Successfully'})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Sometging went wrong'})
+    }
+}
+// get all recent ticket 
+export const getAllRecentTicket = async(req,res)=>{
+    try {
+        const tickets = await prisma.recentTicket.findMany({
+            include: {
+                Patient: {
+                    select: {
+                        patient_name: true,
+                        profile_path: true
+                    }
+                }
+            }
+        });
+        res.status(200).json({status:200, tickets });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500, msg:'Something went wrong' });
+    }
+}
 
 // get trending consultant
 export const trendingConsultant = async(req,res)=>{

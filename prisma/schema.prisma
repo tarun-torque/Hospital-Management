@@ -140,11 +140,22 @@ model Patient {
   otp            String?
   emailVerified  String?        @default("no")
   password       String?
+  recentTicket   recentTicket[]
   review         Review[]
   mood           Mood[]
   booking        Booking[]
   support        Support[]
   deviceTokens   deviceTokens[]
+}
+
+model recentTicket {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  Patient     Patient @relation(fields: [patientId], references: [id])
+  patientId   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model patientGoogleSingIn {
@@ -201,7 +212,7 @@ model Doctor {
   emailVerified      String?              @default("no")
   gender             String?
   state              String?
-  noOfBooking        Int? @default(0)
+  noOfBooking        Int?                 @default(0)
   otp                String?
   languages          String[]
   experience         Int?
@@ -237,15 +248,15 @@ model DoctorAvailability {
 }
 
 model Booking {
-  id          Int      @id @default(autoincrement())
-  patientId   Int
-  doctorId    Int
-  slotStart   DateTime
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  doctorId     Int
+  slotStart    DateTime
   serviceTitle String
-  slotEnd     DateTime
-  channelName String
-  Doctor      Doctor   @relation(fields: [doctorId], references: [id])
-  Patient     Patient  @relation(fields: [patientId], references: [id])
+  slotEnd      DateTime
+  channelName  String
+  Doctor       Doctor   @relation(fields: [doctorId], references: [id])
+  Patient      Patient  @relation(fields: [patientId], references: [id])
 }
 
 // manager model
