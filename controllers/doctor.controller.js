@@ -23,7 +23,7 @@ export const recentTicket = async(req,res)=>{
             return res.status(400).json({msg:400,msg:'Patient id is required'})
         }
 
-        const patient=  await prisma.patient.findUnique({where:{id:patinetId}})
+        const patient=  await prisma.patient.findUnique({where:{id:patientId}})
 
         const data = {patientId,title,description}
         const save =  await prisma.recentTicket.create({data})
