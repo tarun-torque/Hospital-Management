@@ -252,7 +252,7 @@ export const adminSearchBar = async(req,res)=>{
                     {subtitle:{has:query}},
                     {what_we_will_discuss:{has:query}},
                     {benefits:{has:query}},
-                    {language:{has:query}}
+                    {language:{contains:query,mode:'insensitive'}},
                 ]
             }
         })
