@@ -245,12 +245,13 @@ export const upcomingSession = async (req, res) => {
 
         const doctorId = +req.params.doctorId;
 
-        const upcomingSession = await prisma.booking.findMany({ where: { doctorId }, include: { Patient: true } })
+        const upcomingSession = await prisma.booking.findMany({ where: { doctorId }, include: { Patient: true },orderBy:{slotStart:'desc'} })
         if (upcomingSession.length === 0) {
             return res.status(400).json({ status: 400, msg: 'No upcoming session' })
         }
+        const upcomingSessionCount = upcomingSession.length
 
-        res.status(200).json({ status: 200, upcomingSession })
+        res.status(200).json({ status: 200, upcomingSession,upcomingSessionCount })
 
     } catch (error) {
         console.log(error)
