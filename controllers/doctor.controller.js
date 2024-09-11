@@ -10,167 +10,167 @@ import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 
 // get alll doctors
-export const allDoctors = async(req,res)=>{
+export const allDoctors = async (req, res) => {
     try {
-        const allDoctors = await prisma.doctor.findMany({where:{verified:'yes'}})
+        const allDoctors = await prisma.doctor.findMany({ where: { verified: 'yes' } })
         const doctorsCount = allDoctors.length
-        const data = {allDoctors,doctorsCount}
+        const data = { allDoctors, doctorsCount }
 
-        if(allDoctors.length===0){
-            return res.status(404).json({status:404,msg:'No Counsultant Found'})
+        if (allDoctors.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No Counsultant Found' })
         }
 
-        res.status(200).json({status:200,data}) 
+        res.status(200).json({ status: 200, data })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
 
     }
 }
 
 // app --  search doctor and services
-export const searchDoctorAndServices  = async(req,res)=>{
+export const searchDoctorAndServices = async (req, res) => {
     try {
-        const {query} = req.query;
-        if(! query){
-              res.status(400).json({status:400,msg:'Search query is required'})
+        const { query } = req.query;
+        if (!query) {
+            res.status(400).json({ status: 400, msg: 'Search query is required' })
         }
 
-         // Search for doctors 
-         const doctors = await prisma.doctor.findMany({
+        // Search for doctors 
+        const doctors = await prisma.doctor.findMany({
             where: {
-              OR: [
-                { doctor_name: { contains: query, mode: 'insensitive' } },
-                { username: { contains: query, mode: 'insensitive' } }
-              ],
+                OR: [
+                    { doctor_name: { contains: query, mode: 'insensitive' } },
+                    { username: { contains: query, mode: 'insensitive' } }
+                ],
             },
-          });
+        });
 
 
-         // Search for services 
-         const services = await prisma.service.findMany({
+        // Search for services 
+        const services = await prisma.service.findMany({
             where: {
-              OR: [
-                { title: { contains: query, mode: 'insensitive' } },
-                { description: { contains: query, mode: 'insensitive' } },
-                { tags: { has: query } }, 
-                { benefits: { has: query } }, 
-                { what_we_will_discuss: { has: query} }, 
-              ],
+                OR: [
+                    { title: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } },
+                    { tags: { has: query } },
+                    { benefits: { has: query } },
+                    { what_we_will_discuss: { has: query } },
+                ],
             },
-          });
+        });
 
 
 
-         if (doctors.length === 0 && services.length === 0) {
-            return res.status(404).json({status:404,msg:'No result found please try again'});
-          }
+        if (doctors.length === 0 && services.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No result found please try again' });
+        }
 
-          res.status(200).json({ status:200, doctors, services })
-        
+        res.status(200).json({ status: 200, doctors, services })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({ status:500,msg:'Something went wrong' })   
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // support system 
-export const patientSupport  = async(req,res)=>{
+export const patientSupport = async (req, res) => {
     try {
         const patientId = +req.params.patientId;
-        const {title,description} = req.body;
+        const { title, description } = req.body;
         const fileInfo = req.file;
-        if(!title){
-            return res.status(400).json({status:400,msg:'Title is required'})
+        if (!title) {
+            return res.status(400).json({ status: 400, msg: 'Title is required' })
         }
-        const fileType = fileInfo.mimetype =='image/jpeg' || fileInfo.mimetype =='image/png'
-        const fileSize = fileInfo.size / (1024 * 1024) <=2 
+        const fileType = fileInfo.mimetype == 'image/jpeg' || fileInfo.mimetype == 'image/png'
+        const fileSize = fileInfo.size / (1024 * 1024) <= 2
 
-        if(!fileType || !fileSize){
-            return res.status(400).json({status:400,msg:'Image type must be JPG/PNG and size less than 2MB'})
+        if (!fileType || !fileSize) {
+            return res.status(400).json({ status: 400, msg: 'Image type must be JPG/PNG and size less than 2MB' })
         }
 
-        const data = {patientId,title,description,image:fileInfo.path}
-        const saveData  =  await prisma.support.create({data})
-        res.status(201).json({status:201,msg:'Support Added',saveData})
+        const data = { patientId, title, description, image: fileInfo.path }
+        const saveData = await prisma.support.create({ data })
+        res.status(201).json({ status: 201, msg: 'Support Added', saveData })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 // to delete support 
-export const deletePatientSupport  = async(req,res)=>{
+export const deletePatientSupport = async (req, res) => {
     try {
         const supportId = +req.params.supportId
-        const deleteSupport = await prisma.support.delete({where:{id:supportId}})
-        res.status(200).json({status:200,msg:'Support deleted'})
+        const deleteSupport = await prisma.support.delete({ where: { id: supportId } })
+        res.status(200).json({ status: 200, msg: 'Support deleted' })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 // get support patient specific
-export const  patientAllSupport = async(req,res)=>{
+export const patientAllSupport = async (req, res) => {
     try {
-        const patientId  = +req.params.patientId
-        const allSupport = await prisma.support.findMany({where:{patientId}})
-        if(allSupport.length === 0 ){
-            return res.status(404).json({status:404,msg:'No Support Found'})
+        const patientId = +req.params.patientId
+        const allSupport = await prisma.support.findMany({ where: { patientId } })
+        if (allSupport.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No Support Found' })
         }
-        res.status(200).json({status:200,allSupport})
+        res.status(200).json({ status: 200, allSupport })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 // get particular support 
-export const eachSupport = async(req,res)=>{
+export const eachSupport = async (req, res) => {
     try {
 
         const supportId = + req.params.supportId
-        const support = await prisma.support.findUnique({where:{id:supportId}})
-        res.status(200).json({status:200,support})
+        const support = await prisma.support.findUnique({ where: { id: supportId } })
+        res.status(200).json({ status: 200, support })
     } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // to update support 
-export const updateSupport =  async(req,res)=>{
+export const updateSupport = async (req, res) => {
     try {
-        const supportId  =+req.params.supportId
-        const {title,description}= req.body
+        const supportId = +req.params.supportId
+        const { title, description } = req.body
         const fileInfo = req.file
 
-        const updatedData  ={}
-        if(title){
+        const updatedData = {}
+        if (title) {
             updatedData.title = title
         }
-        if(description){
+        if (description) {
             updatedData.description = description
         }
-        if(fileInfo){
-            const fileType = fileInfo.mimetype =='image/jpeg' || fileInfo.mimetype =='image/png'
-            const fileSize = fileInfo.size / (1024 * 1024) <=2 
-    
-            if(!fileType || !fileSize){
-                return res.status(400).json({status:400,msg:'Image type must be JPG/PNG and size less than 2MB'})
+        if (fileInfo) {
+            const fileType = fileInfo.mimetype == 'image/jpeg' || fileInfo.mimetype == 'image/png'
+            const fileSize = fileInfo.size / (1024 * 1024) <= 2
+
+            if (!fileType || !fileSize) {
+                return res.status(400).json({ status: 400, msg: 'Image type must be JPG/PNG and size less than 2MB' })
             }
 
-            updatedData.image=fileInfo.path
+            updatedData.image = fileInfo.path
         }
 
         if (Object.keys(updatedData).length === 0) {
             return res.status(400).json({ status: 400, msg: 'No valid fields to update' });
-          }
+        }
 
-          const updatedSupport = await prisma.support.update({
+        const updatedSupport = await prisma.support.update({
             where: { id: supportId },
             data: updatedData,
-          });
+        });
 
-          res.status(200).json({status:200,msg:'Support updated'});
+        res.status(200).json({ status: 200, msg: 'Support updated' });
     } catch (error) {
         res.status(500).json({ status: 500, msg: 'Something went wrong', error: error.message });
     }
@@ -183,150 +183,150 @@ export const updateSupport =  async(req,res)=>{
 
 
 //get doctor profile
-export const getDoctorProfile = async(req,res)=>{
+export const getDoctorProfile = async (req, res) => {
     try {
         const doctorId = +req.params.doctorId;
-        const profile = await prisma.doctor.findUnique({where:{id:doctorId},include:{doctorServices:true}})
-        res.status(200).json({status:200,profile})
+        const profile = await prisma.doctor.findUnique({ where: { id: doctorId }, include: { doctorServices: true } })
+        res.status(200).json({ status: 200, profile })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 // add service
 export const addDoctorService = async (req, res) => {
     try {
-      const { serviceId, doctorId } = req.body;
-  
-      // Validate that the doctorId and serviceId exist
-      const doctor = await prisma.doctor.findUnique({ where: { id:doctorId  } });
-      const service = await prisma.service.findUnique({ where: { id: serviceId } });
-  
-      if (!doctor) {
-        return res.status(404).json({ msg: 'Doctor not found' });
-      }
-  
-      if (!service) {
-        return res.status(404).json({ msg: 'Service not found' });
-      }
-  
-      // Create or connect the DoctorService relation
-      const doctorService = await prisma.doctorService.create({
-        data: {
-            doctorId,
-            serviceId
-        },
-      });
+        const { serviceId, doctorId } = req.body;
 
-      return res.status(201).json({status:201, message: 'Service added successfully', doctorService });
-    } catch (error) {
-      console.error('Error adding service:', error);
-      return res.status(500).json({ status:500,msg: 'Internal server error' });
-    }
-  };
+        // Validate that the doctorId and serviceId exist
+        const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
+        const service = await prisma.service.findUnique({ where: { id: serviceId } });
 
-//   get upcoming session of doctor
-export const upcomingSession = async(req,res)=>{
-    try {
-
-        const doctorId  = +req.params.doctorId;
-
-        const upcomingSession  = await prisma.booking.findMany({where:{doctorId},include:{Patient:true}})
-        if(upcomingSession.length===0){
-            return res.status(400).json({status:400,msg:'No upcoming session'})
+        if (!doctor) {
+            return res.status(404).json({ msg: 'Doctor not found' });
         }
 
-        res.status(200).json({status:200,upcomingSession})
-        
+        if (!service) {
+            return res.status(404).json({ msg: 'Service not found' });
+        }
+
+        // Create or connect the DoctorService relation
+        const doctorService = await prisma.doctorService.create({
+            data: {
+                doctorId,
+                serviceId
+            },
+        });
+
+        return res.status(201).json({ status: 201, message: 'Service added successfully', doctorService });
+    } catch (error) {
+        console.error('Error adding service:', error);
+        return res.status(500).json({ status: 500, msg: 'Internal server error' });
+    }
+};
+
+//   get upcoming session of doctor
+export const upcomingSession = async (req, res) => {
+    try {
+
+        const doctorId = +req.params.doctorId;
+
+        const upcomingSession = await prisma.booking.findMany({ where: { doctorId }, include: { Patient: true } })
+        if (upcomingSession.length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No upcoming session' })
+        }
+
+        res.status(200).json({ status: 200, upcomingSession })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // get service from its id :
-export const getServiceFromId= async(req,res)=>{
+export const getServiceFromId = async (req, res) => {
     try {
         const serviceId = +req.params
-        const service = await prisma.service.findUnique({where:{id:serviceId}})
-        res.status(200).json({status:200,service})
+        const service = await prisma.service.findUnique({ where: { id: serviceId } })
+        res.status(200).json({ status: 200, service })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // get service from doctor id 
 export const getServicesByDoctorId = async (req, res) => {
-  try {
-    const { doctorId } = req.params;
+    try {
+        const { doctorId } = req.params;
 
-    const doctorServices = await prisma.doctorService.findMany({
-      where: { doctorId: parseInt(doctorId) },
-      include: {
-        service: true, // Includes details of the related service
-      },
-    });
+        const doctorServices = await prisma.doctorService.findMany({
+            where: { doctorId: parseInt(doctorId) },
+            include: {
+                service: true, // Includes details of the related service
+            },
+        });
 
-    if (doctorServices.length === 0) {
-      return res.status(404).json({ message: 'No services found for this doctor' });
+        if (doctorServices.length === 0) {
+            return res.status(404).json({ message: 'No services found for this doctor' });
+        }
+
+        return res.status(200).json(doctorServices);
+    } catch (error) {
+        console.error('Error retrieving services by doctorId:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
-
-    return res.status(200).json(doctorServices);
-  } catch (error) {
-    console.error('Error retrieving services by doctorId:', error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
 };
 
 // get doctor by service id 
 export const getDoctorsByServiceId = async (req, res) => {
     try {
-      const { serviceId } = req.params;
-  
-      // Find doctors related to the service
-      const serviceDoctors = await prisma.doctorService.findMany({
-        where: { serviceId: parseInt(serviceId) },
-        include: {
-          doctor: true, // Includes details of the related doctor
-        },
-      });
-  
-      if (serviceDoctors.length === 0) {
-        return res.status(404).json({ message: 'No doctors found for this service' });
-      }
-  
-      return res.status(200).json(serviceDoctors);
-    } catch (error) {
-      console.error('Error retrieving doctors by serviceId:', error);
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-  };
+        const { serviceId } = req.params;
 
-export const allYt = async(req,res)=>{
+        // Find doctors related to the service
+        const serviceDoctors = await prisma.doctorService.findMany({
+            where: { serviceId: parseInt(serviceId) },
+            include: {
+                doctor: true, // Includes details of the related doctor
+            },
+        });
+
+        if (serviceDoctors.length === 0) {
+            return res.status(404).json({ message: 'No doctors found for this service' });
+        }
+
+        return res.status(200).json(serviceDoctors);
+    } catch (error) {
+        console.error('Error retrieving doctors by serviceId:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const allYt = async (req, res) => {
     try {
-        const yt = await prisma.yt_content.findMany({where:{verified:'publish'}})
-        res.status(200).json({status:200,yt})
+        const yt = await prisma.yt_content.findMany({ where: { verified: 'publish' } })
+        res.status(200).json({ status: 200, yt })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
-export const allArticle = async(req,res)=>{
+export const allArticle = async (req, res) => {
     try {
-        const article = await prisma.article_content.findMany({where:{verified:'publish'}})
-        res.status(200).json({status:200,article})
+        const article = await prisma.article_content.findMany({ where: { verified: 'publish' } })
+        res.status(200).json({ status: 200, article })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
-export const allBlog = async(req,res)=>{
+export const allBlog = async (req, res) => {
     try {
-        const blog = await prisma.blog_content.findMany({where:{verified:'publish'}})
+        const blog = await prisma.blog_content.findMany({ where: { verified: 'publish' } })
         const blogDataArray = blog.map(blog => {
             const extractedContent = extractContent(blog.content);
             return {
@@ -341,16 +341,16 @@ export const allBlog = async(req,res)=>{
             };
         });
 
-        res.status(200).json({ status: 200,blog: blogDataArray });
+        res.status(200).json({ status: 200, blog: blogDataArray });
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({ status: 500,msg:'Something went wrong' });
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
 
     }
 }
 
-  
+
 
 
 
@@ -500,15 +500,15 @@ export const doctorTest = async (req, res) => {
             && (patient_name !== undefined)
         ) {
 
-            const isEmailVerified = await prisma.doctor.findUnique({where:{email}})
-            if(isEmailVerified.emailVerified==='no'){
-             return res.status(400).json({status:400,msg:'verify email first'})
+            const isEmailVerified = await prisma.doctor.findUnique({ where: { email } })
+            if (isEmailVerified.emailVerified === 'no') {
+                return res.status(400).json({ status: 400, msg: 'verify email first' })
             }
 
-            const requiredField  = ['username','fcmToken','doctor_name','password','country','contact_number','gender','state','languages','specialities','experience','maximum_education','pricePerSession']
-            for(const field of requiredField){
-                if(req.body[field] === undefined || req.body[field]==='' || req.body[field]===null){
-                    return res.status(400).json({status:400,msg:`${field} is required`})
+            const requiredField = ['username', 'fcmToken', 'doctor_name', 'password', 'country', 'contact_number', 'gender', 'state', 'languages', 'specialities', 'experience', 'maximum_education', 'pricePerSession']
+            for (const field of requiredField) {
+                if (req.body[field] === undefined || req.body[field] === '' || req.body[field] === null) {
+                    return res.status(400).json({ status: 400, msg: `${field} is required` })
                 }
             }
 
@@ -517,502 +517,513 @@ export const doctorTest = async (req, res) => {
         }
 
 
-        }catch(error){
+    } catch (error) {
 
+    }
+}
+
+//  requst for approval
+export const CreateDoctor_profile = async (req, res) => {
+    try {
+
+        // gather info from the doctor 
+        const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession, gender } = req.body
+        const fileInfo = req.files;
+
+        const isUsername = await prisma.doctor.findUnique({ where: { username } })
+        const isemail = await prisma.doctor.findUnique({ where: { email } })
+        if (isUsername || isemail) {
+            return res.status(409).json({ message: 'Doctor is already present with this Username or Email' })
         }
+
+        // hashing password
+        const salt = bcrypt.genSaltSync(10)
+        const hash_pswd = bcrypt.hashSync(password, salt)
+
+        // profile pic info
+        const doctorProfile_originalName = fileInfo.doctorProfile[0].originalname;
+        const doctorProfile_path = fileInfo.doctorProfile[0].path;
+        const doctorProfile_type = fileInfo.doctorProfile[0].mimetype;
+        const doctorProfile_size = (fileInfo.doctorProfile[0].size) / (1024 * 1024); //size in MB
+
+        // documents info
+        const doctorDocument_originalName = fileInfo.doctorDocument[0].originalname;
+        const doctorDocument_path = fileInfo.doctorDocument[0].path;
+        const doctorDocument_type = fileInfo.doctorDocument[0].mimetype;
+        const doctorDocument_size = (fileInfo.doctorDocument[0].size) / (1024 * 1024); //size in MB
+
+        // check profile pic
+        const isProfilePic = (doctorProfile_type == 'image/jpg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
+        if (!isProfilePic) {
+            return res.status(400).json({ message: 'Profile Photo must be jpg or png and size less than 2MB' })
+        }
+        // check document
+        const isDocument = (doctorDocument_type == 'application/zip') && (doctorDocument_size <= 20)
+        if (!isDocument) {
+            return res.status(400).json({ message: 'Document must be zip and size not greater than 20MB' })
+        }
+
+        const experienceInt = parseInt(experience)
+        const priceInt = parseInt(pricePerSession)
+
+        // for database
+        const data = {
+            doctor_name,
+            username,
+            password: hash_pswd,
+            email,
+            country,
+            contact_number,
+            state,
+            languages,
+            specialities,
+            gender,
+            experience: experienceInt,
+            pricePerSession: priceInt,
+            maximum_education,
+            profile_pic: doctorProfile_path,
+            profile_picType: doctorProfile_type,
+            documents: doctorDocument_path,
+            documents_type: doctorDocument_type
+        }
+
+        const info = await prisma.doctor.create({ data })
+
+
+        //  for frontend
+        const forClient = {
+            id: info.id,
+            doctor_name,
+            username, state,
+            languages,
+            specialities,
+            experience,
+            maximum_education,
+            gender,
+            profile_pic: doctorProfile_path
+        }
+
+
+        const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
+
+        res.status(201).json({ message: 'Request is done', token })
+
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+    }
+}
+
+
+// login doctor
+export const doctorLogin = async (req, res) => {
+
+    try {
+        const { email, password } = req.body;
+
+        const doctor = await prisma.doctor.findUnique({ where: { email } })
+        if (doctor) {
+            var isPassword = bcrypt.compareSync(password, doctor.password)
+        }
+
+        if ((!doctor) || (!isPassword)) {
+            return res.status(404).json({ message: 'Incorrect Credentials!' })
+        }
+
+        // sending info. for client
+        const forClient = {
+            id: await prisma.doctor.id,
+            username: await prisma.doctor.username,
+            doctor_name: await prisma.doctor.doctor_name,
+            state: await prisma.doctor.state,
+            languages: await prisma.doctor.languages,
+            specialities: await prisma.doctor.specialities,
+            experience: await prisma.doctor.experience,
+            maximum_education: await prisma.doctor.maximum_education,
+            profile_pic: await prisma.doctor.profile_pic
+        }
+
+        const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
+
+        res.status(200).json({ message: 'LoggedIn succesfully', token })
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+
+
+// update profile
+export const updateDoctorProfile = async (req, res) => {
+    try {
+
+        const DoctorId = +req.params.DoctorId;
+        const { email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession } = req.body;
+
+        // check doctor
+        const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
+        if (!isDoctor) {
+            return res.send(404).json({ messages: 'Doctor is not found' })
+        }
+
+        //update information
+        const info = await prisma.doctor.update({
+            where: { id: DoctorId }, data: {
+                email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession
+
+            }
+        })
+
+        res.status(201).json({ message: 'Profile updated succesfully' })
+
+    } catch (error) {
+        res.send(error)
+        console.log(error)
     }
 
-        //  requst for approval
-        export const CreateDoctor_profile = async (req, res) => {
-            try {
+}
 
-                // gather info from the doctor 
-                const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession, gender } = req.body
-                const fileInfo = req.files;
+// // delete profile
+export const deleteDoctor_profile = async (req, res) => {
 
-                const isUsername = await prisma.doctor.findUnique({ where: { username } })
-                const isemail = await prisma.doctor.findUnique({ where: { email } })
-                if (isUsername || isemail) {
-                    return res.status(409).json({ message: 'Doctor is already present with this Username or Email' })
-                }
+    try {
+        const DoctorId = +req.params.DoctorId;
 
-                // hashing password
-                const salt = bcrypt.genSaltSync(10)
-                const hash_pswd = bcrypt.hashSync(password, salt)
-
-                // profile pic info
-                const doctorProfile_originalName = fileInfo.doctorProfile[0].originalname;
-                const doctorProfile_path = fileInfo.doctorProfile[0].path;
-                const doctorProfile_type = fileInfo.doctorProfile[0].mimetype;
-                const doctorProfile_size = (fileInfo.doctorProfile[0].size) / (1024 * 1024); //size in MB
-
-                // documents info
-                const doctorDocument_originalName = fileInfo.doctorDocument[0].originalname;
-                const doctorDocument_path = fileInfo.doctorDocument[0].path;
-                const doctorDocument_type = fileInfo.doctorDocument[0].mimetype;
-                const doctorDocument_size = (fileInfo.doctorDocument[0].size) / (1024 * 1024); //size in MB
-
-                // check profile pic
-                const isProfilePic = (doctorProfile_type == 'image/jpg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
-                if (!isProfilePic) {
-                    return res.status(400).json({ message: 'Profile Photo must be jpg or png and size less than 2MB' })
-                }
-                // check document
-                const isDocument = (doctorDocument_type == 'application/zip') && (doctorDocument_size <= 20)
-                if (!isDocument) {
-                    return res.status(400).json({ message: 'Document must be zip and size not greater than 20MB' })
-                }
-
-                const experienceInt = parseInt(experience)
-                const priceInt = parseInt(pricePerSession)
-
-                // for database
-                const data = {
-                    doctor_name,
-                    username,
-                    password: hash_pswd,
-                    email,
-                    country,
-                    contact_number,
-                    state,
-                    languages,
-                    specialities,
-                    gender,
-                    experience: experienceInt,
-                    pricePerSession: priceInt,
-                    maximum_education,
-                    profile_pic: doctorProfile_path,
-                    profile_picType: doctorProfile_type,
-                    documents: doctorDocument_path,
-                    documents_type: doctorDocument_type
-                }
-
-                const info = await prisma.doctor.create({ data })
-
-
-                //  for frontend
-                const forClient = {
-                    id: info.id,
-                    doctor_name,
-                    username, state,
-                    languages,
-                    specialities,
-                    experience,
-                    maximum_education,
-                    gender,
-                    profile_pic: doctorProfile_path
-                }
-
-
-                const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
-
-                res.status(201).json({ message: 'Request is done', token })
-
-            } catch (error) {
-                console.log(error)
-                res.send(error)
-            }
+        const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
+        if (!isDoctor) {
+            res.status(404).json({ message: 'Doctor is not found' })
         }
 
+        const info = await prisma.doctor.delete({ where: { id: DoctorId } })
 
-        // login doctor
-        export const doctorLogin = async (req, res) => {
+        res.status(200).json({ message: 'Your Profile deleted succesfully' })
 
-            try {
-                const { email, password } = req.body;
+    } catch (error) {
+        res.send(error)
+        console.log(error)
+    }
 
-                const doctor = await prisma.doctor.findUnique({ where: { email } })
-                if (doctor) {
-                    var isPassword = bcrypt.compareSync(password, doctor.password)
-                }
 
-                if ((!doctor) || (!isPassword)) {
-                    return res.status(404).json({ message: 'Incorrect Credentials!' })
-                }
+}
 
-                // sending info. for client
-                const forClient = {
-                    id: await prisma.doctor.id,
-                    username: await prisma.doctor.username,
-                    doctor_name: await prisma.doctor.doctor_name,
-                    state: await prisma.doctor.state,
-                    languages: await prisma.doctor.languages,
-                    specialities: await prisma.doctor.specialities,
-                    experience: await prisma.doctor.experience,
-                    maximum_education: await prisma.doctor.maximum_education,
-                    profile_pic: await prisma.doctor.profile_pic
-                }
+// update status iff verified == yes
+export const updateDoctorStatus = async (req, res) => {
+    try {
+        const DoctorId = +req.params.DoctorId;
+        const { status } = req.body;
 
-                const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
+        const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
+        if (!isDoctor) {
+            res.status(404).json({ message: 'Something went wrong' })
+        }
+        if (isDoctor.verified == 'no') {
+            res.status(400).json({ message: 'You are not verified' })
+        }
+        const updateStatus = await prisma.doctor.update({ where: { id: DoctorId }, data: { status } })
 
-                res.status(200).json({ message: 'LoggedIn succesfully', token })
+        res.status(200).json({ message: `Your status updated to ${status}` })
 
-            } catch (error) {
-                console.log(error)
-            }
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// update remarks iff verified == yes 
+export const updateDoctorRemarks = async (req, res) => {
+    try {
+        const DoctorId = +req.params.DoctorId;
+        const { remarks } = req.body;
+
+        const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
+        if (!isDoctor) {
+            res.status(404).json({ message: 'Something went wrong' })
+        }
+        if (isDoctor.verified == 'no') {
+            res.status(400).json({ message: 'You are not verified' })
+        }
+        const updateStatus = await prisma.doctor.update({ where: { id: DoctorId }, data: { remarks } })
+
+        res.status(200).json({ message: 'Remarks is updated' })
+
+    } catch (error) {
+        res.status(400).json({ message: 'something went wrong' })
+        console.log(error)
+    }
+}
+
+// doctor update avalabilty
+export const updateAvailability = async (req, res) => {
+    const doctorId = +req.params.doctorId;
+    const { availability } = req.body;
+
+    //  `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
+
+    try {
+        if (!availability) {
+            return res.status(400).json({ status: 400, msg: 'Availability is required' });
         }
 
-
-
-
-
-        // update profile
-        export const updateDoctorProfile = async (req, res) => {
-            try {
-
-                const DoctorId = +req.params.DoctorId;
-                const { email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession } = req.body;
-
-                // check doctor
-                const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
-                if (!isDoctor) {
-                    return res.send(404).json({ messages: 'Doctor is not found' })
-                }
-
-                //update information
-                const info = await prisma.doctor.update({
-                    where: { id: DoctorId }, data: {
-                        email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession
-
-                    }
-                })
-
-                res.status(201).json({ message: 'Profile updated succesfully' })
-
-            } catch (error) {
-                res.send(error)
-                console.log(error)
-            }
-
+        // Parse availability if it is a string
+        let parsedAvailability;
+        try {
+            parsedAvailability = JSON.parse(availability);
+        } catch (e) {
+            return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
         }
 
-        // // delete profile
-        export const deleteDoctor_profile = async (req, res) => {
+        // Get current date and time
+        const now = new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Start of the current day
+        const nextWeek = new Date(today);
+        nextWeek.setDate(today.getDate() + 7);
 
-            try {
-                const DoctorId = +req.params.DoctorId;
+        // Check if all slots are within the upcoming 7 days
+        for (const slot of parsedAvailability) {
+            const slotStart = new Date(slot.startTime);
+            const slotEnd = new Date(slot.endTime);
 
-                const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
-                if (!isDoctor) {
-                    res.status(404).json({ message: 'Doctor is not found' })
-                }
-
-                const info = await prisma.doctor.delete({ where: { id: DoctorId } })
-
-                res.status(200).json({ message: 'Your Profile deleted succesfully' })
-
-            } catch (error) {
-                res.send(error)
-                console.log(error)
-            }
-
-
-        }
-
-        // update status iff verified == yes
-        export const updateDoctorStatus = async (req, res) => {
-            try {
-                const DoctorId = +req.params.DoctorId;
-                const { status } = req.body;
-
-                const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
-                if (!isDoctor) {
-                    res.status(404).json({ message: 'Something went wrong' })
-                }
-                if (isDoctor.verified == 'no') {
-                    res.status(400).json({ message: 'You are not verified' })
-                }
-                const updateStatus = await prisma.doctor.update({ where: { id: DoctorId }, data: { status } })
-
-                res.status(200).json({ message: `Your status updated to ${status}` })
-
-            } catch (error) {
-                res.status(400).json({ message: 'something went wrong' })
-                console.log(error)
-            }
-        }
-
-        // update remarks iff verified == yes 
-        export const updateDoctorRemarks = async (req, res) => {
-            try {
-                const DoctorId = +req.params.DoctorId;
-                const { remarks } = req.body;
-
-                const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
-                if (!isDoctor) {
-                    res.status(404).json({ message: 'Something went wrong' })
-                }
-                if (isDoctor.verified == 'no') {
-                    res.status(400).json({ message: 'You are not verified' })
-                }
-                const updateStatus = await prisma.doctor.update({ where: { id: DoctorId }, data: { remarks } })
-
-                res.status(200).json({ message: 'Remarks is updated' })
-
-            } catch (error) {
-                res.status(400).json({ message: 'something went wrong' })
-                console.log(error)
-            }
-        }
-
-        // doctor update avalabilty
-        export const updateAvailability = async (req, res) => {
-            const doctorId = +req.params.doctorId;
-            const { availability } = req.body;
-
-            //  `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
-
-            try {
-                if (!availability) {
-                    return res.status(400).json({ status: 400, msg: 'Availability is required' });
-                }
-
-                // Parse availability if it is a string
-                let parsedAvailability;
-                try {
-                    parsedAvailability = JSON.parse(availability);
-                } catch (e) {
-                    return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
-                }
-
-                // Get current date and time
-                const now = new Date();
-                const today = new Date();
-                today.setHours(0, 0, 0, 0); // Start of the current day
-                const nextWeek = new Date(today);
-                nextWeek.setDate(today.getDate() + 7);
-
-                // Check if all slots are within the upcoming 7 days
-                for (const slot of parsedAvailability) {
-                    const slotStart = new Date(slot.startTime);
-                    const slotEnd = new Date(slot.endTime);
-
-                    // Check if slot is within the next 7 days
-                    if (slotStart < today || slotEnd > nextWeek) {
-                        return res.status(400).json({
-                            status: 400,
-                            msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
-                        });
-                    }
-
-                    // Prevent updating availability for past times on the current day
-                    if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
-                        return res.status(400).json({
-                            status: 400,
-                            msg: `Cannot update past time ${slot.startTime} for today`
-                        });
-                    }
-
-                    // Check for overlap for each slot before inserting new availability
-                    const existingSlot = await prisma.doctorAvailability.findFirst({
-                        where: {
-                            doctorId,
-                            startTime: {
-                                lte: slotEnd,  // Overlap if new slot's end is greater or equal to an existing slot's start
-                            },
-                            endTime: {
-                                gte: slotStart, // Overlap if new slot's start is less or equal to an existing slot's end
-                            }
-                        }
-                    });
-
-                    // If an overlap is found, return an error
-                    if (existingSlot) {
-                        return res.status(400).json({
-                            status: 400,
-                            msg: `Availability conflict: ${slot.startTime} - ${slot.endTime} is already booked`
-                        });
-                    }
-                }
-
-                // If no conflicts, proceed to create the new availability
-                const availableSlots = await prisma.doctorAvailability.createMany({
-                    data: parsedAvailability.map(slot => ({
-                        doctorId,
-                        startTime: new Date(slot.startTime),
-                        endTime: new Date(slot.endTime)
-                    }))
+            // Check if slot is within the next 7 days
+            if (slotStart < today || slotEnd > nextWeek) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
                 });
-
-                res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
-
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ status: 500, msg: 'Error updating availability' });
             }
-        };
 
+            // Prevent updating availability for past times on the current day
+            if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: `Cannot update past time ${slot.startTime} for today`
+                });
+            }
 
-        // get available slots of particular docotor
-        export const getAvailableSlotsDoctor = async (req, res) => {
-            const doctorId = +req.params.doctorId;
-            const today = new Date();
-            const nextWeek = new Date(today)
-            nextWeek.setDate(today.getDate() + 7)
-
-            try {
-
-                const availableSlots = await prisma.doctorAvailability.findMany({
-                    where: {
-                        doctorId,
-                        startTime: {
-                            gte: today,
-                            lte: nextWeek
-                        }
+            // Check for overlap for each slot before inserting new availability
+            const existingSlot = await prisma.doctorAvailability.findFirst({
+                where: {
+                    doctorId,
+                    startTime: {
+                        lte: slotEnd,  // Overlap if new slot's end is greater or equal to an existing slot's start
+                    },
+                    endTime: {
+                        gte: slotStart, // Overlap if new slot's start is less or equal to an existing slot's end
                     }
-                })
-
-                if (availableSlots.length == 0) {
-                    return res.status(400).json({ status: 400, msg: 'No Slots are available' })
                 }
+            });
 
-                res.status(200).json({ status: 200, msg: availableSlots });
-
-            } catch (error) {
-                res.status(500).json({ error: 'Error fetching available slots' });
-                console.log(error.message)
+            // If an overlap is found, return an error
+            if (existingSlot) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: `Availability conflict: ${slot.startTime} - ${slot.endTime} is already booked`
+                });
             }
         }
 
+        // If no conflicts, proceed to create the new availability
+        const availableSlots = await prisma.doctorAvailability.createMany({
+            data: parsedAvailability.map(slot => ({
+                doctorId,
+                startTime: new Date(slot.startTime),
+                endTime: new Date(slot.endTime)
+            }))
+        });
 
-        // to book slot 
-        export const bookSlot = async (req, res) => {
-            const { slotStart, slotEnd, channelName } = req.body;
-            const patientId = +req.params.patientId
-            const doctorId = +req.params.doctorId
-            try {
-                const slotStartTime = new Date(slotStart);
-                const slotEndTime = new Date(slotEnd);
+        res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
-                // Check if the slot is already booked or overlaps with an existing booking
-                const existingBooking = await prisma.booking.findFirst({
-                    where: {
-                        doctorId,
-                        OR: [
-                            { slotStart: slotStartTime },
-                            { slotEnd: slotStartTime },
-                            {
-                                AND: [
-                                    { slotStart: { lte: slotEndTime } },
-                                    { slotEnd: { gte: slotStartTime } },
-                                ],
-                            },
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Error updating availability' });
+    }
+};
+
+
+// get available slots of particular docotor
+export const getAvailableSlotsDoctor = async (req, res) => {
+    const doctorId = +req.params.doctorId;
+    const today = new Date();
+    const nextWeek = new Date(today)
+    nextWeek.setDate(today.getDate() + 7)
+
+    try {
+
+        const availableSlots = await prisma.doctorAvailability.findMany({
+            where: {
+                doctorId,
+                startTime: {
+                    gte: today,
+                    lte: nextWeek
+                }
+            }
+        })
+
+        if (availableSlots.length == 0) {
+            return res.status(400).json({ status: 400, msg: 'No Slots are available' })
+        }
+
+        res.status(200).json({ status: 200, msg: availableSlots });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching available slots' });
+        console.log(error.message)
+    }
+}
+
+
+// to book slot 
+export const bookSlot = async (req, res) => {
+    const { slotStart, slotEnd, channelName } = req.body;
+    const patientId = +req.params.patientId
+    const doctorId = +req.params.doctorId
+    try {
+        const slotStartTime = new Date(slotStart);
+        const slotEndTime = new Date(slotEnd);
+
+        // Check if the slot is already booked or overlaps with an existing booking
+        const existingBooking = await prisma.booking.findFirst({
+            where: {
+                doctorId,
+                OR: [
+                    { slotStart: slotStartTime },
+                    { slotEnd: slotStartTime },
+                    {
+                        AND: [
+                            { slotStart: { lte: slotEndTime } },
+                            { slotEnd: { gte: slotStartTime } },
                         ],
                     },
-                });
+                ],
+            },
+        });
 
-                if (existingBooking) {
-                    return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
-                }
-
-                // Create a booking for the patient with the specified doctor and time slot
-                const booking = await prisma.booking.create({
-                    data: {
-                        patientId,
-                        doctorId,
-                        slotStart: slotStartTime,
-                        slotEnd: slotEndTime,
-                        channelName
-                    },
-                });
-
-                // const token = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
-                // const fcmToken = token.fcmToken
-
-                const title = 'New Slot Booking';
-                const body = `Slot booked from ${slotStartTime.toLocaleTimeString()} to ${slotEndTime.toLocaleTimeString()}.`;
-                await toDoctor(title, body, channelName)
-
-                // Calculate the next available time with a 2-minute buffer
-                const nextAvailableTime = new Date(slotEndTime);
-                nextAvailableTime.setMinutes(nextAvailableTime.getMinutes() + 2);
-
-                // Respond with a success message and booking details, including the next available time
-                res.status(200).json({
-                    status: 200,
-                    msg: 'Slot booked successfully',
-                    booking,
-                    nextAvailableTime: nextAvailableTime.toISOString(),
-                });
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ status: 200, msg: 'Error booking slot' });
-            }
+        if (existingBooking) {
+            return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         }
 
+        // update booking of doctor
 
-        // get all available slots
-        export const getAllAvailableSlots = async (req, res) => {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Start of today
-            const nextWeek = new Date(today);
-            nextWeek.setDate(today.getDate() + 7); // End date (7 days from today)
 
-            try {
-                // Get all booked slots for the upcoming 7 days
-                const bookedSlots = await prisma.booking.findMany({
-                    where: {
-                        slotStart: {
-                            gte: today,
-                            lt: nextWeek
-                        },
-                    },
-                    orderBy: {
-                        slotStart: 'asc'
-                    }
+        // Create a booking for the patient with the specified doctor and time slot
+        const booking = await prisma.booking.create({
+            data: {
+                patientId,
+                doctorId,
+                slotStart: slotStartTime,
+                slotEnd: slotEndTime,
+                channelName
+            },
+        });
+
+        // Increment the noOfBooking for the doctor
+        await prisma.doctor.update({
+            where: { id: doctorId },
+            data: {
+                noOfBooking: { increment: 1 }
+            },
+        });
+
+        // const token = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
+        // const fcmToken = token.fcmToken
+
+        const title = 'New Slot Booking';
+        const body = `Slot booked from ${slotStartTime.toLocaleTimeString()} to ${slotEndTime.toLocaleTimeString()}.`;
+        await toDoctor(title, body, channelName)
+
+        // Calculate the next available time with a 2-minute buffer
+        const nextAvailableTime = new Date(slotEndTime);
+        nextAvailableTime.setMinutes(nextAvailableTime.getMinutes() + 2);
+
+        // Respond with a success message and booking details, including the next available time
+        res.status(200).json({
+            status: 200,
+            msg: 'Slot booked successfully',
+            booking,
+            nextAvailableTime: nextAvailableTime.toISOString(),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 200, msg: 'Error booking slot' });
+    }
+}
+
+
+// get all available slots
+export const getAllAvailableSlots = async (req, res) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7); // End date (7 days from today)
+
+    try {
+        // Get all booked slots for the upcoming 7 days
+        const bookedSlots = await prisma.booking.findMany({
+            where: {
+                slotStart: {
+                    gte: today,
+                    lt: nextWeek
+                },
+            },
+            orderBy: {
+                slotStart: 'asc'
+            }
+        });
+
+        const availableSlots = [];
+        const startHour = 9; // Start slots at 9 AM each day
+        const endHour = 17; // End slots by 5 PM each day
+
+        let currentDay = new Date(today);
+
+        while (currentDay < nextWeek) {
+            let currentStartTime = new Date(currentDay);
+            currentStartTime.setHours(startHour, 0, 0, 0); // Set to 9:00 AM
+            let currentEndTime = new Date(currentStartTime);
+            currentEndTime.setHours(currentStartTime.getHours() + 1); // Slot duration is 1 hour
+
+            // Loop through the day from 9 AM to 5 PM
+            while (currentStartTime.getHours() < endHour) {
+                const slotAvailable = bookedSlots.every(booked => {
+                    const bookedStart = new Date(booked.slotStart);
+                    const bookedEnd = new Date(booked.slotEnd);
+
+                    return (
+                        currentEndTime <= bookedStart || currentStartTime >= bookedEnd
+                    );
                 });
 
-                const availableSlots = [];
-                const startHour = 9; // Start slots at 9 AM each day
-                const endHour = 17; // End slots by 5 PM each day
-
-                let currentDay = new Date(today);
-
-                while (currentDay < nextWeek) {
-                    let currentStartTime = new Date(currentDay);
-                    currentStartTime.setHours(startHour, 0, 0, 0); // Set to 9:00 AM
-                    let currentEndTime = new Date(currentStartTime);
-                    currentEndTime.setHours(currentStartTime.getHours() + 1); // Slot duration is 1 hour
-
-                    // Loop through the day from 9 AM to 5 PM
-                    while (currentStartTime.getHours() < endHour) {
-                        const slotAvailable = bookedSlots.every(booked => {
-                            const bookedStart = new Date(booked.slotStart);
-                            const bookedEnd = new Date(booked.slotEnd);
-
-                            return (
-                                currentEndTime <= bookedStart || currentStartTime >= bookedEnd
-                            );
-                        });
-
-                        if (slotAvailable) {
-                            availableSlots.push({
-                                startTime: currentStartTime.toISOString(),
-                                endTime: currentEndTime.toISOString(),
-                            });
-                        }
-
-                        // Move to the next slot with a 2-minute buffer
-                        currentStartTime = new Date(currentEndTime);
-                        currentStartTime.setMinutes(currentStartTime.getMinutes() + 2);
-                        currentEndTime = new Date(currentStartTime);
-                        currentEndTime.setHours(currentStartTime.getHours() + 1);
-                    }
-
-                    // Move to the next day
-                    currentDay.setDate(currentDay.getDate() + 1);
+                if (slotAvailable) {
+                    availableSlots.push({
+                        startTime: currentStartTime.toISOString(),
+                        endTime: currentEndTime.toISOString(),
+                    });
                 }
 
-                res.status(200).json({
-                    status: 200,
-                    availableSlots,
-                });
-
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ status: 500, msg: 'Error fetching available slots' });
+                // Move to the next slot with a 2-minute buffer
+                currentStartTime = new Date(currentEndTime);
+                currentStartTime.setMinutes(currentStartTime.getMinutes() + 2);
+                currentEndTime = new Date(currentStartTime);
+                currentEndTime.setHours(currentStartTime.getHours() + 1);
             }
-        };
+
+            // Move to the next day
+            currentDay.setDate(currentDay.getDate() + 1);
+        }
+
+        res.status(200).json({
+            status: 200,
+            availableSlots,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Error fetching available slots' });
+    }
+};
 
 
 

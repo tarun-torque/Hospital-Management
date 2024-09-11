@@ -168,7 +168,7 @@ model Review {
 }
 
 model Support {
-  id         Int      @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   title       String
   description String
   image       String
@@ -201,6 +201,7 @@ model Doctor {
   emailVerified      String?              @default("no")
   gender             String?
   state              String?
+  noOfBooking        Int? @default(0)
   otp                String?
   languages          String[]
   experience         Int?
