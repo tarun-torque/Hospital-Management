@@ -12,20 +12,20 @@ import { allPatient } from './admin.controller.js';
 // post ticket
 export const recentTicket = async(req,res)=>{
     const {title,description} = req.body
-    const patinetId = +req.params.patientId
+    const patientId = +req.params.patientId
     try {
 
         if(!title || !description){
             return res.status(400).json({msg:400,msg:'All fields are required'})
         }
 
-        if(!patinetId){
+        if(!patientId){
             return res.status(400).json({msg:400,msg:'Patient id is required'})
         }
 
         const patient=  await prisma.patient.findUnique({where:{id:patinetId}})
 
-        const data = {patinetId,title,description}
+        const data = {patientId,title,description}
         const save =  await prisma.recentTicket.create({data})
         res.status(201).json({status:201,msg:'Ticket added Successfully'})
         
@@ -34,6 +34,7 @@ export const recentTicket = async(req,res)=>{
         res.status(500).json({status:500,msg:'Sometging went wrong'})
     }
 }
+
 // get all recent ticket 
 export const getAllRecentTicket = async(req,res)=>{
     try {
@@ -41,6 +42,7 @@ export const getAllRecentTicket = async(req,res)=>{
             include: {
                 Patient: {
                     select: {
+                        username:true,
                         patient_name: true,
                         profile_path: true
                     }
