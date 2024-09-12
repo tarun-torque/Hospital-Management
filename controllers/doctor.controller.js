@@ -39,8 +39,9 @@ export const updateDoctorPrice = async(req,res)=>{
         const updatePrice  = await prisma.doctorPrice.update({
             where:{
                 doctorId_serviceId:{doctorId,serviceId},
-                data:{yourPrice}
-            }
+               
+            },
+            data:{yourPrice}
         })
         res.status(200).json({status:200,msg:'Your Price is updated'})
 
