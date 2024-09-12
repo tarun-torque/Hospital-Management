@@ -678,8 +678,8 @@ export const signInDoctorFromGoogle = async (req, res) => {
             });
             return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
         } else {
-            await prisma.doctor.create({ data });
-            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token });
+          const saveDoctor =   await prisma.doctor.create({ data });
+            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token ,id:saveDoctor.id});
         }
 
     } catch (error) {

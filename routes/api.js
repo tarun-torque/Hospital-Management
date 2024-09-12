@@ -105,9 +105,11 @@ router.get('/upcoming/session/:doctorId',upcomingSession)
 router.get('/get/service/from/:doctorId',getServicesByDoctorId)
 router.get('/get/doctor/from/:serviceId',getDoctorsByServiceId)
 
+
 router.get('/get/all/yt',allYt)
 router.get('/get/all/article',allArticle)
 router.get('/get/all/blog',allBlog)
+
 
 router.get('/get/all/docotors',allDoctors)
 router.get('/search/doctors/services',searchDoctorAndServices)
@@ -127,14 +129,8 @@ router.get('/creator/:creatorId/search/bar',creatorSearchBar)
 router.post('/post/recent/ticket/:patientId',recentTicket)
 router.get('/get/all/recent/ticket',getAllRecentTicket)
 
-
-
 router.post('/doctor/google/signIn',signInDoctorFromGoogle)
 router.post('/doctor/add/service',addDoctorService)
-
-
-
-
 
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
 router.post('/doctor/login',doctorLogin)
@@ -157,6 +153,7 @@ router.post('/create/patient/profile/:email',registerPatient)
 
 router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/from/google/:patinetId',getGooglePatientProfile)
+
 
 router.post('/login/patient',loginPatient)
 router.post('/:patientId/support',post_support)
