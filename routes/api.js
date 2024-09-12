@@ -216,7 +216,7 @@ router.put('/admin/update/category/:CategoryId',upload.single('contentCategoryIm
 router.post('/admin/create/category',upload.single('categoryImage'),category)
 router.put('/admin/update/service/category/:categoryId',upload.single('categoryImage'),updateCategory)
 router.get('/get/all/category',allCategory)
-router.delete('/admin/delete/category/:categoryId',categoryDelete)
+router.delete('/admin/delete/category/service/:categoryId',categoryDelete)
 
 
 router.post('/admin/create/service/:categoryId',upload.single('serviceImage'),createService)
