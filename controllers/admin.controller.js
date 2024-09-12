@@ -1494,15 +1494,36 @@ export const allCategory = async(req,res)=>{
 // to delete category
 export const categoryDelete = async (req, res) => {
     try {
-        const categoryId = +req.params.categoryId
-        const delCategory = await prisma.category.delete({ where: { id: categoryId } })
-        if (!delCategory) {
-            return res.status(404).json({ status: 404, msg: 'Category does not exist' })
+        const categoryId = +req.params.categoryId;
+    
+        const categoryExists = await prisma.category.findUnique({
+          where: { id: categoryId },
+          include: { services: true },
+        });
+    
+        if (!categoryExists) {
+          return res.status(404).json({ status: 404, msg: 'Category does not exist' });
         }
-        res.status(200).json({ status: 200, msg: 'Catagory deleted successfully' })
-    } catch (error) {
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
-    }
+    
+      
+        if (categoryExists.services.length === 0) {
+          await prisma.category.delete({
+            where: { id: categoryId },
+          });
+    
+          return res.status(200).json({ status: 200, msg: 'Category deleted successfully (No services were assigned)' });
+        }
+    
+        await prisma.category.delete({
+          where: { id: categoryId },
+        });
+    
+        res.status(200).json({ status: 200, msg: 'Category and related services deleted successfully' });
+    
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
+      }
 }
 
 // to create service of category
