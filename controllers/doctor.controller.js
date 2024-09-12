@@ -1197,8 +1197,8 @@ export const updateAvailability = async (req, res) => {
                 startTime: new Date(slot.startTime),
                 endTime: new Date(slot.endTime)
             }))
-        });
-
+        })
+    
         res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
     } catch (error) {

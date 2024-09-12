@@ -178,6 +178,7 @@ export const get_blogs = async (req, res) => {
             return res.status(404).json({ msg: 'No Blogs found' });
         }
 
+        
 
         const blogDataArray = blogs.map(blog => {
             const extractedContent = extractContent(blog.content);
@@ -190,8 +191,8 @@ export const get_blogs = async (req, res) => {
                 createdAt: blog.createdAt,
                 updatedAt: blog.updatedAt,
                 blog_creatorId: blog.blog_creatorId
-            };
-        });
+            }
+        })
 
 
         return res.status(200).json({ blogData: blogDataArray });

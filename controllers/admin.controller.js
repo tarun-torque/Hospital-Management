@@ -1722,7 +1722,22 @@ export const topBlogs = async(req,res)=>{
             orderBy:{views:'desc'}
         })
 
-        res.status(200).json({status:200,blogs})
+        const blogDataArray = blogs.map(blog => {
+            const extractedContent = extractContent(blog.content);
+            return {
+                id: blog.id,
+                tags: blog.tags,
+                category: blog.category,
+                data: extractedContent,
+                verified: blog.verified,
+                views:blog.views,
+                createdAt: blog.createdAt,
+                updatedAt: blog.updatedAt,
+                blog_creatorId: blog.blog_creatorId
+            }
+        })
+
+        res.status(200).json({status:200,blogs:blogDataArray})
 
     } catch (error) {
         console.log(error)

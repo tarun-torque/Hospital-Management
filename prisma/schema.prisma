@@ -293,7 +293,7 @@ model Rating {
   doctorId  Int
   bookingId Int
   stars     Int
-  review    String
+  review    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
