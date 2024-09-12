@@ -612,7 +612,7 @@ export const upcomingSession = async (req, res) => {
 // get service from its id :
 export const getServiceFromId = async (req, res) => {
     try {
-        const serviceId = +req.params
+        const serviceId = +req.params.serviceId
         const service = await prisma.service.findUnique({ where: { id: serviceId } })
         res.status(200).json({ status: 200, service })
 
