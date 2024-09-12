@@ -50,7 +50,11 @@ export const getDoctorPrice = async(req,res)=>{
     const doctorId = +req.params.doctorId;
     const serviceId = +req.params.serviceId;
     try {
-        const yourPrice = await prisma.doctorPrice.findUnique({where:{doctorId,serviceId}})
+        const yourPrice = await prisma.doctorPrice.findUnique({
+            where: {
+              doctorId_serviceId: { doctorId, serviceId } 
+            }
+          })
         res.status(200).json({status:200,yourPrice})
 
     } catch (error) {
