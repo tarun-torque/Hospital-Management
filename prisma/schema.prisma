@@ -52,6 +52,16 @@ model Service {
   Category             Category?       @relation(fields: [categoryId], references: [id])
   categoryId           Int
   doctorServices       DoctorService[]
+  doctorPrice          DoctorPrice[]
+}
+
+model DoctorPrice {
+  id        Int      @id @default(autoincrement())
+  yourPrice Int
+  serviceId Int
+  doctorId  Int
+  Doctor    Doctor  @relation(fields: [doctorId], references: [id])
+  Service   Service @relation(fields: [serviceId], references: [id])
 }
 
 // creator model
@@ -152,7 +162,7 @@ model recentTicket {
   id          Int      @id @default(autoincrement())
   title       String
   description String
-  Patient     Patient @relation(fields: [patientId], references: [id])
+  Patient     Patient  @relation(fields: [patientId], references: [id])
   patientId   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -226,6 +236,7 @@ model Doctor {
   doctorAvailability DoctorAvailability[]
   booking            Booking[]
   doctorServices     DoctorService[]
+  doctorPrice        DoctorPrice[]
 }
 
 model DoctorService {
@@ -234,7 +245,7 @@ model DoctorService {
   doctor    Doctor  @relation(fields: [doctorId], references: [id])
   service   Service @relation(fields: [serviceId], references: [id])
 
-  @@id([doctorId, serviceId]) // Composite primary key
+  @@id([doctorId, serviceId])
 }
 
 model DoctorAvailability {

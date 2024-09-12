@@ -9,6 +9,64 @@ import { testFirbase, toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 
+// doctor price of service
+export const doctorPrice = async(req,res)=>{
+    const doctorId = +req.params.doctorId;
+    const serviceId = +req.params.serviceId;
+    const {yourPrice} = req.body;
+    try {
+        if(!yourPrice){
+            return res.status(400).json({status:400,msg:'Your Price is required'})
+        }
+
+        const updatePrice = await prisma.doctorPrice.create({doctorId,serviceId,yourPrice})
+         res.status(200).json({status:200,msg:'Your Price is added'})
+    } catch (error) {
+        console.log(error)
+         res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// doctor update price of service
+export const updateDoctorPrice = async(req,res)=>{
+    const doctorId = +req.params.doctorId;
+    const serviceId = +req.params.serviceId;
+    const {yourPrice} = req.body;
+    try {
+        if(!yourPrice){
+            return res.status(400).json({status:400,msg:'Your Price is required'})
+        }
+        const updatePrice  = await prisma.doctorPrice.update({where:{doctorId,serviceId},data:yourPrice})
+        res.status(200).json({status:200,msg:'Your Price is updated'})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// get doctor Price 
+export const getDoctorPrice = async(req,res)=>{
+    const doctorId = +req.params.doctorId;
+    const serviceId = +req.params.serviceId;
+    try {
+        const yourPrice = await prisma.doctorPrice.findUnique({where:{doctorId,serviceId}})
+        res.status(200).json({status:200,yourPrice})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+
+
+
+
+
+
+
+
 // post ticket
 export const recentTicket = async(req,res)=>{
     const {title,description} = req.body
@@ -562,7 +620,7 @@ export const getServicesByDoctorId = async (req, res) => {
         const doctorServices = await prisma.doctorService.findMany({
             where: { doctorId: parseInt(doctorId) },
             include: {
-                service: true, // Includes details of the related service
+                service: true,
             },
         });
 
