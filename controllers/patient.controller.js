@@ -10,6 +10,89 @@ import exp from "constants";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// to add journal patient journal 
+export const patientJournal = async(req,res)=>{
+    const patientId = +req.params.patientId
+    const {title,description} = req.body;
+    try {
+        if(!title){
+            return res.status(400).json({status:400,msg:'Title is required'})
+        }
+        if(!description){
+            return res.status(400).json({status:400,msg:'Description is required'})
+        }
+
+        const saveJournal = await prisma.journal.create({data:{patientId,title,description}})
+         res.status(201).json({status:201,msg:'Journal is added'})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// to update journal
+export const updateJounal = async(req,res)=>{
+    const journalId = +req.params.journalId
+    const {title,description} = req.body
+    try {
+        const updatedData = {}
+        if(title){
+            updatedData.title=title
+        }
+        if(description){
+            updatedData.description=description
+        }
+
+        if(Object.keys(updatedData).length===0){
+            return res.status(400).json({ status:400,msg:'No fields to update' });
+        }
+
+        const updateJounal  = await prisma.journal.update({where:{id:journalId},data:{updatedData}})
+        res.status(200).json({ status:200,msg:'Journal Updated Successfully' });
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// to delete journal 
+export const deleteJournal  = async(req,res)=>{
+    const journalId = +req.params.journalId
+    try {
+        const deleteJournal = await prisma.journal.delete({where:{id:journalId}})
+        if(! deleteJournal){
+            return res.status(400).json({status:400,msg:'Journal does not exist'})
+        }
+        res.status(200).json({status:200,msg:'Journal deleted Successfully'})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// get all patient specific journal
+export const patientJournalAll = async(req,res)=>{
+    const patientId =  + req.params.patientId
+    try {
+        const journal = await prisma.journal.findMany({where:{patientId}})
+
+        if(journal.length===0){
+            return res.status(404).json({status:404,msg:'No Journal found'})
+        }
+        res.status(200).json({status:200,journal})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+
+    }
+}
+
+
+
 
 //rating to the docttor 
 export const giveRatingToDoctor  = async(req,res)=>{

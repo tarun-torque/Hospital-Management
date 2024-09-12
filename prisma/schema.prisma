@@ -159,6 +159,17 @@ model Patient {
   support        Support[]
   deviceTokens   deviceTokens[]
   Rating         Rating[]
+  Journal        Journal[]
+}
+
+model Journal {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String
+  Patient     Patient  @relation(fields: [patientId], references: [id])
+  patientId   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model recentTicket {
@@ -262,6 +273,7 @@ model DoctorAvailability {
   updatedAt DateTime @updatedAt
 }
 
+
 model Booking {
   id           Int      @id @default(autoincrement())
   patientId    Int
@@ -275,13 +287,12 @@ model Booking {
   Rating       Rating[]
 }
 
-
 model Rating {
   id        Int      @id @default(autoincrement())
   patientId Int
   doctorId  Int
   bookingId Int
-  stars     Int 
+  stars     Int
   review    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
