@@ -56,14 +56,14 @@ model Service {
 }
 
 model DoctorPrice {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   yourPrice Int
   serviceId Int
   doctorId  Int
   Doctor    Doctor  @relation(fields: [doctorId], references: [id])
   Service   Service @relation(fields: [serviceId], references: [id])
 
-   @@unique([doctorId, serviceId]) 
+  @@unique([doctorId, serviceId])
 }
 
 // creator model
@@ -158,6 +158,7 @@ model Patient {
   booking        Booking[]
   support        Support[]
   deviceTokens   deviceTokens[]
+  Rating         Rating[]
 }
 
 model recentTicket {
@@ -239,6 +240,7 @@ model Doctor {
   booking            Booking[]
   doctorServices     DoctorService[]
   doctorPrice        DoctorPrice[]
+  Rating             Rating[]
 }
 
 model DoctorService {
@@ -270,6 +272,25 @@ model Booking {
   channelName  String
   Doctor       Doctor   @relation(fields: [doctorId], references: [id])
   Patient      Patient  @relation(fields: [patientId], references: [id])
+  Rating       Rating[]
+}
+
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  doctorId  Int
+  bookingId Int
+  stars     Int 
+  review    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Patient Patient @relation(fields: [patientId], references: [id])
+  Doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  Booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@unique([bookingId, patientId, doctorId])
 }
 
 // manager model

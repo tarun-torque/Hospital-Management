@@ -11,6 +11,56 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
+//rating to the docttor 
+export const giveRatingToDoctor  = async(req,res)=>{
+    const bookingId = +req.params.bookingId
+    const patientId = +req.params.patientId
+    const doctorId = +req.params.doctorId
+    const {stars,review} =  req.body
+
+    try {
+
+        if(!stars){
+            return res.status(400).json({status:400,msg:'Please give rating first'})
+        }
+
+        if(stars<1 || stars>5){
+            return res.status(400).json({status:400,msg:'Give stars between 1 to 5'})
+        }
+
+        const existingRating = await prisma.rating.findUnique({
+            where: {
+              bookingId_patientId_doctorId: {
+                bookingId,
+                patientId,
+                doctorId
+              }
+            }
+          });
+      
+          if (existingRating) {
+            return res.status(400).json({ status:400,msg: 'You have already rated' });
+          }
+
+          const rating = await prisma.rating.create({
+            data: {
+              patientId,
+              doctorId,
+              bookingId,
+              stars,
+              review
+            }
+          })
+
+         res.status(201).json({status:201,msg:'Thanks for giving rating'})
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+
 
 // signIn patient from google
 export const signInPatientFromGoogle = async (req, res) => {
