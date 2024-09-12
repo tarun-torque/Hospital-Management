@@ -48,7 +48,7 @@ export const updateJounal = async(req,res)=>{
             return res.status(400).json({ status:400,msg:'No fields to update' });
         }
 
-        const updateJounal  = await prisma.journal.update({where:{id:journalId},data:{updatedData}})
+        const updateJounal  = await prisma.journal.update({where:{id:journalId},data:updatedData})
         res.status(200).json({ status:200,msg:'Journal Updated Successfully' });
 
     } catch (error) {
@@ -59,7 +59,7 @@ export const updateJounal = async(req,res)=>{
 
 // to delete journal 
 export const deleteJournal  = async(req,res)=>{
-    const journalId = +req.params.journalId
+    const journalId = req.params.journalId
     try {
         const deleteJournal = await prisma.journal.delete({where:{id:journalId}})
         if(! deleteJournal){
