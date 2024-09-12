@@ -36,7 +36,7 @@ export const updateDoctorPrice = async(req,res)=>{
         if(!yourPrice){
             return res.status(400).json({status:400,msg:'Your Price is required'})
         }
-        const updatePrice  = await prisma.doctorPrice.update({where:{doctorId,serviceId},data:yourPrice})
+        const updatePrice  = await prisma.doctorPrice.update({where:{doctorId,serviceId},data:{yourPrice}})
         res.status(200).json({status:200,msg:'Your Price is updated'})
 
     } catch (error) {
