@@ -33,7 +33,7 @@ export const patientJournal = async(req,res)=>{
 
 // to update journal
 export const updateJounal = async(req,res)=>{
-    const journalId = +req.params.journalId
+    const journalId = req.params.journalId
     const {title,description} = req.body
     try {
         const updatedData = {}
