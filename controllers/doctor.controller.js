@@ -19,7 +19,7 @@ export const doctorPrice = async(req,res)=>{
             return res.status(400).json({status:400,msg:'Your Price is required'})
         }
 
-        const updatePrice = await prisma.doctorPrice.create({doctorId,serviceId,yourPrice})
+        const updatePrice = await prisma.doctorPrice.create({data:{doctorId,serviceId,yourPrice}})
          res.status(200).json({status:200,msg:'Your Price is added'})
     } catch (error) {
         console.log(error)
