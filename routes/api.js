@@ -154,7 +154,7 @@ router.delete('/delete/journal/:journalId',deleteJournal)
 
 
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
-router.post('/doctor/login',doctorLogin)
+router.put('/doctor/login',doctorLogin)
 router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
 router.delete('/delete/doctor/profile/:DoctorId',deleteDoctor_profile)
 router.put('/update/status/:DoctorId',updateDoctorStatus)
@@ -176,7 +176,7 @@ router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/from/google/:patinetId',getGooglePatientProfile)
 
 
-router.post('/login/patient',loginPatient)
+router.put('/login/patient',loginPatient)
 router.post('/:patientId/support',post_support)
 router.put('/update/:patientId/:supportId',update_support)
 router.get('/get/support/:id',get_support)
