@@ -488,7 +488,7 @@ export const loginPatient = async (req, res) => {
         //generate token
         const data = { id: isEmail.id, username: isEmail.username, patient_name: isEmail.patient_name, profile_path: isEmail.profile_path }
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({ message: 'LoggedIn', token })
+        res.status(200).json({status:200, msg: 'LoggedIn', token })
 
     } catch (error) {
         console.log(error)

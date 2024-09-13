@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import path from 'path'
 import fs from 'fs'
+import bcrypt from 'bcryptjs'
 const router = Router()
 
 
@@ -281,5 +282,8 @@ router.post('/admin/login',adminLogin)
 // notification
 router.get('/test/firebase',testFirbase)
 router.post('/send/notification/patient/doctor',sendNotificationsPatientDoctor)
+
+
+
 
 export default router

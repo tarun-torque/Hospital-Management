@@ -1010,7 +1010,7 @@ export const doctorLogin = async (req, res) => {
 
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
 
-        res.status(200).json({ message: 'LoggedIn succesfully', token })
+        res.status(200).json({ status:200,msg: 'LoggedIn succesfully', token })
 
     } catch (error) {
         console.log(error)
