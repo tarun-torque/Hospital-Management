@@ -10,62 +10,62 @@ import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 
 // doctor price of service
-export const doctorPrice = async(req,res)=>{
+export const doctorPrice = async (req, res) => {
     const doctorId = +req.params.doctorId;
     const serviceId = +req.params.serviceId;
-    const {yourPrice} = req.body;
+    const { yourPrice } = req.body;
     try {
-        if(!yourPrice){
-            return res.status(400).json({status:400,msg:'Your Price is required'})
+        if (!yourPrice) {
+            return res.status(400).json({ status: 400, msg: 'Your Price is required' })
         }
 
-        const updatePrice = await prisma.doctorPrice.create({data:{doctorId,serviceId,yourPrice}})
-         res.status(200).json({status:200,msg:'Your Price is added'})
+        const updatePrice = await prisma.doctorPrice.create({ data: { doctorId, serviceId, yourPrice } })
+        res.status(200).json({ status: 200, msg: 'Your Price is added' })
     } catch (error) {
         console.log(error)
-         res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // doctor update price of service
-export const updateDoctorPrice = async(req,res)=>{
+export const updateDoctorPrice = async (req, res) => {
     const doctorId = +req.params.doctorId;
     const serviceId = +req.params.serviceId;
-    const {yourPrice} = req.body;
+    const { yourPrice } = req.body;
     try {
-        if(!yourPrice){
-            return res.status(400).json({status:400,msg:'Your Price is required'})
+        if (!yourPrice) {
+            return res.status(400).json({ status: 400, msg: 'Your Price is required' })
         }
-        const updatePrice  = await prisma.doctorPrice.update({
-            where:{
-                doctorId_serviceId:{doctorId,serviceId},
-               
+        const updatePrice = await prisma.doctorPrice.update({
+            where: {
+                doctorId_serviceId: { doctorId, serviceId },
+
             },
-            data:{yourPrice}
+            data: { yourPrice }
         })
-        res.status(200).json({status:200,msg:'Your Price is updated'})
+        res.status(200).json({ status: 200, msg: 'Your Price is updated' })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // get doctor Price 
-export const getDoctorPrice = async(req,res)=>{
+export const getDoctorPrice = async (req, res) => {
     const doctorId = +req.params.doctorId;
     const serviceId = +req.params.serviceId;
     try {
         const yourPrice = await prisma.doctorPrice.findUnique({
             where: {
-              doctorId_serviceId: { doctorId, serviceId } 
+                doctorId_serviceId: { doctorId, serviceId }
             }
-          })
-        res.status(200).json({status:200,yourPrice})
+        })
+        res.status(200).json({ status: 200, yourPrice })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -78,62 +78,62 @@ export const getDoctorPrice = async(req,res)=>{
 
 
 // post ticket
-export const recentTicket = async(req,res)=>{
-    const {title,description} = req.body
+export const recentTicket = async (req, res) => {
+    const { title, description } = req.body
     const patientId = +req.params.patientId
     try {
 
-        if(!title || !description){
-            return res.status(400).json({msg:400,msg:'All fields are required'})
+        if (!title || !description) {
+            return res.status(400).json({ msg: 400, msg: 'All fields are required' })
         }
 
-        if(!patientId){
-            return res.status(400).json({msg:400,msg:'Patient id is required'})
+        if (!patientId) {
+            return res.status(400).json({ msg: 400, msg: 'Patient id is required' })
         }
 
-        const patient=  await prisma.patient.findUnique({where:{id:patientId}})
+        const patient = await prisma.patient.findUnique({ where: { id: patientId } })
 
-        const data = {patientId,title,description}
-        const save =  await prisma.recentTicket.create({data})
-        res.status(201).json({status:201,msg:'Ticket added Successfully'})
-        
+        const data = { patientId, title, description }
+        const save = await prisma.recentTicket.create({ data })
+        res.status(201).json({ status: 201, msg: 'Ticket added Successfully' })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Sometging went wrong'})
+        res.status(500).json({ status: 500, msg: 'Sometging went wrong' })
     }
 }
 
 // get all recent ticket 
-export const getAllRecentTicket = async(req,res)=>{
+export const getAllRecentTicket = async (req, res) => {
     try {
         const tickets = await prisma.recentTicket.findMany({
             include: {
                 Patient: {
                     select: {
-                        username:true,
+                        username: true,
                         patient_name: true,
                         profile_path: true
                     }
                 }
             }
         });
-        res.status(200).json({status:200, tickets });
+        res.status(200).json({ status: 200, tickets });
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500, msg:'Something went wrong' });
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
 }
 
 // get trending consultant
-export const trendingConsultant = async(req,res)=>{
+export const trendingConsultant = async (req, res) => {
     try {
-        const consultants = await prisma.doctor.findMany({where:{verified:'yes'},orderBy:{noOfBooking:'desc'}})
-        res.status(200).json({status:200,consultants})
-        
+        const consultants = await prisma.doctor.findMany({ where: { verified: 'yes' }, orderBy: { noOfBooking: 'desc' } })
+        res.status(200).json({ status: 200, consultants })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,consultants})
+        res.status(500).json({ status: 500, consultants })
     }
 }
 
@@ -308,120 +308,120 @@ export const updateSupport = async (req, res) => {
 
 
 // admin dashboard search bar (staff,services,content)
-export const adminSearchBar = async(req,res)=>{
+export const adminSearchBar = async (req, res) => {
     try {
 
-        const {query} = req.query
+        const { query } = req.query
 
-        if(!query){
-            return res.status(400).json({status:400,msg:'Search Query is required'})
+        if (!query) {
+            return res.status(400).json({ status: 400, msg: 'Search Query is required' })
         }
 
-        const doctor  = await prisma.doctor.findMany({
-            where:{
-                  OR:[
-                    {doctor_name:{contains:query,mode:'insensitive'}},
-                    {username:{contains:query,mode:'insensitive'}},
-                  ]
+        const doctor = await prisma.doctor.findMany({
+            where: {
+                OR: [
+                    { doctor_name: { contains: query, mode: 'insensitive' } },
+                    { username: { contains: query, mode: 'insensitive' } },
+                ]
             }
         })
 
         const manager = await prisma.manager.findMany({
-            where:{
-                OR:[
-                    {name:{contains:query,mode:'insensitive'}},
-                    {username:{contains:query,mode:'insensitive'}},
-                    {states:{has:query}},
-                    {countries:{has:query}}
+            where: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } },
+                    { username: { contains: query, mode: 'insensitive' } },
+                    { states: { has: query } },
+                    { countries: { has: query } }
                 ]
             }
         })
 
 
         const creator = await prisma.creator.findMany({
-            where:{
-                OR:[
-                    {username:{contains:query,mode:'insensitive'}},
-                    {country:{contains:query,mode:'insensitive'}},
-                    {state:{contains:query,mode:'insensitive'}},
-                    {language:{has:query}}
-                    
+            where: {
+                OR: [
+                    { username: { contains: query, mode: 'insensitive' } },
+                    { country: { contains: query, mode: 'insensitive' } },
+                    { state: { contains: query, mode: 'insensitive' } },
+                    { language: { has: query } }
+
                 ]
             }
         })
 
         const categories = await prisma.category.findMany({
-            where:{
-                OR:[
-                    {name:{contains:query,mode:'insensitive'}}
+            where: {
+                OR: [
+                    { name: { contains: query, mode: 'insensitive' } }
                 ]
             }
         })
 
         const services = await prisma.service.findMany({
-            where:{
-                OR:[
-                    {title:{contains:query,mode:'insensitive'}},
-                    {description:{contains:query,mode:'insensitive'}},
-                    {tags:{has:query}},
-                    {subtitle:{has:query}},
-                    {what_we_will_discuss:{has:query}},
-                    {benefits:{has:query}},
-                    {language:{contains:query,mode:'insensitive'}},
+            where: {
+                OR: [
+                    { title: { contains: query, mode: 'insensitive' } },
+                    { description: { contains: query, mode: 'insensitive' } },
+                    { tags: { has: query } },
+                    { subtitle: { has: query } },
+                    { what_we_will_discuss: { has: query } },
+                    { benefits: { has: query } },
+                    { language: { contains: query, mode: 'insensitive' } },
                 ]
             }
         })
 
         const articles = await prisma.article_content.findMany({
-            where:{
-                OR:[
-                    {heading:{contains:query,mode:'insensitive'}},
-                    {content:{contains:query,mode:'insensitive'}},
-                    {tags:{has:query}},
-                    {category:{has:query}}
+            where: {
+                OR: [
+                    { heading: { contains: query, mode: 'insensitive' } },
+                    { content: { contains: query, mode: 'insensitive' } },
+                    { tags: { has: query } },
+                    { category: { has: query } }
                 ]
             }
         })
 
         const blogs = await prisma.blog_content.findMany({
-            where:{
-                OR:[
-                    {content:{contains:query,mode:'insensitive'}},
-                    {tags:{has:query}},
-                    {category:{has:query}}
+            where: {
+                OR: [
+                    { content: { contains: query, mode: 'insensitive' } },
+                    { tags: { has: query } },
+                    { category: { has: query } }
                 ]
             }
         })
 
         const ytContent = await prisma.yt_content.findMany({
-            where:{
-                OR:[
-                    {heading:{contains:query,mode:'insensitive'}},
-                    {content:{contains:query,mode:'insensitive'}},
-                    {tags:{has:query}},
-                    {category:{has:query}}
+            where: {
+                OR: [
+                    { heading: { contains: query, mode: 'insensitive' } },
+                    { content: { contains: query, mode: 'insensitive' } },
+                    { tags: { has: query } },
+                    { category: { has: query } }
                 ]
             }
         })
 
-        if(doctor.length===0 && manager.length===0 && creator.length===0 && categories.length===0 && services.length===0 && articles.length===0 && blogs.length===0 && ytContent.length===0){
-            return res.status(404).json({status:404,msg:'No result found'})
+        if (doctor.length === 0 && manager.length === 0 && creator.length === 0 && categories.length === 0 && services.length === 0 && articles.length === 0 && blogs.length === 0 && ytContent.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No result found' })
         }
 
-     res.status(200).json({status:200,doctor,manager,creator,categories,services,articles,blogs,ytContent,})
+        res.status(200).json({ status: 200, doctor, manager, creator, categories, services, articles, blogs, ytContent, })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 
 // manager dashboard search bar
- export const managerSearchBar = async(req,res)=>{
+export const managerSearchBar = async (req, res) => {
     const { managerId } = req.params;
-    const { query } = req.query;  
-    
+    const { query } = req.query;
+
     try {
         const managerDetails = await prisma.manager.findUnique({
             where: { id: parseInt(managerId) },
@@ -463,7 +463,7 @@ export const adminSearchBar = async(req,res)=>{
                 },
             },
         });
-    
+
         if (!managerDetails) {
             return res.status(404).json({ status: 404, msg: 'Results not found' });
         }
@@ -477,10 +477,10 @@ export const adminSearchBar = async(req,res)=>{
 // creator dashboard search bar
 export const creatorSearchBar = async (req, res) => {
     const { creatorId } = req.params;
-    const { query } = req.query;  
+    const { query } = req.query;
 
     try {
-      
+
         const creatorDetails = await prisma.creator.findUnique({
             where: { id: parseInt(creatorId) },
             include: {
@@ -595,13 +595,13 @@ export const upcomingSession = async (req, res) => {
 
         const doctorId = +req.params.doctorId;
 
-        const upcomingSession = await prisma.booking.findMany({ where: { doctorId }, include: { Patient: true },orderBy:{slotStart:'desc'} })
+        const upcomingSession = await prisma.booking.findMany({ where: { doctorId }, include: { Patient: true }, orderBy: { slotStart: 'desc' } })
         if (upcomingSession.length === 0) {
             return res.status(400).json({ status: 400, msg: 'No upcoming session' })
         }
         const upcomingSessionCount = upcomingSession.length
 
-        res.status(200).json({ status: 200, upcomingSession,upcomingSessionCount })
+        res.status(200).json({ status: 200, upcomingSession, upcomingSessionCount })
 
     } catch (error) {
         console.log(error)
@@ -746,8 +746,8 @@ export const signInDoctorFromGoogle = async (req, res) => {
             });
             return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
         } else {
-          const saveDoctor =   await prisma.doctor.create({ data });
-            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token ,id:saveDoctor.id});
+            const saveDoctor = await prisma.doctor.create({ data });
+            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token, id: saveDoctor.id });
         }
 
     } catch (error) {
@@ -997,15 +997,15 @@ export const doctorLogin = async (req, res) => {
 
         // sending info. for client
         const forClient = {
-            id: await prisma.doctor.id,
-            username: await prisma.doctor.username,
-            doctor_name: await prisma.doctor.doctor_name,
-            state: await prisma.doctor.state,
-            languages: await prisma.doctor.languages,
-            specialities: await prisma.doctor.specialities,
-            experience: await prisma.doctor.experience,
-            maximum_education: await prisma.doctor.maximum_education,
-            profile_pic: await prisma.doctor.profile_pic
+            id: doctor.id,
+            username: doctor.username,
+            doctor_name: doctor.doctor_name,
+            state: doctor.state,
+            languages: doctor.languages,
+            specialities: doctor.specialities,
+            experience: doctor.experience,
+            maximum_education: doctor.maximum_education,
+            profile_pic: doctor.profile_pic
         }
 
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
@@ -1198,7 +1198,7 @@ export const updateAvailability = async (req, res) => {
                 endTime: new Date(slot.endTime)
             }))
         })
-    
+
         res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
     } catch (error) {
@@ -1242,7 +1242,7 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName,serviceTitle } = req.body;
+    const { slotStart, slotEnd, channelName, serviceTitle } = req.body;
     const patientId = +req.params.patientId
     const doctorId = +req.params.doctorId
     try {
