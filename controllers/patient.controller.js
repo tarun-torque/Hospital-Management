@@ -10,6 +10,22 @@ import exp from "constants";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+export const getBookingOfPatient = async(req,res)=>{
+    const patientId = +req.params.patientId
+    try {
+        const appointment = await prisma.booking.findMany({where:{patientId},include:{Doctor:true}})
+        if(appointment.length === 0){
+            return res.status(400).json({status:400,msg:'No Appointment'})
+        }
+
+        res.status(200).json({status:200,appointment})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
 export const getPatientProfile = async(req,res)=>{
     const patientId = +req.params.patientId
     try {
