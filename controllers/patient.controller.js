@@ -13,12 +13,20 @@ const __dirname = dirname(__filename);
 export const getBookingOfPatient = async(req,res)=>{
     const patientId = +req.params.patientId
     try {
-        const appointment = await prisma.booking.findMany({where:{patientId},include:{Doctor:true}})
+        const appointment = await prisma.booking.findMany({
+            where: { patientId },
+            include: { Doctor: true },
+            orderBy: [
+              { slotStart: 'asc' }, 
+              { slotEnd: 'asc' }    
+            ]
+          })
+        const appointmentCount = appointment.length
         if(appointment.length === 0){
             return res.status(400).json({status:400,msg:'No Appointment'})
         }
 
-        res.status(200).json({status:200,appointment})
+        res.status(200).json({status:200,appointmentCount,appointment})
 
     } catch (error) {
         console.log(error)
