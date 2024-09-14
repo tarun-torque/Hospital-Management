@@ -28,6 +28,7 @@ export const login_creator = async (req, res) => {
         }
 
         const data = {
+            role:isCreator.role,
             id: isCreator.id,
             username: isCreator.username,
             email: isCreator.email,
@@ -35,6 +36,7 @@ export const login_creator = async (req, res) => {
             language: isCreator.language,
             profile_path: isCreator.profile_path
         }
+        
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
         res.status(200).json({status:200, messages: 'Logged In', token: token, id: isCreator.id })
 

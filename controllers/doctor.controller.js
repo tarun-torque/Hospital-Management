@@ -957,6 +957,7 @@ export const CreateDoctor_profile = async (req, res) => {
 
         //  for frontend
         const forClient = {
+            role:info.role,
             id: info.id,
             doctor_name,
             username, state,
@@ -966,6 +967,7 @@ export const CreateDoctor_profile = async (req, res) => {
             maximum_education,
             gender,
             profile_pic: doctorProfile_path
+
         }
 
 
@@ -997,6 +999,7 @@ export const doctorLogin = async (req, res) => {
 
         // sending info. for client
         const forClient = {
+            role:doctor.role,
             id: doctor.id,
             username: doctor.username,
             doctor_name: doctor.doctor_name,

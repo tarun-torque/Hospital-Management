@@ -15,7 +15,9 @@ datasource db {
 model admin {
   id        Int    @id @default(autoincrement())
   name      String
-  email     String
+  image     String
+  email     String @unique
+  role      String? @default("admin")
   password  String
   secretKey String
 }
@@ -78,6 +80,7 @@ model Creator {
   state           String
   language        String[]
   password        String
+  role            String?            @default("creator")
   status          String            @default("active") //active pending temporary off
   remarks         String            @default("no remarks")
   yt_contents     Yt_content[]
@@ -152,6 +155,7 @@ model Patient {
   otp            String?
   emailVerified  String?        @default("no")
   password       String?
+  role            String?            @default("patient")
   recentTicket   recentTicket[]
   review         Review[]
   mood           Mood[]
@@ -232,6 +236,7 @@ model Doctor {
   email              String               @unique
   password           String?
   country            String?
+  role            String?            @default("doctor")
   contact_number     String?
   emailVerified      String?              @default("no")
   gender             String?
@@ -273,7 +278,6 @@ model DoctorAvailability {
   updatedAt DateTime @updatedAt
 }
 
-
 model Booking {
   id           Int      @id @default(autoincrement())
   patientId    Int
@@ -314,6 +318,7 @@ model manager {
   countries        String[]
   profile_path     String
   contact_number   String
+  role            String?            @default("manager")
   password         String
   status           String?    @default("active")
   remarks          String?    @default("I am active")

@@ -16,35 +16,83 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-// admin login
-export const adminLogin  = async(req,res)=>{
-    const {email,password,secretKey} = req.body
+
+// admin register
+export const adminRegister = async (req, res) => {
+    const { name, email, password, secretKey } = req.body;
+    const fileInfo = req.file
     try {
-        if(!email){
-            return res.status(400).json({status:400,msg:'Email is required'})
+
+        const requiredField = ['name', 'email', 'password', 'secretKey']
+        for (const field of requiredField) {
+            if (req.body[field] === undefined || req.body[field] === null || req.body[field] === '') {
+                return res.status(400).json({ status: 400, msg: `${field} is required` })
+            }
         }
 
-        if(!password){
-            return res.status(400).json({status:400,msg:'Password is required'})
+        const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
+        if (!isFile) {
+            return res.status(400).json({ status:400,msg: 'Profile picture should be jpg/png and size less than 2MB' })
         }
 
-        if(!secretKey){
-            return res.status(400).json({status:400,msg:'Secret Key is required'})
+        const salt = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(password, salt)
+        const hash_key = bcrypt.hashSync(secretKey, salt)
+
+        const data = {name,email,password:hash_pass,secretKey:hash_key,image:fileInfo.path}
+        const tokenData = {name,email}
+
+        const token = jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:'999h'})
+        const saveData = await prisma.admin.create({data})
+        res.status(201).json({ status:201,msg:'Registered Successfully',token,id:saveData.id })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// admin login
+export const adminLogin = async (req, res) => {
+    const { email, password, secretKey } = req.body
+    try {
+        if (!email) {
+            return res.status(400).json({ status: 400, msg: 'Email is required' })
         }
 
-        const isAdmin = await prisma.admin.findUnique({where:{id:1}})
-        const data = {name:isAdmin.name}
-
-        const token = jwt.sign({data},process.env.SECRET_KEY,{expiresIn:'999h'})
-
-        if(email===isAdmin.email && password===isAdmin.password && secretKey===isAdmin.secretKey){
-            return res.status(200).json({status:200,msg:'LoggedIn',token})
+        if (!password) {
+            return res.status(400).json({ status: 400, msg: 'Password is required' })
         }
 
-        else {
-            return res.status(400).json({status:400,msg:'Invalid Credentials'})
+        if (!secretKey) {
+            return res.status(400).json({ status: 400, msg: 'Secret Key is required' })
         }
 
+        const isAdmin = await prisma.admin.findUnique({ where: { email } })
+        const checkPswd = bcrypt.compareSync(password, isAdmin.password)
+        const checkKey= bcrypt.compareSync(secretKey,isAdmin.secretKey)
+
+        if (!isAdmin || !checkPswd || !checkKey ) {
+            return res.status(400).json({ status: 400, msg: 'Invalid credentials' })
+        }
+
+        const data = { name: isAdmin.name }
+        const token = jwt.sign({ data }, process.env.SECRET_KEY, { expiresIn: '999h' })
+        res.status(200).json({ status: 200, msg: 'LoggedIn', token,id:isAdmin.id })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// get admin profile
+export const getAdminProfile = async(req,res)=>{
+    try {
+        const adminId = +req.params.adminId
+        const info = await prisma.admin.findUnique({where:{id:adminId}})
+        const profile =  {name:info.name,image:info.image}
+        res.status(200).json({status:200,profile})
+    
     } catch (error) {
         console.log(error)
         res.status(500).json({status:500,msg:'Something went wrong'})
@@ -1377,7 +1425,7 @@ export const allContentAdmin = async (req, res) => {
         const allArticle = await prisma.article_content.findMany();
         const allBlog = await prisma.blog_content.findMany();
 
-       
+
 
 
         const blogDataArray = allBlog.map(blog => {
@@ -1426,7 +1474,7 @@ export const category = async (req, res) => {
 
         const data = { name, assignedManager, imagePath: fileInfo.path }
 
-        const saved = await prisma.category.create({data})
+        const saved = await prisma.category.create({ data })
         res.status(200).json({ status: 200, msg: 'Category is created Succesfully' })
 
 
@@ -1466,7 +1514,7 @@ export const updateCategory = async (req, res) => {
         }
 
         // update category
-        const updateData = await prisma.category.update({ where: { id: categoryId }, data:updatedData })
+        const updateData = await prisma.category.update({ where: { id: categoryId }, data: updatedData })
         res.status(200).json({ status: 200, msg: 'Catagory Updated Succesfully' })
     } catch (error) {
         console.log(error)
@@ -1475,18 +1523,18 @@ export const updateCategory = async (req, res) => {
 }
 
 // get all category
-export const allCategory = async(req,res)=>{
+export const allCategory = async (req, res) => {
     try {
-        const allCategory  =  await prisma.category.findMany()
-        if(allCategory.length==0){
-            return res.status(404).json({status:400,msg:'No category found'})
+        const allCategory = await prisma.category.findMany()
+        if (allCategory.length == 0) {
+            return res.status(404).json({ status: 400, msg: 'No category found' })
         }
         const number = allCategory.length
-        const data = {allCategory,number}
-        res.status(200).json({status:200,msg:data})
-        
+        const data = { allCategory, number }
+        res.status(200).json({ status: 200, msg: data })
+
     } catch (error) {
-        
+
     }
 }
 
@@ -1495,42 +1543,42 @@ export const allCategory = async(req,res)=>{
 export const categoryDelete = async (req, res) => {
     try {
         const categoryId = +req.params.categoryId;
-    
+
         const categoryExists = await prisma.category.findUnique({
-          where: { id: categoryId },
-          include: { services: true },
-        });
-    
-        if (!categoryExists) {
-          return res.status(404).json({ status: 404, msg: 'Category does not exist' });
-        }
-    
-      
-        if (categoryExists.services.length === 0) {
-          await prisma.category.delete({
             where: { id: categoryId },
-          });
-    
-          return res.status(200).json({ status: 200, msg: 'Category deleted successfully (No services were assigned)' });
-        }
-    
-        await prisma.category.delete({
-          where: { id: categoryId },
+            include: { services: true },
         });
-    
+
+        if (!categoryExists) {
+            return res.status(404).json({ status: 404, msg: 'Category does not exist' });
+        }
+
+
+        if (categoryExists.services.length === 0) {
+            await prisma.category.delete({
+                where: { id: categoryId },
+            });
+
+            return res.status(200).json({ status: 200, msg: 'Category deleted successfully (No services were assigned)' });
+        }
+
+        await prisma.category.delete({
+            where: { id: categoryId },
+        });
+
         res.status(200).json({ status: 200, msg: 'Category and related services deleted successfully' });
-    
-      } catch (error) {
+
+    } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
-      }
+    }
 }
 
 // to create service of category
 export const createService = async (req, res) => {
     try {
         const categoryId = +req.params.categoryId;
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration,price } = req.body;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration, price } = req.body;
         const fileInfo = req.file;
 
         const requiredField = ['title', 'description', 'tags', 'subtitle', 'what_we_will_discuss', 'benefits', 'language', 'duration']
@@ -1553,10 +1601,10 @@ export const createService = async (req, res) => {
 
         const intDuration = parseInt(duration)
         const intPrice = parseInt(price)
-        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration:intDuration,price:intPrice, categoryId, imagePath: fileInfo.path }
+        const data = { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration: intDuration, price: intPrice, categoryId, imagePath: fileInfo.path }
 
         const saveService = await prisma.service.create({ data })
-        res.status(200).json({status:200,msg:'Service Created Successfully'})
+        res.status(200).json({ status: 200, msg: 'Service Created Successfully' })
 
     } catch (error) {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
@@ -1568,7 +1616,7 @@ export const createService = async (req, res) => {
 export const updateService = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
-        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration,price } = req.body;
+        const { title, description, tags, subtitle, what_we_will_discuss, benefits, language, duration, price } = req.body;
         const fileInfo = req.file;
 
         const updatedData = {}
@@ -1604,7 +1652,7 @@ export const updateService = async (req, res) => {
         if (duration) {
             updatedData.duration = duration
         }
-        if(price){
+        if (price) {
             updatedData.price = price
         }
 
@@ -1614,7 +1662,7 @@ export const updateService = async (req, res) => {
             if ((fileSize <= 2) && (fileType == 'image/png' || fileType == 'image/jpeg')) {
                 return res.status(400).json({ status: 400, msg: 'File size must be less than 2MB and PNG/JPG' })
             }
-            updatedData.imagePath=fileInfo.path
+            updatedData.imagePath = fileInfo.path
         }
 
         if (Object.keys(updatedData).length === 0) {
@@ -1623,73 +1671,73 @@ export const updateService = async (req, res) => {
 
 
         // update service
-        const updateService = await prisma.service.update({where:{id:serviceId},data:updatedData })
+        const updateService = await prisma.service.update({ where: { id: serviceId }, data: updatedData })
 
-        res.status(200).json({status:200,json:'Service Updated Successfully'})
+        res.status(200).json({ status: 200, json: 'Service Updated Successfully' })
 
     } catch (error) {
         console.log(error)
-           res.status(500).json({status:500,msg:'Something went wrong'})
-           
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+
     }
 }
 
 
 // to delete service
-export const deleteService = async(req,res)=>{
+export const deleteService = async (req, res) => {
     try {
 
         const serviceId = +req.params.serviceId
-        const deleteService = await prisma.service.delete({where:{id:serviceId}})
-        res.status(200).json({status:200,msg:'Service deleted successfully'})
-        
+        const deleteService = await prisma.service.delete({ where: { id: serviceId } })
+        res.status(200).json({ status: 200, msg: 'Service deleted successfully' })
+
     } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // get all service 
-export const allService = async(req,res)=>{
+export const allService = async (req, res) => {
     try {
-        const allService = await prisma.service.findMany({include:{doctorServices:true}})
+        const allService = await prisma.service.findMany({ include: { doctorServices: true } })
         const serviceCount = allService.length
 
-        const data = {allService,serviceCount}
+        const data = { allService, serviceCount }
 
-        if(allService.length == 0){
-            return res.status(404).json({status:404,msg:data})
+        if (allService.length == 0) {
+            return res.status(404).json({ status: 404, msg: data })
         }
 
-        res.status(200).json({status:200,msg:data})
-        
+        res.status(200).json({ status: 200, msg: data })
+
     } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 
 // get service by category 
-export const getServiceFromCategoryId = async(req,res)=>{
-  try {
-    const categoryId  = +req.params.categoryId;
-    const category   = await prisma.service.findMany({where:{categoryId}})
+export const getServiceFromCategoryId = async (req, res) => {
+    try {
+        const categoryId = +req.params.categoryId;
+        const category = await prisma.service.findMany({ where: { categoryId } })
 
-    res.status(200).json({status:200,msg:category})
+        res.status(200).json({ status: 200, msg: category })
 
-  } catch (error) {
-    res.status(500).json({status:500,msg:'Something went wrong'})
-  }
+    } catch (error) {
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
 }
 
 // get service from service id
-export const getServiceFromServiceId = async(req,res)=>{
+export const getServiceFromServiceId = async (req, res) => {
     try {
-        const serviceId =  +req.params.serviceId;
-        const service =  await prisma.service.findUnique({where:{id:serviceId}})
-        res.status(200).json({status:200,msg:service})
-        
+        const serviceId = +req.params.serviceId;
+        const service = await prisma.service.findUnique({ where: { id: serviceId } })
+        res.status(200).json({ status: 200, msg: service })
+
     } catch (error) {
-        res.status(400).json({status:400,msg:'Something went wrong'})
+        res.status(400).json({ status: 400, msg: 'Something went wrong' })
     }
 }
 
@@ -1698,28 +1746,28 @@ export const getServiceFromServiceId = async(req,res)=>{
 
 
 // top articles 
-export const topArticle = async(req,res)=>{
+export const topArticle = async (req, res) => {
     try {
 
         const article = await prisma.article_content.findMany({
-            where:{verified:'publish'},
-            orderBy:{views:'desc'}
+            where: { verified: 'publish' },
+            orderBy: { views: 'desc' }
         })
 
-        res.status(200).json({status:200,article})
-        
+        res.status(200).json({ status: 200, article })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // top blogs 
-export const topBlogs = async(req,res)=>{
+export const topBlogs = async (req, res) => {
     try {
         const blogs = await prisma.blog_content.findMany({
-            where:{verified:'publish'},
-            orderBy:{views:'desc'}
+            where: { verified: 'publish' },
+            orderBy: { views: 'desc' }
         })
 
         const blogDataArray = blogs.map(blog => {
@@ -1730,58 +1778,58 @@ export const topBlogs = async(req,res)=>{
                 category: blog.category,
                 data: extractedContent,
                 verified: blog.verified,
-                views:blog.views,
+                views: blog.views,
                 createdAt: blog.createdAt,
                 updatedAt: blog.updatedAt,
                 blog_creatorId: blog.blog_creatorId
             }
         })
 
-        res.status(200).json({status:200,blogs:blogDataArray})
+        res.status(200).json({ status: 200, blogs: blogDataArray })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
-export const topYt = async(req,res)=>{
+export const topYt = async (req, res) => {
     try {
-        const yt  = await prisma.yt_content.findMany({
-            where:{verified:'publish'},
-            orderBy:{views:'desc'}
+        const yt = await prisma.yt_content.findMany({
+            where: { verified: 'publish' },
+            orderBy: { views: 'desc' }
         })
-        res.status(200).json({status:200,yt})
-        
+        res.status(200).json({ status: 200, yt })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
-export const consultants  = async(req,res)=>{
+export const consultants = async (req, res) => {
     try {
-        const consultant = await prisma.doctor.findMany({where:{verified:'yes'}})
+        const consultant = await prisma.doctor.findMany({ where: { verified: 'yes' } })
         const certifiedConsultants = consultant.length
 
-        const con = await prisma.doctor.findMany({where:{verified:'no'}})
+        const con = await prisma.doctor.findMany({ where: { verified: 'no' } })
         const pendingConsultants = con.length
 
-        res.status(200).json({status:200,certifiedConsultants,pendingConsultants})
+        res.status(200).json({ status: 200, certifiedConsultants, pendingConsultants })
 
     } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
-export const registeredUser = async(req,res)=>{
+export const registeredUser = async (req, res) => {
     try {
-        const user  = await prisma.patient.findMany()
+        const user = await prisma.patient.findMany()
         const registeredUser = user.length
 
-        res.status(200).json({status:200,registeredUser})
-        
+        res.status(200).json({ status: 200, registeredUser })
+
     } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }

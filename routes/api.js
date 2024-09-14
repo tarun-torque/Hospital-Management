@@ -9,7 +9,7 @@ const router = Router()
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
 import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, CreateDoctor_profile, creatorSearchBar, deleteDoctor_profile, deletePatientSupport, doctorLogin, doctorPrice, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getServiceFromId, getServicesByDoctorId, managerSearchBar, patientAllSupport, patientSupport, recentTicket, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport } from "../controllers/doctor.controller.js";
 import { delete_support, deleteJournal, get_mood, get_support, getGooglePatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, registerPatient, resetPassword, signInPatientFromGoogle, test, update_support, updateJounal, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
-import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin} from "../controllers/admin.controller.js";
+import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
 import { sendNotificationsPatientDoctor, testFirbase } from "../controllers/push_notification/notification.js";
 
@@ -54,6 +54,9 @@ const storage  = multer.diskStorage({
         }
         else if(req.baseUrl==='/api/add/support/:patientId'){
             uploadPath = path.join(uploadPath,'supportImage')
+        }
+        else if(req.baseUrl==='/api/admin/register'){
+            uploadPath = path.join(uploadPath,'profile')
         }
         
         cb(null,uploadPath)
@@ -155,7 +158,7 @@ router.delete('/delete/journal/:journalId',deleteJournal)
 
 
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
-router.put('/doctor/login',doctorLogin)
+router.post('/doctor/login',doctorLogin)
 router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
 router.delete('/delete/doctor/profile/:DoctorId',deleteDoctor_profile)
 router.put('/update/status/:DoctorId',updateDoctorStatus)
@@ -177,7 +180,7 @@ router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/from/google/:patinetId',getGooglePatientProfile)
 
 
-router.put('/login/patient',loginPatient)
+router.post('/login/patient',loginPatient)
 router.post('/:patientId/support',post_support)
 router.put('/update/:patientId/:supportId',update_support)
 router.get('/get/support/:id',get_support)
@@ -270,13 +273,15 @@ router.get('/admin/all/patients',allPatient)
 router.get('/admin/get/staff',staff)
 
 // manager API
-router.post('/manager/login',login_manager);
+router.post('/manager/login',login_manager)
 router.get('/get/manager/profile/:managerId',eachManager)
 router.get('/manager/get/content',getContentByManager)
 
 
 // admin login 
+router.post('/admin/register',upload.single('profile'),adminRegister)
 router.post('/admin/login',adminLogin)
+router.get('/get/admin/profile/:adminId',getAdminProfile)
 
 
 // notification
