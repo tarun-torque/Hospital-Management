@@ -461,7 +461,6 @@ export const managerSearchBar = async (req, res) => {
                         blog_contents: true,
                         article_content: true,
                     },
-
                 },
             },
         });

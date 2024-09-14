@@ -10,6 +10,18 @@ import exp from "constants";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+export const getPatientProfile = async(req,res)=>{
+    const patientId = +req.params.patientId
+    try {
+        const profile = await prisma.patient.findUnique({where:{id:patientId}})
+        res.status(200).json({status:200,profile})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+
 // to add journal patient journal 
 export const patientJournal = async(req,res)=>{
     const patientId = +req.params.patientId
@@ -488,7 +500,8 @@ export const loginPatient = async (req, res) => {
         //generate token
         const data = { id: isEmail.id, username: isEmail.username, patient_name: isEmail.patient_name, profile_path: isEmail.profile_path }
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({status:200, msg: 'LoggedIn', token })
+        res.status(200).json({status:200, msg: 'LoggedIn', token ,id:isEmail.id})
+
 
     } catch (error) {
         console.log(error)
