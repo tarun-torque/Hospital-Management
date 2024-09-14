@@ -454,12 +454,14 @@ export const managerSearchBar = async (req, res) => {
                         ],
                     },
                     select: {
+                        id: true,
                         username: true,
                         email: true,
                         yt_contents: true,
                         blog_contents: true,
                         article_content: true,
                     },
+
                 },
             },
         });
