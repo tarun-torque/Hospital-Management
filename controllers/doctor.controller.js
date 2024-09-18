@@ -598,22 +598,43 @@ export const addDoctorService = async (req, res) => {
 //   get upcoming session of doctor
 export const upcomingSession = async (req, res) => {
     try {
-
         const doctorId = +req.params.doctorId;
 
-        const upcomingSession = await prisma.booking.findMany({ where: { doctorId }, include: { Patient: true }, orderBy: { slotStart: 'desc' } })
-        if (upcomingSession.length === 0) {
-            return res.status(400).json({ status: 400, msg: 'No upcoming session' })
-        }
-        const upcomingSessionCount = upcomingSession.length
+        // Get the current date and time
+        const currentDateTime = new Date();
 
-        res.status(200).json({ status: 200, upcomingSession, upcomingSessionCount })
+        // Query to get upcoming sessions only
+        const upcomingSession = await prisma.booking.findMany({
+            where: {
+                doctorId,
+                slotStart: {
+                    gt: currentDateTime // Only future sessions
+                }
+            },
+            include: {
+                Patient: true
+            },
+            orderBy: {
+                slotStart: 'desc' // Order by upcoming sessions in descending order
+            }
+        });
+
+        // If there are no upcoming sessions
+        if (upcomingSession.length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No upcoming session' });
+        }
+
+        const upcomingSessionCount = upcomingSession.length;
+
+        // Return response with upcoming sessions and count
+        res.status(200).json({ status: 200, upcomingSession, upcomingSessionCount });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        console.log(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
 
 // get service from its id :
 export const getServiceFromId = async (req, res) => {
