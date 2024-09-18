@@ -227,7 +227,7 @@ router.delete('/admin/delete/service/:serviceId',deleteService)
 router.get('/get/all/service',allService)
 router.get('/get/service/by/:categoryId',getServiceFromCategoryId)
 router.get('/get/service/:serviceId',getServiceFromServiceId)
-router.get('/get/category/from/:categoryId',getCategoryFromCategoryId)
+router.get('/get/category/:categoryId',getCategoryFromCategoryId)
 
 
 
