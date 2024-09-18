@@ -1705,9 +1705,10 @@ export const getCategoriesByDoctorId = async (req, res) => {
         const services = await prisma.doctorService.findMany({where:{doctorId:parseInt(doctorId)}})
         const categories = await prisma.service.findMany({where:{categoryId:services.serviceId},
         include:{
+            service:false,
             Category:true
         }})
-        
+
         return res.status(200).json({ statu:200,categories });
     } catch (error) {
         console.error('Error retrieving categories:', error);
