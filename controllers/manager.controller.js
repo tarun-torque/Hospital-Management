@@ -31,7 +31,7 @@ if(!isEmail || ! isPassword){
 }
 // send token
 const token  = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
-res.status(200).json({status:200,message:'Logged in Succesfully',token:token,id:isEmail.id})
+res.status(200).json({status:200,message:'Logged in Succesfully',token:token,id:isEmail.id,profile:isEmail})
     
 } catch (error) {
     console.log(error)
