@@ -7,8 +7,8 @@ const router = Router()
 
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
-import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, CreateDoctor_profile, creatorSearchBar, deleteDoctor_profile, deletePatientSupport, doctorLogin, doctorPrice, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getServiceFromId, getServicesByDoctorId, managerSearchBar, patientAllSupport, patientSupport, recentTicket, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport } from "../controllers/doctor.controller.js";
-import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getGooglePatientProfile, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, registerPatient, resetPassword, signInPatientFromGoogle, test, update_support, updateJounal, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
+import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, creatorSearchBar, deleteDoctor_profile, deletePatientSupport, doctorLogin, doctorPrice, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getServiceFromId, getServicesByDoctorId, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerRequestDoctor, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorEmail, verifyDoctorOTP } from "../controllers/doctor.controller.js";
+import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getGooglePatientProfile, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, registerPatient, resetPassword, signInPatientFromGoogle, update_support, updateJounal, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
 import { sendNotificationsPatientDoctor, testFirbase } from "../controllers/push_notification/notification.js";
@@ -103,6 +103,7 @@ router.get('/get/creator/profile/:creatorId',eachCreator)
 
 
 // doctor api
+
 router.get('/get/doctor/profile/:doctorId',getDoctorProfile)
 router.get('/get/service/:serviceId',getServiceFromId)
 router.get('/upcoming/session/:doctorId',upcomingSession)
@@ -156,10 +157,13 @@ router.delete('/delete/journal/:journalId',deleteJournal)
 
 
 
-
-router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), CreateDoctor_profile)
+router.post('/send/otp/doctor',verifyDoctorEmail)
+router.post('/verify/doctor/otp',verifyDoctorOTP)
+router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), registerRequestDoctor)
 router.post('/doctor/login',doctorLogin)
+
 router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
+
 router.delete('/delete/doctor/profile/:DoctorId',deleteDoctor_profile)
 router.put('/update/status/:DoctorId',updateDoctorStatus)
 router.put('/update/remarks/:DoctorId',updateDoctorRemarks)
@@ -169,9 +173,6 @@ router.post('/booking/:patientId/:doctorId',bookSlot)
 
 
 // patient api
-router.post('/test',test)
-
-
 router.post('/verify/patient/mail',verifyPatientEmail)
 router.post('/verify/patient/otp/:email',verifyPatientOTP)
 router.post('/create/patient/profile/:email',registerPatient)
@@ -290,5 +291,4 @@ router.post('/send/notification/patient/doctor',sendNotificationsPatientDoctor)
 
 
 router.get('/get/booking/:patientId',getBookingOfPatient)
-
 export default router

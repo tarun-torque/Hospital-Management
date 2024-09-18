@@ -231,141 +231,6 @@ export const getGooglePatientProfile = async(req,res)=>{
 }
 
 
-// send OTP and verify OTP and then register user from a single route
-export const test  = async(req,res)=>{
-    try {
-        const {email,otp,patient_name,username,country,contact_number,dob,gender,new_patient,password  } = req.body;
-
-        if(!email && !otp && !patient_name  ){
-            return res.status(400).json({status:400,msg:'Enter email'})
-        }
-
-        // for sending email
-         if( 
-            (email !==undefined && email !== null && email !=='') 
-            && (otp===undefined || otp === null || otp ==='')
-            && (patient_name===undefined || patient_name === null || patient_name ==='')
-        ){
-
-            const isEmail = await prisma.patient.findUnique({where:{email}})
-            if(isEmail){
-                    await prisma.patient.delete({where:{email}})
-                    return res.status(400).json({status:400,msg:'Try again'})
-            }
- 
-
-            const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
-            const otpToken = jwt.sign({otpNumber},process.env.SECRET_KEY,{expiresIn:'2m'})
-
-            const saveEmail = await prisma.patient.create({data:{email}})
-            const saveOtpToken =  await prisma.patient.update({where:{email},data:{otp:otpToken}})
-              
-        const mailOptions = {
-            from: process.env.ADMIN_EMAIL,
-            to: email,
-            subject: 'Your One-Time Password (OTP) for Verification',
-            html: `
-                <p>Hello</p>
-                <p>Thank you for signing up. Please use the following OTP to verify your email address. This OTP is valid for 2 minutes.</p>
-                <h3>${otpNumber}</h3>
-                <p>If you did not request this, please contact our support team immediately at support@example.com.</p>
-                <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</a></p>
-                <p>Follow us on Social Media:<br/>
-                <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
-                <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
-                <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
-                </p>
-                <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
-            `,
-            attachments: [
-                {
-                    filename: 'insta_logo.png',
-                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
-                    cid: 'insta'
-                },
-                {
-                    filename: 'fb_logo.png',
-                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
-                    cid: 'fb'
-                },
-                {
-                    filename: 'yt_logo.png',
-                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
-                    cid: 'yt'
-                }
-            ]
-        }
-
-        transporter.sendMail (mailOptions, async(error, info) => {
-            if (error) {
-                await prisma.patient.delete({where:{email}})
-                return res.status(400).json({msg:'OTP not sent'})
-            } else {
-                // await prisma.patient.update({where:{email},data:{email:null}})
-                return res.status(200).json({msg:'OTP sent check your Email'})
-            }
-        });
-        
-    }
-    
-
-    // verify OTP
-    else if(  
-        (email !==undefined  && email !== null && email !=='') 
-        && (otp!==undefined || otp !== null || otp !=='')
-        && (patient_name===undefined || patient_name === null || patient_name ==='')
-    ){
-           try {
-            const findOtp  = await prisma.patient.findUnique({where:{email}})
-            const realOtp = findOtp.otp
-            
-            const decode = jwt.verify(realOtp,process.env.SECRET_KEY)
-            if(decode.otpNumber==otp){
-                await prisma.patient.update({where:{email},data:{emailVerified:'yes'}})
-                return res.status(200).json({status:200,msg:"Email verified" })
-            }
-            if(decode.otpNumber !== otp){
-                return res.status(400).json({status:400,msg:'OTP is invalid or expired'})
-            }
-            
-           } catch (error) {
-                  return res.status(400).json({status:400,msg:'OTP is invalid or expired'})
-           }
-        }
-
-    // then register patient
-        else if(  
-            (email !==undefined || email !== null || email !=='') 
-            && (otp!==undefined || otp !== null || otp !=='')
-            && (patient_name!==undefined)
-        ){
-           const isEmailVerified = await prisma.patient.findUnique({where:{email}})
-           if(isEmailVerified.emailVerified==='no'){
-            return res.status(400).json({status:400,msg:'verify email first'})
-           }
-            const requiredField  = ['patient_name','username','country','contact_number','dob','gender','new_patient','password']
-            for(const field of requiredField){
-                if(req.body[field] === undefined || req.body[field]==='' || req.body[field]===null){
-                    return res.status(400).json({status:400,msg:`${field} is required`})
-                }
-            }
-
-            const salt  = bcrypt.genSalt(10)
-            const hash_pass = bcrypt.hashSync(password,salt)
-
-            const data = {patient_name,username,country,contact_number,dob,gender,new_patient,password:hash_pass}
-
-            const token = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
-            const saveData = await prisma.patient.update({where:{email},data:data})
-            res.status(200).json({status:200,msg:'Profile created',token})
-        }
-        
-        
-    } catch (error) {
-        res.status(500).json({status:500,msg:'Something went wrong'})
-    }
-}
-
 // verify email
 // -------- sent email
 export const verifyPatientEmail = async (req, res, next) => {
@@ -429,9 +294,6 @@ export const verifyPatientEmail = async (req, res, next) => {
             }
         });
 
-
-
-
     } catch (error) {
         return res.status(500).json({ msg: error.message });
     }
@@ -440,10 +302,9 @@ export const verifyPatientEmail = async (req, res, next) => {
 
 // verify otp
 export const verifyPatientOTP = async (req, res, next) => {
-    const email = req.params.email
+    const email = req.query
     try {
         const { otp } = req.body;
-
         if (!otp) {
             return res.status(400).json({ msg: 'OTP is required' });
         }

@@ -259,6 +259,8 @@ model Doctor {
   Rating             Rating[]
 }
 
+
+
 model DoctorService {
   doctorId  Int
   serviceId Int
