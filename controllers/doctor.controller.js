@@ -725,12 +725,12 @@ export const allBlog = async (req, res) => {
 // for registration of doctor
 export const verifyDoctorEmail = async (req, res, next) => {
     try {
-        const { email } = req.body;
+        const  { email } = req.body;
         if (!email) {
             return res.status(400).json({ msg: 'Email is required' });
         }
 
-        const isEmail = await prisma.patient.findUnique({ where: { email } });
+        const isEmail = await prisma.doctor.findUnique({ where: { email } });
         if (isEmail) {
             return res.status(400).json({ msg: 'Email is already present' });
         }
@@ -777,40 +777,46 @@ export const verifyDoctorEmail = async (req, res, next) => {
             if (error) {
                 return res.status(400).json({msg:'OTP not sent'})
             } else {
-                await prisma.doctor.create({email:email,otp:otpToken})
-                return res.status(200).json({msg:'OTP sent check your Email'})
+                await prisma.doctor.create({data:{email:email,otp:otpToken}})
+                return res.status(200).json({status:200,msg:'OTP sent check your Email'})
             }
-        });
+        })
+
     } catch (error) {
         return res.status(500).json({ msg: error.message });
     }
 }
 // verify otp
 export const verifyDoctorOTP = async (req, res, next) => {
-    const email = req.query
+    const email = req.query.email
     try {
         const { otp } = req.body;
         if (!otp) {
-            return res.status(400).json({ msg: 'OTP is required' });
+            return res.status(400).json({status:400, msg: 'OTP is required' });
         }
 
-        const retrieveOtp = await prisma.doctor.findUnique({ where: { email } });
-    
+        const retrieveOtp = await prisma.doctor.findUnique({ where: { email } })
+        if (!retrieveOtp) {
+            return res.status(400).json({ status:400,msg: 'OTP is invalid or expired' });
+        }
+
         const realOtp = retrieveOtp.otp;
         const payload = jwt.verify(realOtp, process.env.SECRET_KEY);
 
         if (payload.otpNumber === otp) {
             await prisma.doctor.update({where:{email},data:{emailVerified:'yes'}})
-            return res.status(200).json({ msg: 'Email is verified' });
-           
+            return res.status(200).json({staus:200, msg: 'Email is verified' })
+
         } else {
-            return res.status(400).json({ msg: 'OTP is invalid or expired' });
+            await prisma.doctor.delete({where:{email}})
+            return res.status(400).json({status:400, msg: 'OTP is invalid or expired' });
         }
     } catch (error) {
-
-        return res.status(400).json({ msg: 'Something went wrong' });
+        await prisma.doctor.delete({where:{email}})
+        return res.status(500).json({stattus:500, msg: 'Something went wrong' });
     }
 }
+
 // register doctor
 export const registerRequestDoctor = async (req, res) => {
     const email = req.query.email;
@@ -822,7 +828,9 @@ export const registerRequestDoctor = async (req, res) => {
     contact_number,
     country,
     gender,
+    fcmToken,
     state,
+    pricePerSession,
     experience,
     maximum_education,
     languages,
@@ -842,7 +850,7 @@ export const registerRequestDoctor = async (req, res) => {
       return res.status(400).json({status:400, msg: 'Email not verified. Please verify your email first.' });
     }
 
-    const requiredField=['username','fcmToken','doctor_name','password','country','contact_number','gender','state','languages','experience','maximum_education','pricePerSession']
+    const requiredField=['username','pricePerSession','fcmToken','doctor_name','password','country','contact_number','gender','state','languages','experience','maximum_education','pricePerSession']
     for(const field of requiredField){
         if(req.body[field]==undefined || req.body[field]==null || req.body[field]==''){
             return res.status(400).json({status:400,msg:`${field} is required`})
@@ -873,7 +881,7 @@ export const registerRequestDoctor = async (req, res) => {
             const doctorDocument_size = (fileInfo.doctorDocument[0].size) / (1024 * 1024); //size in MB
     
             // check profile pic
-            const isProfilePic = (doctorProfile_type == 'image/jpg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
+            const isProfilePic = (doctorProfile_type == 'image/jpeg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
             if (!isProfilePic) {
                 return res.status(400).json({ message: 'Profile Photo must be jpg or png and size less than 2MB' })
             }
@@ -898,11 +906,11 @@ export const registerRequestDoctor = async (req, res) => {
         country,
         gender,
         state,
-        experience,
+        experience:experienceInt,
         maximum_education,
         languages,
-        pricePerSession:parseInt(pricePerSession)
-      },
+        pricePerSession:priceInt
+      }
     });
 
     res.status(200).json({ message: 'Doctor registered successfully', doctor: updatedDoctor });
@@ -1659,7 +1667,6 @@ export const DoctorOtpSend = async (req, res) => {
 export const DoctorResetPassword = async(req,res)=>{
     try {
         const {otp,email,newPassword} = req.body;
-
         const checkOtp =  await prisma.doctor.findUnique({where:{email}})
 
         if(!checkOtp){

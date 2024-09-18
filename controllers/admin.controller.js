@@ -1740,6 +1740,17 @@ export const getServiceFromServiceId = async (req, res) => {
         res.status(400).json({ status: 400, msg: 'Something went wrong' })
     }
 }
+// get category from category id
+export const getCategoryFromCategoryId = async (req, res) => {
+    try {
+        const categoryId = +req.params.categoryId;
+        const category = await prisma.category.findUnique({ where: { id: categoryId } })
+        res.status(200).json({ status: 200, msg: category })
+
+    } catch (error) {
+        res.status(400).json({ status: 400, msg: 'Something went wrong' })
+    }
+}
 
 
 
