@@ -736,9 +736,8 @@ export const verifyDoctorEmail = async (req, res, next) => {
         }
 
         const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
-        const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' });
+        const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
-        
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,
@@ -774,20 +773,14 @@ export const verifyDoctorEmail = async (req, res, next) => {
                 }
             ]
         };
-
-
       const mailSent =   transporter.sendMail (mailOptions, async(error, info) => {
             if (error) {
                 return res.status(400).json({msg:'OTP not sent'})
             } else {
-                await prisma.doctor.create({email,otp:otpToken})
+                await prisma.doctor.create({email:email,otp:otpToken})
                 return res.status(200).json({msg:'OTP sent check your Email'})
             }
         });
-
-
-
-
     } catch (error) {
         return res.status(500).json({ msg: error.message });
     }
@@ -1661,7 +1654,8 @@ export const DoctorOtpSend = async (req, res) => {
         console.log(error)
     }
 }
-// docttor reset password
+
+// doctor reset password
 export const DoctorResetPassword = async(req,res)=>{
     try {
         const {otp,email,newPassword} = req.body;
