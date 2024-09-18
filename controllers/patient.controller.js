@@ -399,11 +399,8 @@ export const loginPatient = async (req, res) => {
 // ------ send otp
 export const otpSend = async (req, res) => {
     try {
-
         const { email } = req.body;
-
         const isPatient = await prisma.patient.findUnique({ where: { email } })
-
         if(! isPatient){
             return res.status(404).json({msg:"User not Found"})
         }

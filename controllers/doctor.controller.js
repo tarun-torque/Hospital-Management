@@ -724,8 +724,8 @@ export const allBlog = async (req, res) => {
 
 // for registration of doctor
 export const verifyDoctorEmail = async (req, res, next) => {
-    const { email } = req.body;
     try {
+        const { email } = req.body;
         if (!email) {
             return res.status(400).json({ msg: 'Email is required' });
         }
@@ -1588,7 +1588,111 @@ export const getAllAvailableSlots = async (req, res) => {
 
 
 
-// filter doctor state
-// filter doctor language
-// filter doctor exp.
-// filter specialities
+// doctor forgot password :
+export const DoctorOtpSend = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const isDoctor = await prisma.doctor.findUnique({ where: { email } })
+        if(! isDoctor){
+            return res.status(404).json({msg:"User not Found"})
+        }
+
+        // otp
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
+
+        // store otp in db
+        const saveOtp = await prisma.doctor.update({ where: { email }, data: { otp:otpToken} })
+
+        // send OTP via mail
+        const mailOptions = {
+            from: process.env.ADMIN_EMAIL,
+            to: email,
+            subject: 'OTP to reset Password',
+            html:
+                `
+            Dear ${isDoctor.doctor_name},
+
+            <p>We received a request to change your password.To proceed, please use the One-Time Password (OTP) provided below. </p>
+
+            <h3>Your OTP is ${otp}</h3>
+
+            <p>This OTP is valid for the next 2 minutes. Please do not share this OTP with anyone, as it is for your personal use only.</p>
+
+            <p>If you did not request, please contact our support team immediately at @example.com.</p>
+
+             <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</strong></a></p>
+
+                      <p>Follow us on Social Meadia :<br/>
+                     <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
+                      <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
+                      <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
+                          </p>
+                      <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
+            `,
+            attachments: [
+                {
+                    filename: 'insta_logo.png',
+                    path: path.join(__dirname, 'attachements', 'insta_logo.png'),
+                    cid: 'insta'
+                },
+                {
+                    filename: 'fb_logo.png',
+                    path: path.join(__dirname, 'attachements', 'fb_logo.png'),
+                    cid: 'fb'
+                },
+                {
+                    filename: 'yt_logo.png',
+                    path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
+                    cid: 'yt'
+                }
+            ]
+        }
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.status(400).json({status:400, msg: 'OTP not Sent' })
+            }
+            else {
+                res.status(200).json({status:200, msg: 'OTP sent Successfully' })
+            }
+        })
+    } catch (error) {
+        res.status(400).json({ message: 'Something went wromg' })
+        console.log(error)
+    }
+}
+// docttor reset password
+export const DoctorResetPassword = async(req,res)=>{
+    try {
+        const {otp,email,newPassword} = req.body;
+
+        const checkOtp =  await prisma.doctor.findUnique({where:{email}})
+
+        if(!checkOtp){
+            return res.status(400).json({msg:'Invalid Email or OTP'})
+        }
+
+        if(checkOtp.otp === null){
+            return res.status(400).json({msg:'Invalid Email or OTP'})
+        }
+
+        // verify otp
+        const decodedOtp = jwt.verify(checkOtp.otp,process.env.SECRET_KEY)
+
+        if(decodedOtp.otp !== otp){
+            return res.status(400).json({msg:'Invalid OTP'}) 
+        }
+
+        // hash password
+        const salt  = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(newPassword,salt)
+
+        // update password in database 
+        const updatePassword  = await prisma.doctor.update({where:{email},data:{password:hash_pass}})
+        res.status(200).json({status:200,msg:'Password reset successful'})
+     
+    } catch (error) {
+        res.status(400).json({ message: 'Invalid or expired OTP' })
+        console.log(error) 
+    }
+}

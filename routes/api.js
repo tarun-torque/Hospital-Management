@@ -160,6 +160,19 @@ router.delete('/delete/journal/:journalId',deleteJournal)
 router.post('/send/otp/doctor',verifyDoctorEmail)
 router.post('/verify/doctor/otp',verifyDoctorOTP)
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), registerRequestDoctor)
+
+
+// doctor forgort password 
+
+
+
+
+
+
+
+
+
+
 router.post('/doctor/login',doctorLogin)
 
 router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
@@ -188,6 +201,8 @@ router.get('/get/support/:id',get_support)
 router.delete('/delete/:supportId',delete_support)
 router.post('/mood/:patientId',mood)
 router.get('/get/:patientId/mood',get_mood)
+
+
 router.post('/forgot/password',otpSend)
 router.post('/reset/password',resetPassword)
 
