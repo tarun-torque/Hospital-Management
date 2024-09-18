@@ -298,4 +298,6 @@ router.get('/get/booking/:patientId',getBookingOfPatient)
 
 // to get category from doctor id :
 router.get('/get/category/from/:doctorId',getCategoriesByDoctorId)
+
+
 export default router
