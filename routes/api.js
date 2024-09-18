@@ -162,14 +162,7 @@ router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
 router.post('/doctor/reset/password',DoctorResetPassword)
 
 
-
-
-
-
-
-
 router.post('/doctor/login',doctorLogin)
-
 router.put('/update/doctor/profile/:DoctorId',updateDoctorProfile)
 
 router.delete('/delete/doctor/profile/:DoctorId',deleteDoctor_profile)
