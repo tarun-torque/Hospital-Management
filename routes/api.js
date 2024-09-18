@@ -7,7 +7,7 @@ const router = Router()
 
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
-import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, creatorSearchBar, deleteDoctor_profile, deletePatientSupport, doctorLogin, DoctorOtpSend, doctorPrice, DoctorResetPassword, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getServiceFromId, getServicesByDoctorId, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerRequestDoctor, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorEmail, verifyDoctorOTP } from "../controllers/doctor.controller.js";
+import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, creatorSearchBar, deleteDoctor_profile, deletePatientSupport, doctorLogin, DoctorOtpSend, doctorPrice, DoctorResetPassword, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getServiceFromId, getServicesByDoctorId, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerRequestDoctor, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorEmail, verifyDoctorOTP } from "../controllers/doctor.controller.js";
 import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getGooglePatientProfile, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, registerPatient, resetPassword, signInPatientFromGoogle, update_support, updateJounal, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
@@ -292,7 +292,10 @@ router.get('/get/admin/profile/:adminId',getAdminProfile)
 // notification
 router.get('/test/firebase',testFirbase)
 router.post('/send/notification/patient/doctor',sendNotificationsPatientDoctor)
-
-
 router.get('/get/booking/:patientId',getBookingOfPatient)
+
+
+
+// to get category from doctor id :
+router.get('/get/category/from/:doctorId',getCategoriesByDoctorId)
 export default router

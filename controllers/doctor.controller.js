@@ -1697,3 +1697,25 @@ export const DoctorResetPassword = async(req,res)=>{
         console.log(error) 
     }
 }
+
+// to get category from doctor id 
+export const getCategoriesByDoctorId = async (req, res) => {
+    const { doctorId } = req.params;
+    try {
+        const doctorServices = await prisma.doctorService.findMany({
+            where: { doctorId: parseInt(doctorId) },
+            include: {
+                service: {
+                    include: {
+                        Category: true,
+                    },
+                },
+            },
+        });
+        const categories = doctorServices.map((doctorService) => doctorService.service.Category);
+        return res.status(200).json({ statu:200,categories });
+    } catch (error) {
+        console.error('Error retrieving categories:', error);
+        return res.status(500).json({status:500 ,msg: 'Something went wrong' });
+    }
+}
