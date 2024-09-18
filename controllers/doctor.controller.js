@@ -8,6 +8,11 @@ import transporter from '../utils/transporter.js';
 import { testFirbase, toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
+import path from 'path'
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // doctor price of service
 export const doctorPrice = async (req, res) => {
@@ -1178,7 +1183,6 @@ export const doctorLogin = async (req, res) => {
 
     try {
         const { email, password } = req.body;
-
         const doctor = await prisma.doctor.findUnique({ where: { email } })
         if (doctor) {
             var isPassword = bcrypt.compareSync(password, doctor.password)
@@ -1210,9 +1214,6 @@ export const doctorLogin = async (req, res) => {
         console.log(error)
     }
 }
-
-
-
 
 
 // update profile
