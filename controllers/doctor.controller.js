@@ -1709,7 +1709,7 @@ export const getCategoriesByDoctorId = async (req, res) => {
             Category:true
         }})
 
-        return res.status(200).json({ statu:200,categories });
+        return res.status(200).json({ status:200,categories });
     } catch (error) {
         console.error('Error retrieving categories:', error);
         return res.status(500).json({status:500 ,msg: 'Something went wrong' });
