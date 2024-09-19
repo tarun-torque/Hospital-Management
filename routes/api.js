@@ -155,7 +155,6 @@ router.post('/send/otp/doctor',verifyDoctorEmail)
 router.post('/verify/doctor/otp',verifyDoctorOTP)
 router.post('/createDoctorProfile', upload.fields([{ name: 'doctorProfile', maxCount: 1 }, { name: 'doctorDocument', maxCount: 1 }]), registerRequestDoctor)
  
-
 // doctor forgort password 
 router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
 router.post('/doctor/reset/password',DoctorResetPassword)

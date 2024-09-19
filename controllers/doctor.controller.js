@@ -863,9 +863,6 @@ export const registerRequestDoctor = async (req, res) => {
       where: { email },
     });
 
-    if (!doctor) {
-      return res.status(404).json({status:400, msg: 'Doctor not found' });
-    }
 
     if (doctor.emailVerified !== 'yes') {
       return res.status(400).json({status:400, msg: 'Email not verified. Please verify your email first.' });
@@ -934,7 +931,11 @@ export const registerRequestDoctor = async (req, res) => {
       }
     });
 
-    res.status(200).json({ message: 'Doctor registered successfully', doctor: updatedDoctor });
+    const tokenData = {doctor_name,username,country,gender}
+
+    const token = jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:'999h'})
+
+    res.status(200).json({status:200, msg: 'Doctor registered successfully', doctor: updatedDoctor,token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error registering doctor' });
