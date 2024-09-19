@@ -8,6 +8,7 @@ import numCPUs from 'os'
 import cluster from 'cluster'
 import http from 'http'
 import process from 'process'
+import checkApiKey from './middleware/apiKey.js'
 
 const ncpus = numCPUs.cpus().length
 // console.log(ncpus)
@@ -31,7 +32,7 @@ if(cluster.isPrimary){
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({extended:false}))
-  app.use('/api',ApiRoutes)
+  app.use('/api',checkApiKey,ApiRoutes)
   
   const PORT = process.env.PORT || 4000
   
