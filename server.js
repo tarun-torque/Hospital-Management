@@ -9,6 +9,7 @@ import cluster from 'cluster'
 import http from 'http'
 import process from 'process'
 import checkApiKey from './middleware/apiKey.js'
+import helmet from 'helmet'
 
 const ncpus = numCPUs.cpus().length
 // console.log(ncpus)
@@ -28,7 +29,7 @@ if(cluster.isPrimary){
   
   app.use('/uploads',express.static(path.join(__dirname,'uploads')))
   
-  
+  app.use(helmet())
   app.use(cors())
   app.use(express.json())
   app.use(express.urlencoded({extended:false}))
