@@ -826,9 +826,19 @@ export const creator_profile = async (req, res) => {
         }
 
         // save in database
-        const info = await prisma.creator.create({
-            data
-        })
+        const info = await prisma.creator.create({data})
+
+        // send notification to the corresponding manager
+        const findManager = await prisma.manager.findUnique({where:{username:assignedManager}})
+        const sendNotification = await prisma.managerNotification.create({data:{
+            managerId:findManager.id,
+            title:`${username} as Creator `,
+            content:'is now registered as creator on Harmony',
+            data:JSON.stringify({
+                creatorId:info.id,
+                creatorProfilePath:info.profile_path,
+            })
+        }})
 
         // for token
         const creator = {
@@ -839,6 +849,7 @@ export const creator_profile = async (req, res) => {
             language: info.language,
             profile_path: info.profile_path
         }
+        
         // create token
         const token = jwt.sign(creator, process.env.SECRET_KEY, { expiresIn: '999h' })
 

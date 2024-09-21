@@ -129,18 +129,12 @@ export const getContentByManager = async (req, res) => {
 };
 
 
-
-
-
-
-
-
-
-
 // get creator of state
 // approve creator
 // approve their content 
 // see views of approved content only their state
 // reply to the support of their state only 
+
+
 
 
