@@ -765,7 +765,7 @@ export const registerDoctor = async(req,res)=>{
         const hash_pswd = bcrypt.hashSync(password,salt)
 
         
-        const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpNumber = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
         
         const data = {username,doctorName,password:hash_pswd,email,fcmToken,otp:otpToken}
@@ -1754,4 +1754,19 @@ export const getCategoriesByDoctorId = async (req, res) => {
 //     }
 // }
 
-// export const completeDoctorProfile = async(req,res)
+// export const completeDoctorProfile = async(req,res)=>{
+//             const { country,contactNumber, state, languages, specialities, experience, maximumEducation, pricePerSession, gender } = req.body
+//     try {
+
+    //     const requiredField = ['country','contactNumber','state','languages','specialities','experience','maximumEducation','pricePerSession','gender']
+    //     for(const field of requiredField){
+    //         if(req.body[field]===undefined  || req.body[field]===''  || req.body[field]===null){
+    //             return res.status(400).json({status:400,msg:`${field} is required'})
+    //         }
+    //     }
+        
+    //     const data = 
+        
+    // } catch (error) {
+        
+    // }
