@@ -168,7 +168,6 @@ router.post('/doctor/:doctorId/availability',updateAvailability)
 router.get('/doctor/:doctorId/availability',getAvailableSlotsDoctor)
 router.post('/booking/:patientId/:doctorId',bookSlot)
 
-
 // patient api
 router.post('/verify/patient/mail',verifyPatientEmail)
 router.post('/verify/patient/otp/:email',verifyPatientOTP)
@@ -203,19 +202,16 @@ router.get('/admin/get/active/doctors',getActiveDoctors)
 router.get('/admin/get/inactive/doctors',getInactiveDoctors)
 router.get('/admin/get/temporaryoff/doctors',getTemporaryoffDoctors)
 
-
 //admin -----category/category services and content category
 router.post('/admin/create/content/category',upload.single('contentCategoryImage'),contentCategory)
 router.get('/all/content/categories',getContentCategory)
 router.delete('/admin/delete/category/:CategoryId',deleteCategory)
 router.put('/admin/update/category/:CategoryId',upload.single('contentCategoryImage'),update_ContentCategory)
 
-
 router.post('/admin/create/category',upload.single('categoryImage'),category)
 router.put('/admin/update/service/category/:categoryId',upload.single('categoryImage'),updateCategory)
 router.get('/get/all/category',allCategory)
 router.delete('/admin/delete/category/service/:categoryId',categoryDelete)
-
 
 router.post('/admin/create/service/:categoryId',upload.single('serviceImage'),createService)
 router.put('/admin/update/service/:serviceId',upload.single('serviceImage'),updateService)

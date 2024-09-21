@@ -1670,10 +1670,10 @@ export const updateService = async (req, res) => {
         }
 
         if (duration) {
-            updatedData.duration = duration
+            updatedData.duration = parseInt(duration)
         }
         if (price) {
-            updatedData.price = price
+            updatedData.price = parseInt(price)
         }
 
         if (fileInfo) {
@@ -1689,10 +1689,8 @@ export const updateService = async (req, res) => {
             return res.status(400).json({ message: 'No valid fields to update' });
         }
 
-
         // update service
         const updateService = await prisma.service.update({ where: { id: serviceId }, data: updatedData })
-
         res.status(200).json({ status: 200, json: 'Service Updated Successfully' })
 
     } catch (error) {
