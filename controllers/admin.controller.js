@@ -113,7 +113,7 @@ export const approveDoctorRequest = async (req, res) => {
             to: `${verify.email}`,
             subject: 'Congratulations! Your Application Has Been Approved',
             html:
-                `Congratulations, Dr. ${verify.doctor_name}!
+                `Congratulations, Dr. ${verify.doctorName}!
 
      <p>We are pleased to inform you that your application has been approved by our team.</p>
 
@@ -162,7 +162,7 @@ export const approveDoctorRequest = async (req, res) => {
                 res.status(500).json({ message: `${verify.username} is verified but email not sent` });
             } else {
                 console.log('Email sent')
-                res.status(200).json({ message: `${verify.username} is verified and sent succesfully` })
+                res.status(200).json({ message: `${verify.doctorName} is verified and Email sent succesfully` })
             }
         })
 
@@ -259,7 +259,7 @@ export const assignManager_doctor = async (req, res) => {
         const sendNotification = await prisma.managerNotification.create({data:{
             managerId:findManager.id,
             title:`${assigned.doctorName} as Doctor `,
-            content:'is now registered as creator on Harmony',
+            content:'is now registered as Doctor on Harmony',
             data:JSON.stringify({
                 doctorId:assigned.id,
                 doctorProfilePath:assigned.profileUrl,
