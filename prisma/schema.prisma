@@ -232,22 +232,22 @@ model Doctor {
   verified           String               @default("no")
   profileUrl         String?
   fcmToken           String?
-  doctor_name        String?
+  doctorName        String?
   email              String               @unique
   password           String?
   country            String?
   role            String?            @default("doctor")
-  contact_number     String?
+  contactNumber     String?
   emailVerified      String?              @default("no")
   gender             String?
   state              String?
   noOfBooking        Int?                 @default(0)
   otp                String?
   languages          String[]
-  experience         Int?
+  experience         String?
   maximum_education  String?
   documents          String?
-  pricePerSession    Int?
+  pricePerSession    String?
   status             String?              @default("active")
   remarks            String?              @default("I am active")
   manager            manager?             @relation(fields: [assignedManager], references: [username])
