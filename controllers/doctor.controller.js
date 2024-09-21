@@ -1423,12 +1423,13 @@ export const bookSlot = async (req, res) => {
             },
         });
 
-        // const token = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
-        // const fcmToken = token.fcmToken
+        const doctor = await prisma.doctor.findUnique({where:{id:doctorId}})
+        const token = doctor.fcmToken
 
         const title = 'New Slot Booking';
         const body = `Slot booked from ${slotStartTime.toLocaleTimeString()} to ${slotEndTime.toLocaleTimeString()}.`;
-        await toDoctor(title, body, channelName)
+
+        await toDoctor(title, body, channelName,token)
 
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);
@@ -1657,3 +1658,100 @@ export const getCategoriesByDoctorId = async (req, res) => {
         return res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
 };
+
+// complete doctor profile
+
+// export const CreateDoctor_profile = async (req, res) => {
+//     try {
+
+//         // gather info from the doctor 
+//         const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession, gender } = req.body
+//         const fileInfo = req.files;
+
+//         const isUsername = await prisma.doctor.findUnique({ where: { username } })
+//         const isemail = await prisma.doctor.findUnique({ where: { email } })
+//         if (isUsername || isemail) {
+//             return res.status(409).json({ message: 'Doctor is already present with this Username or Email' })
+//         }
+
+//         // hashing password
+//         const salt = bcrypt.genSaltSync(10)
+//         const hash_pswd = bcrypt.hashSync(password, salt)
+
+//         // profile pic info
+//         const doctorProfile_originalName = fileInfo.doctorProfile[0].originalname;
+//         const doctorProfile_path = fileInfo.doctorProfile[0].path;
+//         const doctorProfile_type = fileInfo.doctorProfile[0].mimetype;
+//         const doctorProfile_size = (fileInfo.doctorProfile[0].size) / (1024 * 1024); //size in MB
+
+//         // documents info
+//         const doctorDocument_originalName = fileInfo.doctorDocument[0].originalname;
+//         const doctorDocument_path = fileInfo.doctorDocument[0].path;
+//         const doctorDocument_type = fileInfo.doctorDocument[0].mimetype;
+//         const doctorDocument_size = (fileInfo.doctorDocument[0].size) / (1024 * 1024); //size in MB
+
+//         // check profile pic
+//         const isProfilePic = (doctorProfile_type == 'image/jpg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
+//         if (!isProfilePic) {
+//             return res.status(400).json({ message: 'Profile Photo must be jpg or png and size less than 2MB' })
+//         }
+//         // check document
+//         const isDocument = (doctorDocument_type == 'application/zip') && (doctorDocument_size <= 20)
+//         if (!isDocument) {
+//             return res.status(400).json({ message: 'Document must be zip and size not greater than 20MB' })
+//         }
+
+//         const experienceInt = parseInt(experience)
+//         const priceInt = parseInt(pricePerSession)
+
+//         // for database
+//         const data = {
+//             doctor_name,
+//             username,
+//             password: hash_pswd,
+//             email,
+//             country,
+//             contact_number,
+//             state,
+//             languages,
+//             specialities,
+//             gender,
+//             experience: experienceInt,
+//             pricePerSession: priceInt,
+//             maximum_education,
+//             profile_pic: doctorProfile_path,
+//             profile_picType: doctorProfile_type,
+//             documents: doctorDocument_path,
+//             documents_type: doctorDocument_type
+//         }
+
+//         const info = await prisma.doctor.create({ data })
+
+
+//         //  for frontend
+//         const forClient = {
+//             role:info.role,
+//             id: info.id,
+//             doctor_name,
+//             username, state,
+//             languages,
+//             specialities,
+//             experience,
+//             maximum_education,
+//             gender,
+//             profile_pic: doctorProfile_path
+
+//         }
+
+
+//         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
+
+//         res.status(201).json({ message: 'Request is done', token })
+
+//     } catch (error) {
+//         console.log(error)
+//         res.send(error)
+//     }
+// }
+
+// export const completeDoctorProfile = async(req,res)

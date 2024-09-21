@@ -298,5 +298,6 @@ router.get('/get/category/from/:doctorId',getCategoriesByDoctorId)
 
 router.post('/register/doctor',registerDoctor)
 router.post('/verify/doctor/otp',verifyDoctorOtp)
+// router.post('/completeDoctor/profile',)
 
 export default router
