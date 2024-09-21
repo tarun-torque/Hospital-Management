@@ -760,6 +760,11 @@ export const registerDoctor = async(req,res)=>{
         if(isDoctor){
             return res.status(400).json({status:400,msg:'Doctor with this mail is already present'})
         }
+        const isUsername = await prisma.doctor.findUnique({where:{username}})
+        if(isUsername){
+            return res.status(400).json({status:400,msg:`${username} is not available`})
+        }
+
 
         const salt = bcrypt.genSaltSync(10)
         const hash_pswd = bcrypt.hashSync(password,salt)
@@ -836,9 +841,10 @@ export const verifyDoctorOtp= async(req,res)=>{
             return res.status(400).json({status:400,msg:'OTP is invalid or expired'})
         }
 
-        await prisma.doctor.update({where:{email},data:{emailVerified:'yes'}})
-        res.status(200).json({status:200,msg:'Email is verified'})
-
+        const saveData =  await prisma.doctor.update({where:{email},data:{emailVerified:'yes'}})
+        const tokenData = {username:saveData.username,name:saveData.doctorName}
+        const token = jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:'999h'})
+        res.status(200).json({status:200,msg:'Email is verified',doctorId:saveData.id,token})
 
     } catch (error) {
         console.log(error.message)
@@ -1753,20 +1759,72 @@ export const getCategoriesByDoctorId = async (req, res) => {
 //         res.send(error)
 //     }
 // }
+export const completeDoctorProfile = async (req, res) => {
+    const { country, contactNumber, state, languages, experience, maximumEducation, pricePerSession, gender } = req.body;
+    const fileInfo = req.files;
+    const doctorId = parseInt(req.params.doctorId);
+  
+    try {
+      // Check for required fields
+      const requiredFields = ['country', 'contactNumber', 'state', 'languages', 'experience', 'maximumEducation', 'pricePerSession', 'gender'];
+      
+      for (const field of requiredFields) {
+        if (!req.body[field]) {
+          return res.status(400).json({ status: 400, msg: `${field} is required` });
+        }
+      }
+  
+      // Ensure files are present
+      if (!fileInfo || !fileInfo.doctorProfile || !fileInfo.doctorDocument) {
+        return res.status(400).json({ status: 400, msg: 'Profile photo and document are required' });
+      }
+  
+      // Profile pic info
+      const doctorProfile = fileInfo.doctorProfile[0];
+      const doctorProfile_path = doctorProfile.path;
+      const doctorProfile_type = doctorProfile.mimetype;
+      const doctorProfile_size = doctorProfile.size / (1024 * 1024); // size in MB
+  
+      // Document info
+      const doctorDocument = fileInfo.doctorDocument[0];
+      const doctorDocument_path = doctorDocument.path;
+      const doctorDocument_type = doctorDocument.mimetype;
+      const doctorDocument_size = doctorDocument.size / (1024 * 1024); // size in MB
+  
+      // Validate profile pic
+      const isProfilePic = (doctorProfile_type === 'image/jpg' || doctorProfile_type === 'image/png') && (doctorProfile_size <= 2);
+      if (!isProfilePic) {
+        return res.status(400).json({ status: 400, msg: 'Profile photo must be jpg or png and size less than 2MB' });
+      }
+  
+      // Validate document
+      const isDocument = (doctorDocument_type === 'application/zip') && (doctorDocument_size <= 20);
+      if (!isDocument) {
+        return res.status(400).json({ status: 400, msg: 'Document must be a zip file and size not greater than 20MB' });
+      }
+  
+     
+      const data = {
+        country,
+        contactNumber,
+        state,
+        languages,
+        experience,
+        maximumEducation,
+        pricePerSession,
+        gender,
+        profileUrl: doctorProfile_path,
+        documents: doctorDocument_path,
+      };
 
-// export const completeDoctorProfile = async(req,res)=>{
-//             const { country,contactNumber, state, languages, specialities, experience, maximumEducation, pricePerSession, gender } = req.body
-//     try {
-
-    //     const requiredField = ['country','contactNumber','state','languages','specialities','experience','maximumEducation','pricePerSession','gender']
-    //     for(const field of requiredField){
-    //         if(req.body[field]===undefined  || req.body[field]===''  || req.body[field]===null){
-    //             return res.status(400).json({status:400,msg:`${field} is required'})
-    //         }
-    //     }
-        
-    //     const data = 
-        
-    // } catch (error) {
-        
-    // }
+      
+      const saveData = await prisma.doctor.update({ where: { id: doctorId }, data });
+      res.status(200).json({ status: 200, msg: 'Profile completed successfully' });
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+  };
+  
+  
