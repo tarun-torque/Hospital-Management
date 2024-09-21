@@ -7,6 +7,7 @@ import path from 'path'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from "constants";
+import { title } from "process";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -170,6 +171,24 @@ export const giveRatingToDoctor  = async(req,res)=>{
               review
             }
           })
+
+
+        // send notification for manager
+        // find assigned manager id of doctor
+        const patient = await prisma.patient.findUnique({where:{id:patientId}})
+        const doctor = await prisma.doctor.findUnique({where:{id:doctorId}})
+        const findManager= await prisma.manager.findUnique({where:{username:doctor.assignedManager}})
+        const sendNotification = await prisma.managerNotificaton.create({data:{
+            managerId:findManager.id,
+            title:`${patient.patient_name} rated Consultant ${doctor.doctorName} with ${stars} stars`,
+            content:`${patient.patient_name} commented: "${review}"`,
+            data:JSON.stringify({
+                    doctorId:doctorId,
+                    patientId:patientId,
+                    bookingId:bookingId,
+                    patientProfilePath:patient.profile_path,
+            })
+        }})
 
          res.status(201).json({status:201,msg:'Thanks for giving rating'})
         

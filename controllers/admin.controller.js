@@ -106,9 +106,7 @@ export const getAdminProfile = async(req,res)=>{
 export const approveDoctorRequest = async (req, res) => {
     try {
         const DoctorId = +req.params.DoctorId;
-
         const verify = await prisma.doctor.update({ where: { id: DoctorId }, data: { verified: 'yes' } })
-
         // send mail to the doctor
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
@@ -255,6 +253,19 @@ export const assignManager_doctor = async (req, res) => {
             return res.status(400).json({ message: 'Doctor is not verified' })
         }
         const assigned = await prisma.doctor.update({ where: { id: doctorId }, data: { assignedManager } })
+
+        // send notification to the manager
+        const findManager = await prisma.manager.findUnique({where:{username:assignedManager}})
+        const sendNotification = await prisma.managerNotification.create({data:{
+            managerId:findManager.id,
+            title:`${assigned.doctorName} as Doctor `,
+            content:'is now registered as creator on Harmony',
+            data:JSON.stringify({
+                doctorId:assigned.id,
+                doctorProfilePath:assigned.profileUrl,
+            })
+        }})
+
         res.status(200).json({ message: 'Manager assigned Succesfully' })
 
     } catch (error) {
@@ -802,11 +813,9 @@ export const creator_profile = async (req, res) => {
 
         // check file  
         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
-
         if (!isFile) {
             return res.status(400).json({ message: 'Profile picture should be jpg/png and size less than 2MB' })
         }
-
         // encrypt password
         const salt = bcrypt.genSaltSync(10);
         const hash_pswd = bcrypt.hashSync(password, salt)

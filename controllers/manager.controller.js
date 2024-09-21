@@ -204,12 +204,10 @@ export const getManagerReadNotification = async (req, res) => {
 
         const count = Notification.length;
 
-      
         if (count === 0) {
             return res.status(404).json({ status: 404, msg: 'No read notifications' });
         }
 
-       
         const readNotifications = Notification.map(notification => ({
             id: notification.id,
             title: notification.title,
