@@ -10,7 +10,7 @@ import {create_yt_Content, create_blog_content, create_arcticle_content, get_all
 import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, creatorSearchBar, deleteDoctor_profile, deletePatientSupport, doctorLogin, DoctorOtpSend, doctorPrice, DoctorResetPassword, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getServiceFromId, getServicesByDoctorId, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp } from "../controllers/doctor.controller.js";
 import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getGooglePatientProfile, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, registerPatient, resetPassword, signInPatientFromGoogle, update_support, updateJounal, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId} from "../controllers/admin.controller.js";
-import {eachManager, getContentByManager, login_manager } from "../controllers/manager.controller.js";
+import {eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager } from "../controllers/manager.controller.js";
 import { sendNotificationsPatientDoctor, testFirbase } from "../controllers/push_notification/notification.js";
 
 
@@ -299,5 +299,13 @@ router.get('/get/category/from/:doctorId',getCategoriesByDoctorId)
 router.post('/register/doctor',registerDoctor)
 router.post('/verify/doctor/otp',verifyDoctorOtp)
 router.post('/doctor/:doctorId/completeProfile', upload.fields([{ name: 'doctorProfile' }, { name: 'doctorDocument' }]), completeDoctorProfile);
+
+
+
+// managers Notification
+router.get('/get/manager/:managerId/unread/notification',getManagerUnreadNotification)
+router.get('/get/manager/:managerId/read/notification',getManagerReadNotification)
+
+
 
 export default router

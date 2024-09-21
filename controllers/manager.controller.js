@@ -4,62 +4,63 @@ import prisma from '../DB/db.config.js'
 import extractContent from '../utils/htmlExtractor.js'
 
 // login manager
-export const login_manager = async(req,res)=>{
-try {
-const {email,password} = req.body;
-if(!email){
-    return res.status(400).json({status:400,msg:'Email is required'})
-}
-if(!password){
-    return res.status(400).json({status:400,msg:'Password is required'})
-}
+export const login_manager = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email) {
+            return res.status(400).json({ status: 400, msg: 'Email is required' })
+        }
+        if (!password) {
+            return res.status(400).json({ status: 400, msg: 'Password is required' })
+        }
 
-// check email and password
-const isEmail = await prisma.manager.findUnique({where:{email}})
-const isPassword = bcrypt.compareSync(password,isEmail.password)
+        // check email and password
+        const isEmail = await prisma.manager.findUnique({ where: { email } })
+        const isPassword = bcrypt.compareSync(password, isEmail.password)
 
-if(!isEmail || ! isPassword){
-    return res.status(400).json({message:'Invalid Credentials'})
-}
+        if (!isEmail || !isPassword) {
+            return res.status(400).json({ message: 'Invalid Credentials' })
+        }
 
- const data = {
-    id:isEmail.id,
-    username:isEmail.username,
-    profile_path:isEmail.profile_path,
-    states:isEmail.states,
-    country:isEmail.country,
-}
-// send token
-const token  = jwt.sign(data,process.env.SECRET_KEY,{expiresIn:'999h'})
-res.status(200).json({status:200,message:'Logged in Succesfully',token:token,id:isEmail.id,profile:isEmail})
-    
-} catch (error) {
-    console.log(error)
-    res.status(400).json({message:'Something went wrong'})
-    
-}
+        const data = {
+            id: isEmail.id,
+            username: isEmail.username,
+            profile_path: isEmail.profile_path,
+            states: isEmail.states,
+            country: isEmail.country,
+        }
+        // send token
+        const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
+        res.status(200).json({ status: 200, message: 'Logged in Succesfully', token: token, id: isEmail.id, profile: isEmail })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ message: 'Something went wrong' })
+
+    }
 
 }
 
 // get each manager profile
-export const eachManager = async(req,res)=>{
+export const eachManager = async (req, res) => {
     try {
         const managerId = +req.params.managerId
         const manager = await prisma.manager.findUnique(
-            {where:{id:managerId},
-            include:{
-                creators:true,
-                doctors:true,
-                assignedCategory:true
-            }
-        })
-        
-        if(! manager){
-            return res.status(404).json({msg:'No Manager found'})
+            {
+                where: { id: managerId },
+                include: {
+                    creators: true,
+                    doctors: true,
+                    assignedCategory: true
+                }
+            })
+
+        if (!manager) {
+            return res.status(404).json({ msg: 'No Manager found' })
         }
-        
-        res.status(200).json({manager})
-        
+
+        res.status(200).json({ manager })
+
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
@@ -70,7 +71,7 @@ export const eachManager = async(req,res)=>{
 export const getContentByManager = async (req, res) => {
     try {
         const managerUsername = req.query.managerUsername;
-        
+
         if (!managerUsername) {
             return res.status(400).json({ status: 400, msg: "Manager username is required" });
         }
@@ -99,8 +100,8 @@ export const getContentByManager = async (req, res) => {
                 }
             }
         });
-        
-    
+
+
         const blogDataArray = allBlog.map(blog => {
             const extractedContent = extractContent(blog.content);
             return {
@@ -115,11 +116,11 @@ export const getContentByManager = async (req, res) => {
             };
         });
 
-       if(allArticle.length==0 && allBlog.length==0 && allYt.length==0){
-        return res.status(404).json({status:404,msg:"No Content Found"})
-       }
+        if (allArticle.length == 0 && allBlog.length == 0 && allYt.length == 0) {
+            return res.status(404).json({ status: 404, msg: "No Content Found" })
+        }
 
-        const data = {allYt,allArticle,allBlog:blogDataArray}
+        const data = { allYt, allArticle, allBlog: blogDataArray }
 
         res.status(200).json({ status: 200, msg: data });
     } catch (error) {
@@ -135,6 +136,77 @@ export const getContentByManager = async (req, res) => {
 // see views of approved content only their state
 // reply to the support of their state only 
 
+
+
+
+
+
+
+
+
+// get manager specific notification 
+// -------unread
+export const getManagerUnreadNotification = async (req, res) => {
+    const managerId = +req.params.managerId
+    try {
+        const unreadNotification = await prisma.managerNotification.findMany({
+            where: {
+                managerId: managerId,
+                isRead: 'no',
+            },
+        });
+
+        const count = unreadNotification.length
+
+        if (count === 0) {
+            return res.status(400).json({ status: 404, msg: 'No unread Notification' })
+        }
+
+        // mark as read
+        const markAsRead = await prisma.managerNotification.updateMany({
+            where: {
+                managerId: managerId,
+                isRead: 'no',
+            },
+            data: {
+                isRead: 'yes',
+            },
+        })
+
+        res.status(200).json({ status: 200, unreadNotification, count })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+
+    }
+}
+
+//----------read
+export const getManagerReadNotification = async (req, res) => {
+    const managerId = +req.params.managerId
+    try {
+        const readNotification = await prisma.managerNotification.findMany({
+            where: {
+                managerId: managerId,
+                isRead: 'yes',
+            },
+        });
+
+        const count = readNotification.length
+
+        if (count === 0) {
+            return res.status(400).json({ status: 404, msg: 'No read Notification' })
+        }
+
+        res.status(200).json({ status: 200, readNotification, count })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+
+    }
+}
 
 
 
