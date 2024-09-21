@@ -147,23 +147,23 @@ export const getContentByManager = async (req, res) => {
 // get manager specific notification 
 // -------unread
 export const getManagerUnreadNotification = async (req, res) => {
-    const managerId = +req.params.managerId
+    const managerId = +req.params.managerId; 
     try {
-        const unreadNotification = await prisma.managerNotification.findMany({
+        const Notification = await prisma.managerNotification.findMany({
             where: {
                 managerId: managerId,
                 isRead: 'no',
             },
         });
 
-        const count = unreadNotification.length
+        const count = Notification.length;
 
         if (count === 0) {
-            return res.status(400).json({ status: 404, msg: 'No unread Notification' })
+            return res.status(404).json({ status: 404, msg: 'No unread notifications' });
         }
 
         // mark as read
-        const markAsRead = await prisma.managerNotification.updateMany({
+        await prisma.managerNotification.updateMany({
             where: {
                 managerId: managerId,
                 isRead: 'no',
@@ -171,42 +171,59 @@ export const getManagerUnreadNotification = async (req, res) => {
             data: {
                 isRead: 'yes',
             },
-        })
+        });
 
-        res.status(200).json({ status: 200, unreadNotification, count })
+        const unreadNotifications = Notification.map(notification => ({
+            id: notification.id,
+            title: notification.title,
+            content: notification.content,
+            data: JSON.parse(notification.data), 
+            managerId: notification.managerId,
+        }));
+
+
+        res.status(200).json({ status: 200, unreadNotifications,count });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
-
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
 
 //----------read
 export const getManagerReadNotification = async (req, res) => {
-    const managerId = +req.params.managerId
+    const managerId = +req.params.managerId; 
     try {
-        const readNotification = await prisma.managerNotification.findMany({
+
+        const Notification = await prisma.managerNotification.findMany({
             where: {
                 managerId: managerId,
                 isRead: 'yes',
             },
         });
 
-        const count = readNotification.length
+        const count = Notification.length;
 
+      
         if (count === 0) {
-            return res.status(400).json({ status: 404, msg: 'No read Notification' })
+            return res.status(404).json({ status: 404, msg: 'No read notifications' });
         }
 
-        res.status(200).json({ status: 200, readNotification, count })
+       
+        const readNotifications = Notification.map(notification => ({
+            id: notification.id,
+            title: notification.title,
+            content: notification.content,
+            data: JSON.parse(notification.data), 
+            managerId: notification.managerId,
+        }));
+
+        res.status(200).json({ status: 200, readNotifications, count });
 
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
-
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
-
+};
 
 
