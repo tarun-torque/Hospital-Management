@@ -590,6 +590,7 @@ export const addDoctorService = async (req, res) => {
         });
 
         return res.status(201).json({ status: 201, message: 'Service added successfully', doctorService });
+        
     } catch (error) {
         console.error('Error adding service:', error);
         return res.status(500).json({ status: 500, msg: 'Internal server error' });
@@ -1803,7 +1804,6 @@ export const completeDoctorProfile = async (req, res) => {
         return res.status(400).json({ status: 400, msg: 'Document must be a zip file and size not greater than 20MB' });
       }
   
-     
       const data = {
         country,
         contactNumber,
