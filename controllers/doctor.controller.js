@@ -597,38 +597,41 @@ export const addDoctorService = async (req, res) => {
     }
 };
 
-//   get upcoming session of doctor
+// get upcoming session of doctor
 export const upcomingSession = async (req, res) => {
     try {
         const doctorId = +req.params.doctorId;
-
-        // Get the current date and time
         const currentDateTime = new Date();
 
-        // Query to get upcoming sessions only
+        const startOfDay = new Date(currentDateTime);
+        startOfDay.setHours(0, 0, 0, 0)
+
+        // Set the end of today (11:59 PM)
+        const endOfDay = new Date(currentDateTime);
+        endOfDay.setHours(23, 59, 59, 999)
+
         const upcomingSession = await prisma.booking.findMany({
             where: {
                 doctorId,
                 slotStart: {
-                    gt: currentDateTime // Only future sessions
+                    gte: currentDateTime, 
+                    lte: endOfDay 
                 }
             },
             include: {
                 Patient: true
             },
             orderBy: {
-                slotStart: 'desc' // Order by upcoming sessions in descending order
+                slotStart: 'asc' 
             }
         });
 
-        // If there are no upcoming sessions
         if (upcomingSession.length === 0) {
-            return res.status(400).json({ status: 400, msg: 'No upcoming session' });
+            return res.status(400).json({ status: 400, msg: 'No upcoming sessions for today' });
         }
 
         const upcomingSessionCount = upcomingSession.length;
 
-        // Return response with upcoming sessions and count
         res.status(200).json({ status: 200, upcomingSession, upcomingSessionCount });
 
     } catch (error) {
@@ -636,6 +639,7 @@ export const upcomingSession = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
 };
+
 
 
 // get service from its id :
@@ -1347,37 +1351,34 @@ export const updateAvailability = async (req, res) => {
 // get available slots of particular docotor
 export const getAvailableSlotsDoctor = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    const now = new Date();
-
-    const startOfDay = new Date(now);
-    startOfDay.setHours(0, 0, 0, 0); 
-
-    const endOfDay = new Date(now);
-    endOfDay.setHours(23, 59, 59, 999);
+    const today = new Date();
+    const nextWeek = new Date(today)
+    nextWeek.setDate(today.getDate() + 7)
 
     try {
+
         const availableSlots = await prisma.doctorAvailability.findMany({
             where: {
                 doctorId,
                 startTime: {
-                    gte: now, 
-                    lte: endOfDay 
+                    gte: today,
+                    lte: nextWeek
                 },
                 isBooked: "no"
             }
-        });
+        })
 
-        if (availableSlots.length === 0) {
-            return res.status(400).json({ status: 400, msg: 'No Slots are available for today' });
+        if (availableSlots.length == 0) {
+            return res.status(400).json({ status: 400, msg: 'No Slots are available' })
         }
 
         res.status(200).json({ status: 200, msg: availableSlots });
 
     } catch (error) {
-        res.status(500).json({ status:500,msg:'Something went wrong'});
-        console.log(error.message);
+        res.status(500).json({ error: 'Error fetching available slots' });
+        console.log(error.message)
     }
-};
+}
 
 
 
