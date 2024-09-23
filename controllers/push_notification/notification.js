@@ -114,7 +114,7 @@ export const testFirbase  = async(req,res)=>{
                 title: 'Testing !!!!',
                 body: 'Firebase Admin SDK is properly initialized.',
             },
-            token: 'erzqMv2-RmO-OHAzyB83Qp:APA91bHQ7X-VWHPC_BpqkQ6mzbb7bco3oU4GtOhlg-n6xpZYfqiJ8yzCkQgIi915QtgxVyhYpqijgoHz49rx6hHU2R2QunwYPSsuBEgd33zbzGsxkwnWAvlTu7qR3XStaRTkqfxOWML_', // Replace with a valid device token
+            token: '', // Replace with a valid device token
         };
         const response = await admin.messaging().send(message);
         console.log('Test message sent successfully:', response);
