@@ -1436,7 +1436,7 @@ export const bookSlot = async (req, res) => {
         const token = doctor.fcmToken
 
         const title = 'New Slot Booking';
-        const body = `Slot booked from ${slotStartTime.toLocaleTimeString()} to ${slotEndTime.toLocaleTimeString()}.`;
+        const body = `Slot booked from ${slotStartTime} to ${slotEndTime}.`;
 
         await toDoctor(title, body, channelName, token)
 
