@@ -1344,38 +1344,41 @@ export const updateAvailability = async (req, res) => {
     }
 };
 
-
 // get available slots of particular docotor
 export const getAvailableSlotsDoctor = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    const today = new Date();
-    const nextWeek = new Date(today)
-    nextWeek.setDate(today.getDate() + 7)
+    const now = new Date();
+
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0); 
+
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
 
     try {
-
         const availableSlots = await prisma.doctorAvailability.findMany({
             where: {
                 doctorId,
                 startTime: {
-                    gte: today,
-                    lte: nextWeek
+                    gte: now, 
+                    lte: endOfDay 
                 },
                 isBooked: "no"
             }
-        })
+        });
 
-        if (availableSlots.length == 0) {
-            return res.status(400).json({ status: 400, msg: 'No Slots are available' })
+        if (availableSlots.length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No Slots are available for today' });
         }
 
         res.status(200).json({ status: 200, msg: availableSlots });
 
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching available slots' });
-        console.log(error.message)
+        res.status(500).json({ status:500,msg:'Something went wrong'});
+        console.log(error.message);
     }
-}
+};
+
 
 
 // to book slot 
@@ -1386,7 +1389,6 @@ export const bookSlot = async (req, res) => {
     try {
         const slotStartTime = new Date(slotStart);
         const slotEndTime = new Date(slotEnd);
-
 
         const existingBooking = await prisma.booking.findFirst({
             where: {
@@ -1421,8 +1423,6 @@ export const bookSlot = async (req, res) => {
                 serviceTitle
             },
         });
-
-
 
         // Increment the noOfBooking for the doctor
         await prisma.doctor.update({
