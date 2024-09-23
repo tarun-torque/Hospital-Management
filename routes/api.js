@@ -11,7 +11,7 @@ import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allY
 import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getGooglePatientProfile, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, registerPatient, resetPassword, signInPatientFromGoogle, update_support, updateJounal, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager } from "../controllers/manager.controller.js";
-import { sendNotificationsPatientDoctor, testFirbase } from "../controllers/push_notification/notification.js";
+import {  testFirbase } from "../controllers/push_notification/notification.js";
 
 
 // to make dynamic directory
@@ -283,7 +283,6 @@ router.get('/get/admin/profile/:adminId',getAdminProfile)
 
 // notification
 router.get('/test/firebase',testFirbase)
-router.post('/send/notification/patient/doctor',sendNotificationsPatientDoctor)
 router.get('/get/booking/:patientId',getBookingOfPatient)
 
 
