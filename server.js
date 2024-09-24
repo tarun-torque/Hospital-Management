@@ -10,6 +10,7 @@ import http from 'http'
 import process from 'process'
 import checkApiKey from './middleware/apiKey.js'
 import helmet from 'helmet'
+import { reminderAutomate } from './controllers/reminder/reminder.js'
 
 const ncpus = numCPUs.cpus().length
 // console.log(ncpus)

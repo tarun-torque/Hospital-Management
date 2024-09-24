@@ -5,7 +5,7 @@ import { messages } from "@vinejs/vine/defaults";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import transporter from '../utils/transporter.js';
-import { testFirbase, toDoctor } from './push_notification/notification.js';
+import { toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 import path from 'path'
@@ -638,9 +638,7 @@ export const upcomingSession = async (req, res) => {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
-
-
+}
 
 // get service from its id :
 export const getServiceFromId = async (req, res) => {
@@ -1143,12 +1141,12 @@ export const doctorLogin = async (req, res) => {
             role: doctor.role,
             id: doctor.id,
             username: doctor.username,
-            doctor_name: doctor.doctor_name,
+            doctor_name: doctor.doctorName,
             state: doctor.state,
             languages: doctor.languages,
             specialities: doctor.specialities,
             experience: doctor.experience,
-            maximum_education: doctor.maximum_education,
+            maximum_education: doctor.maximumEducation,
             profile_pic: doctor.profile_pic
         }
 
@@ -1160,7 +1158,6 @@ export const doctorLogin = async (req, res) => {
         console.log(error)
     }
 }
-
 
 // update profile
 export const updateDoctorProfile = async (req, res) => {
