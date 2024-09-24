@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import cron from 'node-cron';
 import { fileURLToPath } from 'url';
-import prisma from '../../DB/db.config';
+import prisma from '../../DB/db.config.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
