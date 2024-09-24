@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import cron from 'node-cron';
 import { fileURLToPath } from 'url';
+import prisma from '../../DB/db.config';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -88,12 +89,13 @@ export const patientVideoCallStart = async (req, res) => {
     try {
 
         // find fcmToken 
+        const patient = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
         const message = {
             notification: {
                 title: 'Video Call Starting Now',
                 body: 'Your video call has started. Please join the call'
             },
-            token: 'fisJbvnERmy00_ypGwqklq:APA91bEaCKjhM6y38EkKC2O23l4tltnSoVgYks9-UhsWDfNtLSi_kB5uK-mn11Pk_J4d519OymAnYsbLYGhxfQ3LgirJUX6uR1QF-nm6hHogqoqVkplPOD-I44WoqhAh9-A8hSFAhmFF'
+            token:patient.fcmToken
         }
         const response = await patientApp.messaging().send(message)
         console.log('Notification of starting video call is sent:', response);
