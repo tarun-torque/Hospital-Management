@@ -87,7 +87,6 @@ export const testFirebasePatient = async (req, res) => {
 export const patientVideoCallStart = async (req, res) => {
     const patientId = +req.params.patientId
     try {
-
         // find fcmToken 
         const patient = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
         const message = {

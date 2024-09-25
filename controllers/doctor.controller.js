@@ -874,11 +874,9 @@ export const signInDoctorFromGoogle = async (req, res) => {
                 return res.status(400).json({ status: 400, msg: `${field} is required` });
             }
         }
-        let doctor = await prisma.doctor.findUnique({ where: { email } });
-
+        let doctor = await prisma.doctor.findUnique({ where: { email } })
         const data = { username, email, profileUrl, fcmToken }
-       
-
+    
         if (doctor) {
             const updateDocotor = await prisma.doctor.update({
                 where: { email },

@@ -213,19 +213,18 @@ export const signInPatientFromGoogle = async (req, res) => {
 
         let patient = await prisma.patientGoogleSingIn.findUnique({ where: { email } });
 
-        const data = { username, email, profileUrl, fcmToken };
-        const token = jwt.sign({ data }, process.env.SECRET_KEY, { expiresIn: '999h' });
-
+        const data = { username, email, profileUrl, fcmToken }
         if (patient) {
           
-            await prisma.patientGoogleSingIn.update({
+          const updatePatient =   await prisma.patientGoogleSingIn.update({
                 where: { email },
                 data: { fcmToken }
-            });
+            })
+            const token = jwt.sign({ token:updatePatient }, process.env.SECRET_KEY, { expiresIn: '999h' });
             return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
         } else {
-          
-            await prisma.patientGoogleSingIn.create({ data });
+           const saveDoctor =  await prisma.patientGoogleSingIn.create({ data });
+            const newToken = jwt.sign({ token:saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
             return res.status(201).json({ status: 201, msg: 'Profile created successfully', token });
         }
 
