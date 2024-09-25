@@ -1283,7 +1283,7 @@ export const updateAvailability = async (req, res) => {
             doctorId,
             startTime: new Date(slot.startTime).toISOString(), // Convert to ISO-8601
             endTime: new Date(slot.endTime).toISOString() // Convert to ISO-8601
-        }));
+        }))
 
         // Save the availability
         const availableSlots = await prisma.doctorAvailability.createMany({
