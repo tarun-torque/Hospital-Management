@@ -1263,7 +1263,7 @@ export const updateDoctorRemarks = async (req, res) => {
 export const updateAvailability = async (req, res) => {
     const doctorId = +req.params.doctorId;
     const { availability } = req.body;
-    console.log(availability);
+    console.log(availability)
 
     try {
         if (!availability) {
@@ -1287,8 +1287,8 @@ export const updateAvailability = async (req, res) => {
                 doctorId,
                 startTime: startTime.toISOString(), // Convert to ISO-8601 after time adjustment
                 endTime: endTime.toISOString() // Convert to ISO-8601 after time adjustment
-            };
-        });
+            }
+        })
 
         // Save the availability
         const availableSlots = await prisma.doctorAvailability.createMany({
@@ -1525,9 +1525,8 @@ export const DoctorOtpSend = async (req, res) => {
         if (!isDoctor) {
             return res.status(404).json({ msg: "User not Found" })
         }
-
         // otp
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
         // store otp in db
