@@ -100,6 +100,7 @@ export const patientVideoCallStart = async (req, res) => {
             token:patient.fcmToken
         }
         const response = await patientApp.messaging().send(message)
+        res.status(200).json({status:'200',msg:'Notification sent successfully'})
         console.log('Notification of starting video call is sent:', response);
     } catch (error) {
         console.log(error)
