@@ -169,6 +169,7 @@ router.post('/doctor/:doctorId/availability',updateAvailability)
 router.get('/doctor/:doctorId/availability',getAvailableSlotsDoctor)
 router.post('/booking/:patientId/:doctorId',bookSlot)
 
+
 // patient api
 router.post('/verify/patient/mail',verifyPatientEmail)
 router.post('/verify/patient/otp/:email',verifyPatientOTP)

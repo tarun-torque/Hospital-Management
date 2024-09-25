@@ -1265,7 +1265,7 @@ export const updateAvailability = async (req, res) => {
     const { availability } = req.body;
     console.log(availability);
 
-    // `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
+    // `availability` is an array of objects like [{ startTime: '2024-09-26T14:00:00.000Z', endTime: '2024-09-26T17:00:00.000Z' }]
 
     try {
         if (!availability) {
@@ -1280,19 +1280,16 @@ export const updateAvailability = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
         }
 
-        // Get current date and time
+        // Check if all slots are within the upcoming 7 days
         const now = new Date();
-
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Start of the current day
-
         const nextWeek = new Date(today);
         nextWeek.setDate(today.getDate() + 7); // End of the 7-day window
 
-        // Check if all slots are within the upcoming 7 days
         for (const slot of parsedAvailability) {
-            const slotStart = new Date(slot.startTime);
-            const slotEnd = new Date(slot.endTime);
+            const slotStart = new Date(slot.startTime); // The ISO string should already be in UTC
+            const slotEnd = new Date(slot.endTime); // The ISO string should already be in UTC
 
             // Check if slot is within the next 7 days
             if (slotStart < today || slotEnd > nextWeek) {
@@ -1323,7 +1320,6 @@ export const updateAvailability = async (req, res) => {
                 }
             });
 
-            // If an overlap is found, return an error
             if (existingSlot) {
                 return res.status(400).json({
                     status: 400,
@@ -1332,12 +1328,12 @@ export const updateAvailability = async (req, res) => {
             }
         }
 
-        // If no conflicts, proceed to create the new availability
+        // Save the availability exactly as it comes from the frontend (ISO string)
         const availableSlots = await prisma.doctorAvailability.createMany({
             data: parsedAvailability.map(slot => ({
                 doctorId,
-                startTime: new Date(slot.startTime), // No conversion, saving as it comes from the frontend
-                endTime: new Date(slot.endTime) // No conversion, saving as it comes from the frontend
+                startTime: slot.startTime, // Save ISO string without conversion
+                endTime: slot.endTime // Save ISO string without conversion
             }))
         });
 
