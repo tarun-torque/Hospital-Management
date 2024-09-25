@@ -150,8 +150,6 @@ router.get('/get/patient/journal/:patientId',patientJournalAll)
 router.delete('/delete/journal/:journalId',deleteJournal)
 
 
-
-
 // doctor forgort password 
 router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
 router.post('/doctor/reset/password',DoctorResetPassword)

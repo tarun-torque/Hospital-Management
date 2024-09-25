@@ -1353,12 +1353,15 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 // to book slot 
 export const bookSlot = async (req, res) => {
     const { slotStart, slotEnd, channelName, serviceTitle } = req.body;
-    const patientId = +req.params.patientId
-    const doctorId = +req.params.doctorId
+    const patientId = +req.params.patientId;
+    const doctorId = +req.params.doctorId;
+    console.log(slotStart,slotEnd)
     try {
-        const slotStartTime = new Date(slotStart);
-        const slotEndTime = new Date(slotEnd);
+        // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
+        const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
+        const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
 
+        // Check if the slot is already booked
         const existingBooking = await prisma.booking.findFirst({
             where: {
                 doctorId,
@@ -1379,15 +1382,13 @@ export const bookSlot = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         }
 
-
-
         // Create a booking for the patient with the specified doctor and time slot
         const booking = await prisma.booking.create({
             data: {
                 patientId,
                 doctorId,
-                slotStart: slotStartTime,
-                slotEnd: slotEndTime,
+                slotStart: slotStartTime.toISOString(), // Use adjusted time
+                slotEnd: slotEndTime.toISOString(), // Use adjusted time
                 channelName,
                 serviceTitle
             },
@@ -1401,32 +1402,32 @@ export const bookSlot = async (req, res) => {
             },
         });
 
-        const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } })
-        const token = doctor.fcmToken
+        const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
+        const token = doctor.fcmToken;
 
         const title = 'New Slot Booking';
         const body = `Slot booked from ${slotStartTime} to ${slotEndTime}.`;
 
-        await toDoctor(title, body, channelName, token)
+        // Send notification to doctor
+        await toDoctor(title, body, channelName, token);
 
-        // Update the doctorAvailability to mark the slot as booked (update many for overlapping)
+        // Update the doctorAvailability to mark the slot as booked
         await prisma.doctorAvailability.updateMany({
             where: {
                 doctorId,
-                startTime: slotStartTime,
-                endTime: slotEndTime
+                startTime: slotStartTime, // Use adjusted time
+                endTime: slotEndTime // Use adjusted time
             },
             data: {
                 isBooked: "yes"
             }
         });
 
-
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);
         nextAvailableTime.setMinutes(nextAvailableTime.getMinutes() + 2);
 
-        // Respond with a success message and booking details, including the next available time
+        // Respond with success message and booking details
         res.status(200).json({
             status: 200,
             msg: 'Slot booked successfully',
@@ -1435,10 +1436,9 @@ export const bookSlot = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ status: 200, msg: 'Error booking slot' });
+        res.status(500).json({ status: 500, msg: 'Error booking slot' });
     }
 }
-
 
 // get all available slots
 export const getAllAvailableSlots = async (req, res) => {
