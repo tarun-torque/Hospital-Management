@@ -1265,8 +1265,6 @@ export const updateAvailability = async (req, res) => {
     const { availability } = req.body;
     console.log(availability);
 
-    // `availability` is an array of objects like [{ startTime: '2024-09-26T14:00:00.000Z', endTime: '2024-09-26T17:00:00.000Z' }]
-
     try {
         if (!availability) {
             return res.status(400).json({ status: 400, msg: 'Availability is required' });
@@ -1280,61 +1278,16 @@ export const updateAvailability = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
         }
 
-        // Check if all slots are within the upcoming 7 days
-        const now = new Date();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Start of the current day
-        const nextWeek = new Date(today);
-        nextWeek.setDate(today.getDate() + 7); // End of the 7-day window
+        // Convert the date strings to ISO-8601 format
+        const transformedAvailability = parsedAvailability.map(slot => ({
+            doctorId,
+            startTime: new Date(slot.startTime).toISOString(), // Convert to ISO-8601
+            endTime: new Date(slot.endTime).toISOString() // Convert to ISO-8601
+        }));
 
-        for (const slot of parsedAvailability) {
-            const slotStart = new Date(slot.startTime); // The ISO string should already be in UTC
-            const slotEnd = new Date(slot.endTime); // The ISO string should already be in UTC
-
-            // Check if slot is within the next 7 days
-            if (slotStart < today || slotEnd > nextWeek) {
-                return res.status(400).json({
-                    status: 400,
-                    msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
-                });
-            }
-
-            // Prevent updating availability for past times on the current day
-            if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
-                return res.status(400).json({
-                    status: 400,
-                    msg: `Cannot update past time ${slot.startTime} for today`
-                });
-            }
-
-            // Check for overlap for each slot before inserting new availability
-            const existingSlot = await prisma.doctorAvailability.findFirst({
-                where: {
-                    doctorId,
-                    startTime: {
-                        lte: slotEnd, // Overlap if new slot's end is greater or equal to an existing slot's start
-                    },
-                    endTime: {
-                        gte: slotStart, // Overlap if new slot's start is less or equal to an existing slot's end
-                    }
-                }
-            });
-
-            if (existingSlot) {
-                return res.status(400).json({
-                    status: 400,
-                    msg: `Availability conflict: ${slot.startTime} - ${slot.endTime} is already booked`
-                });
-            }
-        }
-
-        // Save the availability exactly as it comes from the frontend (ISO string)
+        // Save the availability
         const availableSlots = await prisma.doctorAvailability.createMany({
-            data: parsedAvailability.map(slot => ({
-                doctorId,
-                startTime: slot.startTime, // Save ISO string without conversion
-                endTime: slot.endTime // Save ISO string without conversion
-            }))
+            data: transformedAvailability
         });
 
         res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
@@ -1344,7 +1297,6 @@ export const updateAvailability = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Error updating availability' });
     }
 }
-
 
 
 // get available slots of particular docotor
