@@ -99,7 +99,8 @@ export const patientVideoCallStart = async (req, res) => {
             data:{
                  type:'calling',
                  channelName:getChannel.channelName,
-                 doctorId:getChannel.doctorId
+                 doctorId:String(getChannel.doctorId),
+                 bookId:String(bookingId)
             },
             token:patient.fcmToken
         }
