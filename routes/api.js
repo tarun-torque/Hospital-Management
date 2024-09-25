@@ -304,6 +304,6 @@ router.get('/get/manager/:managerId/read/notification',getManagerReadNotificatio
 // test notification for patient app
 router.get('/test/patinet',testFirebasePatient)
 router.get('/test/firebase',testFirebase)
-router.get('/notify/patient/:patientId/video/call/started',patientVideoCallStart)
+router.get('/notify/patient/:patientId/:bookingId/video/call/started',patientVideoCallStart)
 
 export default router

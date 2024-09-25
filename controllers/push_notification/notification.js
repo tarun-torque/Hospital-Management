@@ -86,16 +86,20 @@ export const testFirebasePatient = async (req, res) => {
 // send notification to the patient to doctor when doctor start video call
 export const patientVideoCallStart = async (req, res) => {
     const patientId = +req.params.patientId
+    const bookingId = +req.params.bookingId
     try {
         // find fcmToken 
         const patient = await prisma.patient.findUnique({where:{id:patientId}})
+        const getChannel = await prisma.booking.findUnique({where:{id:bookingId}})
         const message = {
             notification: {
                 title: 'Video Call Starting Now',
                 body: 'Your video call has started. Please join the call'
             },
             data:{
-                 type:'calling'
+                 type:'calling',
+                 channelName:getChannel.channelName,
+                 doctorId:getChannel.doctorId
             },
             token:patient.fcmToken
         }
