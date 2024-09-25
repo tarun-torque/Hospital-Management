@@ -1355,7 +1355,7 @@ export const bookSlot = async (req, res) => {
     const { slotStart, slotEnd, channelName, serviceTitle } = req.body;
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
-    console.log(slotStart, slotEnd)
+    console.log(slotStart, slotEnd);
     try {
         // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
@@ -1392,27 +1392,30 @@ export const bookSlot = async (req, res) => {
                 channelName,
                 serviceTitle
             },
-        })
+        });
 
-        const { slotStart, slotEnd } = booking;
+        // Directly extract slotStart and slotEnd from the booking object
+        const startDate = new Date(booking.slotStart);
+        const endDate = new Date(booking.slotEnd);
 
         // Convert ISO to a human-readable format using toLocaleString (adjust locale as needed)
         const formattedStartDate = startDate.toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
-        })
+        });
 
         const formattedStartTime = startDate.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        })
+        });
+
         const formattedEndTime = endDate.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        })
+        });
 
         // Increment the noOfBooking for the doctor
         await prisma.doctor.update({
@@ -1426,7 +1429,7 @@ export const bookSlot = async (req, res) => {
         const token = doctor.fcmToken;
 
         const title = 'Appointment Booked';
-        const body = `Appointment Booked on ${formattedStartDate} at ${formattedStartTime} - ${formattedEndTime}.`
+        const body = `Appointment Booked on ${formattedStartDate} at ${formattedStartTime} - ${formattedEndTime}.`;
 
         // Send notification to doctor
         await toDoctor(title, body, channelName, token);
@@ -1458,7 +1461,7 @@ export const bookSlot = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Error booking slot' });
     }
-}
+};
 
 // get all available slots
 export const getAllAvailableSlots = async (req, res) => {
