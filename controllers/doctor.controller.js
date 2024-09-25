@@ -1262,7 +1262,8 @@ export const updateDoctorRemarks = async (req, res) => {
 // doctor update avalabilty
 export const updateAvailability = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    const { availability } = req.body;
+    const { availability } = req.body
+    console.log(availability)
 
     //  `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
 
@@ -1339,7 +1340,7 @@ export const updateAvailability = async (req, res) => {
                 startTime: new Date(new Date(slot.startTime).getTime() + (5.5 * 60 * 60 * 1000)), // Convert to IST
                 endTime: new Date(new Date(slot.endTime).getTime() + (5.5 * 60 * 60 * 1000)) // Convert to IST
             }))
-        });
+        })
 
         res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
