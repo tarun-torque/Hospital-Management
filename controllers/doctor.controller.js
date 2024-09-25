@@ -1262,10 +1262,10 @@ export const updateDoctorRemarks = async (req, res) => {
 // doctor update avalabilty
 export const updateAvailability = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    const { availability } = req.body
-    console.log(availability)
+    const { availability } = req.body;
+    console.log(availability);
 
-    //  `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
+    // `availability` is an array of objects like [{ startTime: '2024-09-06 09:00:00', endTime: '2024-09-06 10:00:00' }]
 
     try {
         if (!availability) {
@@ -1280,31 +1280,30 @@ export const updateAvailability = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
         }
 
-        // Get current date and time in IST
+        // Get current date and time
         const now = new Date();
-        const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000)); // Adjust to IST
 
-        const todayIST = new Date(nowIST);
-        todayIST.setHours(0, 0, 0, 0); // Start of the current day in IST
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Start of the current day
 
-        const nextWeekIST = new Date(todayIST);
-        nextWeekIST.setDate(todayIST.getDate() + 7); // End of the 7-day window in IST
+        const nextWeek = new Date(today);
+        nextWeek.setDate(today.getDate() + 7); // End of the 7-day window
 
         // Check if all slots are within the upcoming 7 days
         for (const slot of parsedAvailability) {
-            const slotStartIST = new Date(new Date(slot.startTime).getTime() + (5.5 * 60 * 60 * 1000));
-            const slotEndIST = new Date(new Date(slot.endTime).getTime() + (5.5 * 60 * 60 * 1000));
+            const slotStart = new Date(slot.startTime);
+            const slotEnd = new Date(slot.endTime);
 
             // Check if slot is within the next 7 days
-            if (slotStartIST < todayIST || slotEndIST > nextWeekIST) {
+            if (slotStart < today || slotEnd > nextWeek) {
                 return res.status(400).json({
                     status: 400,
                     msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
-                })
+                });
             }
 
             // Prevent updating availability for past times on the current day
-            if (slotStartIST.toDateString() === todayIST.toDateString() && slotStartIST < nowIST) {
+            if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
                 return res.status(400).json({
                     status: 400,
                     msg: `Cannot update past time ${slot.startTime} for today`
@@ -1316,10 +1315,10 @@ export const updateAvailability = async (req, res) => {
                 where: {
                     doctorId,
                     startTime: {
-                        lte: slotEndIST,  // Overlap if new slot's end is greater or equal to an existing slot's start
+                        lte: slotEnd, // Overlap if new slot's end is greater or equal to an existing slot's start
                     },
                     endTime: {
-                        gte: slotStartIST, // Overlap if new slot's start is less or equal to an existing slot's end
+                        gte: slotStart, // Overlap if new slot's start is less or equal to an existing slot's end
                     }
                 }
             });
@@ -1337,10 +1336,10 @@ export const updateAvailability = async (req, res) => {
         const availableSlots = await prisma.doctorAvailability.createMany({
             data: parsedAvailability.map(slot => ({
                 doctorId,
-                startTime: new Date(new Date(slot.startTime).getTime() + (5.5 * 60 * 60 * 1000)), // Convert to IST
-                endTime: new Date(new Date(slot.endTime).getTime() + (5.5 * 60 * 60 * 1000)) // Convert to IST
+                startTime: new Date(slot.startTime), // No conversion, saving as it comes from the frontend
+                endTime: new Date(slot.endTime) // No conversion, saving as it comes from the frontend
             }))
-        })
+        });
 
         res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
@@ -1349,6 +1348,7 @@ export const updateAvailability = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Error updating availability' });
     }
 }
+
 
 
 // get available slots of particular docotor
@@ -1376,7 +1376,7 @@ export const getAvailableSlotsDoctor = async (req, res) => {
                 },
                 isBooked: "no"
             }
-        });
+        })
 
         if (availableSlots.length === 0) {
             return res.status(400).json({ status: 400, msg: 'No Slots are available' });
