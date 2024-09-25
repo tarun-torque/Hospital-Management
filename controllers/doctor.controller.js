@@ -564,6 +564,7 @@ export const getDoctorProfile = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
 // add service
 export const addDoctorService = async (req, res) => {
     try {
@@ -880,16 +881,16 @@ export const signInDoctorFromGoogle = async (req, res) => {
 
         if (doctor) {
 
-            await prisma.doctor.update({
+            const updateDocotor = await prisma.doctor.update({
                 where: { email },
                 data: { fcmToken }
-            });
-            return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
+            })
+            return res.status(200).json({ status: 200, msg: 'Token refreshed', token,id:updateDocotor.id });
         } else {
             const saveDoctor = await prisma.doctor.create({ data });
             return res.status(201).json({ status: 201, msg: 'Profile created successfully', token, id: saveDoctor.id });
         }
-
+        
     } catch (error) {
         res.status(500).json({ status: 500, msg: error.message });
     }
@@ -1298,7 +1299,7 @@ export const updateAvailability = async (req, res) => {
                 return res.status(400).json({
                     status: 400,
                     msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
-                });
+                })
             }
 
             // Prevent updating availability for past times on the current day
