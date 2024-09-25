@@ -1807,12 +1807,12 @@ export const completeDoctorProfile = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
+}
 
 export const registerPatient = async(req,res)=>{
-    const {username,email,patientName,password,fcmToken}=req.body
+    const {dob,contactNumber,profileUrl,country,gender,email,patientName,password,fcmToken}=req.body
     try {
-        const requiredField = ['username', 'email', 'patientName', 'password', 'fcmToken']
+        const requiredField = ['dob','gender','country','contactNumber','email', 'patientName', 'password', 'fcmToken']
         for (const field of requiredField) {
             if (req.body[field] === undefined || req.body[field] === '' || req.body[field] === null) {
                 return res.status(400).json({ status: 400, msg: `${field} is required` })
@@ -1823,18 +1823,14 @@ export const registerPatient = async(req,res)=>{
         if (isPatient) {
             return res.status(400).json({ status: 400, msg: 'Patient with this mail is already present' })
         }
-        const isUsername = await prisma.doctor.findUnique({ where: { username } })
-        if (isUsername) {
-            return res.status(400).json({ status: 400, msg: `${username} is not available` })
-        }
-
+    
         const salt = bcrypt.genSaltSync(10)
         const hash_pswd = bcrypt.hashSync(password, salt)
 
         const otpNumber = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
-        const data = { username, patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
+        const data = {dob,contactNumber,profileUrl,country,gender,patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,

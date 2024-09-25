@@ -142,8 +142,7 @@ model Blog_content {
 //patient models
 model Patient {
   id            Int            @id @default(autoincrement())
-  username      String         @unique
-  patientName   String?
+  patientName   String
   email         String         @unique
   profileUrl    String?
   country       String?

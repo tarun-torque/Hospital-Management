@@ -193,9 +193,9 @@ export const giveRatingToDoctor  = async(req,res)=>{
 
 // signIn patient from google
 export const signInPatientFromGoogle = async (req, res) => {
-    const { username, email, profileUrl, fcmToken } = req.body;
+    const { patientName, email, profileUrl, fcmToken } = req.body;
     try {
-        const requiredFields = ['username', 'email', 'fcmToken'];
+        const requiredFields = ['patientName', 'email', 'fcmToken'];
         for (const field of requiredFields) {
             if (!req.body[field]) {
                 return res.status(400).json({ status: 400, msg: `${field} is required` });
@@ -204,7 +204,7 @@ export const signInPatientFromGoogle = async (req, res) => {
 
         let patient = await prisma.patient.findUnique({ where: { email } });
 
-        const data = { username, email, profileUrl, fcmToken }
+        const data = { patientName, email, profileUrl, fcmToken }
         if (patient) {
           const updatePatient =   await prisma.patient.update({
                 where: { email },
@@ -217,7 +217,7 @@ export const signInPatientFromGoogle = async (req, res) => {
             const newToken = jwt.sign({ token:saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
             return res.status(201).json({ status: 201, msg: 'Profile created successfully', token:newToken });
         }
-
+        
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: error.message });
