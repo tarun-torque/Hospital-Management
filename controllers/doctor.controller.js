@@ -1376,8 +1376,7 @@ export const bookSlot = async (req, res) => {
                     },
                 ],
             },
-        });
-
+        })
         if (existingBooking) {
             return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         }
@@ -1398,24 +1397,27 @@ export const bookSlot = async (req, res) => {
         const startDate = new Date(booking.slotStart);
         const endDate = new Date(booking.slotEnd);
 
+        const adjustedStartDate = new Date(startDate.getTime() + 5.5 * 60 * 60 * 1000)
+        const adjustedEndDate = new Date(endDate.getTime() + 5.5 * 60 * 60 * 1000)
+
         // Convert ISO to a human-readable format using toLocaleString (adjust locale as needed)
-        const formattedStartDate = startDate.toLocaleString('en-US', {
+        const formattedStartDate = adjustedStartDate.toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
-        });
+        })
 
-        const formattedStartTime = startDate.toLocaleString('en-US', {
+        const formattedStartTime = adjustedStartDate.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        });
+        })
 
-        const formattedEndTime = endDate.toLocaleString('en-US', {
+        const formattedEndTime = adjustedEndDate.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        });
+        })
 
         // Increment the noOfBooking for the doctor
         await prisma.doctor.update({
@@ -1461,8 +1463,7 @@ export const bookSlot = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Error booking slot' });
     }
-};
-
+}
 // get all available slots
 export const getAllAvailableSlots = async (req, res) => {
     const today = new Date();
