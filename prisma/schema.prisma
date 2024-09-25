@@ -141,30 +141,32 @@ model Blog_content {
 
 //patient models
 model Patient {
-  id             Int            @id @default(autoincrement())
-  username       String?        @unique
-  patient_name   String?
-  email          String?        @unique
-  profile_path   String?
-  profileType    String?
-  country        String?
-  contact_number String?
-  dob            String? //selectd dob from calender(dd-mm-yy) to wish birthday of user
-  gender         String? //male female others
-  new_patient    String?
-  otp            String?
-  emailVerified  String?        @default("no")
-  password       String?
-  role           String?        @default("patient")
-  recentTicket   recentTicket[]
-  review         Review[]
-  mood           Mood[]
-  booking        Booking[]
-  support        Support[]
-  deviceTokens   deviceTokens[]
-  Rating         Rating[]
-  Journal        Journal[]
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  patientName   String?
+  email         String         @unique
+  profileUrl    String?
+  country       String?
+  contactNumber String?
+  dob           String? //selectd dob from calender(dd-mm-yy) to wish birthday of user
+  gender        String? //male female others
+  otp           String?
+  fcmToken      String
+  emailVerified String?        @default("no")
+  password      String?
+  role          String?        @default("patient")
+  recentTicket  recentTicket[]
+  review        Review[]
+  mood          Mood[]
+  booking       Booking[]
+  support       Support[]
+  Rating        Rating[]
+  Journal       Journal[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
+
+
 
 model Journal {
   id          String   @id @default(uuid()) @db.Uuid
@@ -184,16 +186,6 @@ model recentTicket {
   patientId   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model patientGoogleSingIn {
-  id         Int      @id @default(autoincrement())
-  username   String
-  email      String   @unique
-  profileUrl String?
-  fcmToken   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 }
 
 model Review {
@@ -339,11 +331,4 @@ model managerNotification {
   data      String
   manager   manager @relation(fields: [managerId], references: [id])
   managerId Int
-}
-
-model deviceTokens {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  Patient   Patient? @relation(fields: [patientId], references: [id])
-  patientId Int?
 }

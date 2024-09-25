@@ -35,16 +35,7 @@ export const getBookingOfPatient = async(req,res)=>{
     }
 }
 
-export const getPatientProfile = async(req,res)=>{
-    const patientId = +req.params.patientId
-    try {
-        const profile = await prisma.patient.findUnique({where:{id:patientId}})
-        res.status(200).json({status:200,profile})
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
-    }
-}
+
 
 
 // to add journal patient journal 
@@ -211,40 +202,39 @@ export const signInPatientFromGoogle = async (req, res) => {
             }
         }
 
-        let patient = await prisma.patientGoogleSingIn.findUnique({ where: { email } });
+        let patient = await prisma.patient.findUnique({ where: { email } });
 
         const data = { username, email, profileUrl, fcmToken }
         if (patient) {
-          
-          const updatePatient =   await prisma.patientGoogleSingIn.update({
+          const updatePatient =   await prisma.patient.update({
                 where: { email },
                 data: { fcmToken }
             })
             const token = jwt.sign({ token:updatePatient }, process.env.SECRET_KEY, { expiresIn: '999h' });
             return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
         } else {
-           const saveDoctor =  await prisma.patientGoogleSingIn.create({ data });
+            const saveDoctor =  await prisma.patient.create({ data });
             const newToken = jwt.sign({ token:saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
             return res.status(201).json({ status: 201, msg: 'Profile created successfully', token:newToken });
         }
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({ status: 500, msg: error.message });
     }
-};
+}
 
-
-export const getGooglePatientProfile = async(req,res)=>{
-    const patinetId =  +req.params.patinetId;
+export const getPatientProfile = async(req,res)=>{
+    const patientId =  +req.params.patientId;
     try {
-
-        if(!patinetId){
-            return res.status(400).json({status:400,msg:'Patinet id is required'})
+        if(!patientId){
+            return res.status(400).json({status:400,msg:'PatientId id is required'})
         }
-        const profile  = await prisma.patientGoogleSingIn.findUnique({where:{id:patinetId}})
+        const profile  = await prisma.patient.findUnique({where:{id:patientId}})
         res.status(200).json({status:200,msg:profile})
     } catch (error) {
-        
+        console.log(error)
+        res.status(500).json({msg:'Something went wrong'})
     }
 }
 
