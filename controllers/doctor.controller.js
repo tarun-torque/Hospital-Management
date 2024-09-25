@@ -1278,12 +1278,17 @@ export const updateAvailability = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
         }
 
-        // Convert the date strings to ISO-8601 format
-        const transformedAvailability = parsedAvailability.map(slot => ({
-            doctorId,
-            startTime: new Date(slot.startTime).toISOString(), // Convert to ISO-8601
-            endTime: new Date(slot.endTime).toISOString() // Convert to ISO-8601
-        }))
+        // Convert the date strings to ISO-8601 format and subtract 5:30:00
+        const transformedAvailability = parsedAvailability.map(slot => {
+            const startTime = new Date(new Date(slot.startTime).getTime() - 5.5 * 60 * 60 * 1000); // Subtract 5 hours and 30 minutes
+            const endTime = new Date(new Date(slot.endTime).getTime() - 5.5 * 60 * 60 * 1000); // Subtract 5 hours and 30 minutes
+            
+            return {
+                doctorId,
+                startTime: startTime.toISOString(), // Convert to ISO-8601 after time adjustment
+                endTime: endTime.toISOString() // Convert to ISO-8601 after time adjustment
+            };
+        });
 
         // Save the availability
         const availableSlots = await prisma.doctorAvailability.createMany({
