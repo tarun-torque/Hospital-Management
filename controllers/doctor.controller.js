@@ -1436,6 +1436,7 @@ export const bookSlot = async (req, res) => {
         // Send notification to doctor
         await toDoctor(title, body, channelName, token);
 
+        
         // Update the doctorAvailability to mark the slot as booked
         await prisma.doctorAvailability.updateMany({
             where: {
