@@ -615,15 +615,15 @@ export const upcomingSession = async (req, res) => {
             where: {
                 doctorId,
                 slotStart: {
-                    gte: currentDateTime, 
-                    lte: endOfDay 
+                    gte: currentDateTime,
+                    lte: endOfDay
                 }
             },
             include: {
                 Patient: true
             },
             orderBy: {
-                slotStart: 'asc' 
+                slotStart: 'asc'
             }
         });
 
@@ -875,18 +875,18 @@ export const signInDoctorFromGoogle = async (req, res) => {
         }
         let doctor = await prisma.doctor.findUnique({ where: { email } })
         const data = { username, email, profileUrl, fcmToken }
-    
+
         if (doctor) {
             const updateDocotor = await prisma.doctor.update({
                 where: { email },
                 data: { fcmToken }
             })
-            const token = jwt.sign({ token:updateDocotor }, process.env.SECRET_KEY, { expiresIn: '999h' })
-            return res.status(200).json({ status: 200, msg: 'Token refreshed', token,id:updateDocotor.id });
+            const token = jwt.sign({ token: updateDocotor }, process.env.SECRET_KEY, { expiresIn: '999h' })
+            return res.status(200).json({ status: 200, msg: 'Token refreshed', token, id: updateDocotor.id });
         } else {
             const saveDoctor = await prisma.doctor.create({ data })
-            const newToken = jwt.sign({ token:saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
-            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token:newToken, id: saveDoctor.id });
+            const newToken = jwt.sign({ token: saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
+            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token: newToken, id: saveDoctor.id });
         }
     } catch (error) {
         res.status(500).json({ status: 500, msg: error.message });
@@ -1279,7 +1279,7 @@ export const updateAvailability = async (req, res) => {
         const transformedAvailability = parsedAvailability.map(slot => {
             const startTime = new Date(new Date(slot.startTime).getTime() - 5.5 * 60 * 60 * 1000); // Subtract 5 hours and 30 minutes
             const endTime = new Date(new Date(slot.endTime).getTime() - 5.5 * 60 * 60 * 1000); // Subtract 5 hours and 30 minutes
-            
+
             return {
                 doctorId,
                 startTime: startTime.toISOString(), // Convert to ISO-8601 after time adjustment
@@ -1355,7 +1355,7 @@ export const bookSlot = async (req, res) => {
     const { slotStart, slotEnd, channelName, serviceTitle } = req.body;
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
-    console.log(slotStart,slotEnd)
+    console.log(slotStart, slotEnd)
     try {
         // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
@@ -1392,7 +1392,27 @@ export const bookSlot = async (req, res) => {
                 channelName,
                 serviceTitle
             },
-        });
+        })
+
+        const { slotStart, slotEnd } = booking;
+
+        // Convert ISO to a human-readable format using toLocaleString (adjust locale as needed)
+        const formattedStartDate = startDate.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+        })
+
+        const formattedStartTime = startDate.toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+        })
+        const formattedEndTime = endDate.toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+        })
 
         // Increment the noOfBooking for the doctor
         await prisma.doctor.update({
@@ -1405,8 +1425,8 @@ export const bookSlot = async (req, res) => {
         const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
         const token = doctor.fcmToken;
 
-        const title = 'New Slot Booking';
-        const body = `Slot booked from ${slotStartTime} to ${slotEndTime}.`;
+        const title = 'Appointment Booked';
+        const body = `Appointment Booked on ${formattedStartDate} at ${formattedStartTime} - ${formattedEndTime}.`
 
         // Send notification to doctor
         await toDoctor(title, body, channelName, token);
@@ -1809,10 +1829,10 @@ export const completeDoctorProfile = async (req, res) => {
     }
 }
 
-export const registerPatient = async(req,res)=>{
-    const {dob,contactNumber,profileUrl,country,gender,email,patientName,password,fcmToken}=req.body
+export const registerPatient = async (req, res) => {
+    const { dob, contactNumber, profileUrl, country, gender, email, patientName, password, fcmToken } = req.body
     try {
-        const requiredField = ['dob','gender','country','contactNumber','email', 'patientName', 'password', 'fcmToken']
+        const requiredField = ['dob', 'gender', 'country', 'contactNumber', 'email', 'patientName', 'password', 'fcmToken']
         for (const field of requiredField) {
             if (req.body[field] === undefined || req.body[field] === '' || req.body[field] === null) {
                 return res.status(400).json({ status: 400, msg: `${field} is required` })
@@ -1823,14 +1843,14 @@ export const registerPatient = async(req,res)=>{
         if (isPatient) {
             return res.status(400).json({ status: 400, msg: 'Patient with this mail is already present' })
         }
-    
+
         const salt = bcrypt.genSaltSync(10)
         const hash_pswd = bcrypt.hashSync(password, salt)
 
         const otpNumber = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
-        const data = {dob,contactNumber,profileUrl,country,gender,patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
+        const data = { dob, contactNumber, profileUrl, country, gender, patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,
@@ -1881,7 +1901,7 @@ export const registerPatient = async(req,res)=>{
     }
 }
 
-export const verifyPatientOtp =  async(req,res)=>{
+export const verifyPatientOtp = async (req, res) => {
     const { otp, email } = req.body
     try {
         const isPatient = await prisma.patient.findUnique({ where: { email } })
