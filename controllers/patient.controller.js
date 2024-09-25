@@ -225,7 +225,7 @@ export const signInPatientFromGoogle = async (req, res) => {
         } else {
            const saveDoctor =  await prisma.patientGoogleSingIn.create({ data });
             const newToken = jwt.sign({ token:saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
-            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token });
+            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token:newToken });
         }
 
     } catch (error) {
