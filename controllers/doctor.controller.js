@@ -1278,20 +1278,23 @@ export const updateAvailability = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Invalid availability format' });
         }
 
-        // Get current date and time
+        // Get current date and time in IST
         const now = new Date();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Start of the current day
-        const nextWeek = new Date(today);
-        nextWeek.setDate(today.getDate() + 7);
+        const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000)); // Adjust to IST
+
+        const todayIST = new Date(nowIST);
+        todayIST.setHours(0, 0, 0, 0); // Start of the current day in IST
+
+        const nextWeekIST = new Date(todayIST);
+        nextWeekIST.setDate(todayIST.getDate() + 7); // End of the 7-day window in IST
 
         // Check if all slots are within the upcoming 7 days
         for (const slot of parsedAvailability) {
-            const slotStart = new Date(slot.startTime);
-            const slotEnd = new Date(slot.endTime);
+            const slotStartIST = new Date(new Date(slot.startTime).getTime() + (5.5 * 60 * 60 * 1000));
+            const slotEndIST = new Date(new Date(slot.endTime).getTime() + (5.5 * 60 * 60 * 1000));
 
             // Check if slot is within the next 7 days
-            if (slotStart < today || slotEnd > nextWeek) {
+            if (slotStartIST < todayIST || slotEndIST > nextWeekIST) {
                 return res.status(400).json({
                     status: 400,
                     msg: `Slot ${slot.startTime} - ${slot.endTime} is out of the allowed 7-day window`
@@ -1299,7 +1302,7 @@ export const updateAvailability = async (req, res) => {
             }
 
             // Prevent updating availability for past times on the current day
-            if (slotStart.toDateString() === today.toDateString() && slotStart < now) {
+            if (slotStartIST.toDateString() === todayIST.toDateString() && slotStartIST < nowIST) {
                 return res.status(400).json({
                     status: 400,
                     msg: `Cannot update past time ${slot.startTime} for today`
@@ -1311,10 +1314,10 @@ export const updateAvailability = async (req, res) => {
                 where: {
                     doctorId,
                     startTime: {
-                        lte: slotEnd,  // Overlap if new slot's end is greater or equal to an existing slot's start
+                        lte: slotEndIST,  // Overlap if new slot's end is greater or equal to an existing slot's start
                     },
                     endTime: {
-                        gte: slotStart, // Overlap if new slot's start is less or equal to an existing slot's end
+                        gte: slotStartIST, // Overlap if new slot's start is less or equal to an existing slot's end
                     }
                 }
             });
@@ -1332,10 +1335,10 @@ export const updateAvailability = async (req, res) => {
         const availableSlots = await prisma.doctorAvailability.createMany({
             data: parsedAvailability.map(slot => ({
                 doctorId,
-                startTime: new Date(slot.startTime),
-                endTime: new Date(slot.endTime)
+                startTime: new Date(new Date(slot.startTime).getTime() + (5.5 * 60 * 60 * 1000)), // Convert to IST
+                endTime: new Date(new Date(slot.endTime).getTime() + (5.5 * 60 * 60 * 1000)) // Convert to IST
             }))
-        })
+        });
 
         res.status(200).json({ status: 200, msg: 'Availability updated', availableSlots });
 
@@ -1343,37 +1346,53 @@ export const updateAvailability = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Error updating availability' });
     }
-};
+}
+
 
 // get available slots of particular docotor
 export const getAvailableSlotsDoctor = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    const today = new Date();
-    const nextWeek = new Date(today)
-    nextWeek.setDate(today.getDate() + 7)
+
+    // Get current date and time in IST
+    const now = new Date();
+    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000))
+
+    const todayIST = new Date(nowIST);
+    todayIST.setHours(0, 0, 0, 0); // Start of the current day in IST
+
+    const nextWeekIST = new Date(todayIST);
+    nextWeekIST.setDate(todayIST.getDate() + 7); // 7-day window
 
     try {
-
+        // Fetch available slots in the upcoming 7 days, considering the IST time zone
         const availableSlots = await prisma.doctorAvailability.findMany({
             where: {
                 doctorId,
                 startTime: {
-                    gte: today,
-                    lte: nextWeek
+                    gte: todayIST,   // Use the adjusted IST date for the query
+                    lte: nextWeekIST
                 },
                 isBooked: "no"
             }
-        })
+        });
 
-        if (availableSlots.length == 0) {
-            return res.status(400).json({ status: 400, msg: 'No Slots are available' })
+        if (availableSlots.length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No Slots are available' });
         }
 
-        res.status(200).json({ status: 200, msg: availableSlots });
+        // Adjust the startTime and endTime of the fetched slots to IST
+        const availableSlotsIST = availableSlots.map(slot => ({
+            ...slot,
+            startTime: new Date(slot.startTime.getTime() + (5.5 * 60 * 60 * 1000)), // Convert to IST
+            endTime: new Date(slot.endTime.getTime() + (5.5 * 60 * 60 * 1000))     // Convert to IST
+        }));
+
+        // Send the original response format with IST adjusted slots
+        res.status(200).json({ status: 200, msg: availableSlotsIST });
 
     } catch (error) {
         res.status(500).json({ error: 'Error fetching available slots' });
-        console.log(error.message)
+        console.log(error.message);
     }
 }
 
@@ -1541,7 +1560,6 @@ export const getAllAvailableSlots = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Error fetching available slots' });
     }
 };
-
 
 
 // doctor forgot password :
