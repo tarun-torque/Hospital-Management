@@ -88,11 +88,14 @@ export const patientVideoCallStart = async (req, res) => {
     const patientId = +req.params.patientId
     try {
         // find fcmToken 
-        const patient = await prisma.patientGoogleSingIn.findUnique({where:{id:patientId}})
+        const patient = await prisma.patient.findUnique({where:{id:patientId}})
         const message = {
             notification: {
                 title: 'Video Call Starting Now',
                 body: 'Your video call has started. Please join the call'
+            },
+            data:{
+                 type:'calling'
             },
             token:patient.fcmToken
         }
@@ -111,6 +114,9 @@ export const doctorReminder = async (doctorFcmToken) => {
             notification: {
                 title:'Upcoming Session Reminder',
                 body:'Your session starts in 10 minutes'
+            },
+            data:{
+                type:'calling'
             },
             token:doctorFcmToken
         }
@@ -133,7 +139,8 @@ export const patientReminder = async(doctorId,bookingId,channelName,patinetFcmTo
             data:{
                 doctorId,
                 bookingId,
-                channelName
+                channelName,
+                type:'calling'
             },
             token:patinetFcmToken
         }

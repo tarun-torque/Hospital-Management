@@ -602,8 +602,8 @@ export const addDoctorService = async (req, res) => {
 export const upcomingSession = async (req, res) => {
     try {
         const doctorId = +req.params.doctorId;
-        const currentDateTime = new Date();
-
+        const currentDateTime = new Date()
+        
         const startOfDay = new Date(currentDateTime);
         startOfDay.setHours(0, 0, 0, 0)
 
@@ -1436,7 +1436,7 @@ export const bookSlot = async (req, res) => {
         // Send notification to doctor
         await toDoctor(title, body, channelName, token);
 
-        
+
         // Update the doctorAvailability to mark the slot as booked
         await prisma.doctorAvailability.updateMany({
             where: {

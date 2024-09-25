@@ -102,7 +102,6 @@ router.get('/get/creator/profile/:creatorId',eachCreator)
 
 
 // doctor api
-
 router.get('/get/service/:serviceId',getServiceFromId)
 router.get('/upcoming/session/:doctorId',upcomingSession)
 router.get('/get/service/from/:doctorId',getServicesByDoctorId)
