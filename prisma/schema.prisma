@@ -293,7 +293,6 @@ model Booking {
   Rating       Rating[]
 }
 
-
 model Rating {
   id        Int      @id @default(autoincrement())
   patientId Int

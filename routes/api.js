@@ -295,7 +295,6 @@ router.post('/verify/patient/otp',verifyPatientOtp)
 
 
 
-
 // managers Notification
 router.get('/get/manager/:managerId/unread/notification',getManagerUnreadNotification)
 router.get('/get/manager/:managerId/read/notification',getManagerReadNotification)

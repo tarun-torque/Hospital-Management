@@ -1965,23 +1965,25 @@ const addHours = (date, hours) => {
         end: new Date(endTime).toISOString().replace('T', ' ').substring(0, 19)
       });
     }
-  
     return slots;
   }
-
 
 // Controller to get the doctor availability and break into 1-hour slots
 export const getSlotsInOneHours = async (req, res) => {
     try {
-      const { doctorId } = req.params
-      
+      const  doctorId  = +req.params.doctorId
+
+      if (!doctorId || isNaN(parseInt(doctorId))) {
+        return res.status(400).json({ status:400,msg: 'Invalid or missing doctorId' });
+      }
+  
       // Fetch availability from the doctorAvailability model using Prisma
       const availabilities = await prisma.doctorAvailability.findMany({
-        where: { doctorId: parseInt(doctorId) }
+        where: { doctorId:doctorId }
       })
    
       if (!availabilities.length) {
-        return res.status(404).json({ message: 'No availability found' });
+        return res.status(404).json({ status:404,msg: 'No Slots found' });
       }
   
       // Process each availability entry to break it into 1-hour slots
@@ -1989,9 +1991,9 @@ export const getSlotsInOneHours = async (req, res) => {
         return breakIntoOneHourSlots(availability.startTime, availability.endTime);
       })
 
-      res.status(200).json(allSlots);
+      res.status(200).json({status:200,allSlots});
     } catch (error) {
       console.error('Error fetching availability:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({status:500, msg: 'Something went wrong' });
     }
 }
