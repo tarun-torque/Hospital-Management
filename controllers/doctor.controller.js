@@ -1936,15 +1936,17 @@ export const verifyPatientOtp = async (req, res) => {
 }
 
 
+import { PrismaClient } from '@prisma/client';
+import moment from 'moment';
+
+const prisma = new PrismaClient();
+
 export const getSlotsInOneHours = async (req, res) => {
     const doctorId = +req.params.doctorId;
-    console.log(`Received request for doctorId: ${doctorId}`);
     try {
         const availabilities = await prisma.doctorAvailability.findMany({
             where: { doctorId: doctorId },
-        })
-        
-        console.log('Fetched availabilities:', availabilities);
+        });
 
         let splitAvailabilities = [];
 
@@ -1954,7 +1956,19 @@ export const getSlotsInOneHours = async (req, res) => {
             const end = moment(endTime);
     
             const diffInHours = end.diff(start, 'hours');
+            
+            // Check if the availability time is more than 1 hour
             if (diffInHours > 1) {
+                // Add the first hour slot
+                splitAvailabilities.push({
+                    startTime: start.toDate(),
+                    endTime: start.clone().add(1, 'hours').toDate(),
+                    doctorId: doctorId,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+
+                // Iterate to create additional hour slots
                 while (start.add(1, 'hours').isBefore(end)) {
                     splitAvailabilities.push({
                         startTime: start.toDate(),
@@ -1964,6 +1978,8 @@ export const getSlotsInOneHours = async (req, res) => {
                         updatedAt: new Date(),
                     });
                 }
+
+                // Push the last segment to include the remaining time
                 splitAvailabilities.push({
                     startTime: start.toDate(),
                     endTime: end.toDate(),
@@ -1972,17 +1988,20 @@ export const getSlotsInOneHours = async (req, res) => {
                     updatedAt: new Date(),
                 });
             } else {
+                // If the difference is 1 hour or less, just add it as it is
                 splitAvailabilities.push(availability);
             }
         }
 
+        const count  = splitAvailabilities.length
+
         console.log('Split availabilities:', splitAvailabilities);
-        
-        // Sending response with proper structure
+
         res.status(200).json({
             status: 200,
+            count,
             splitAvailabilities
-        });
+        })
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
@@ -1991,3 +2010,4 @@ export const getSlotsInOneHours = async (req, res) => {
         });
     }
 }
+
