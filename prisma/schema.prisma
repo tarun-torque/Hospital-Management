@@ -274,6 +274,7 @@ model availableSlots {
   endTime   DateTime
   Doctor    Doctor   @relation(fields: [doctorId], references: [id])
   doctorId  Int
+  isBooked  String   @default("no")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -305,6 +306,7 @@ model Rating {
   Patient   Patient  @relation(fields: [patientId], references: [id])
   Doctor    Doctor   @relation(fields: [doctorId], references: [id])
   Booking   Booking  @relation(fields: [bookingId], references: [id])
+
   @@unique([bookingId, patientId, doctorId])
 }
 

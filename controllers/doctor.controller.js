@@ -9,7 +9,7 @@ import { toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 import path from 'path'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from 'constants';
@@ -1404,17 +1404,7 @@ export const bookSlot = async (req, res) => {
         await toDoctor(title, body, channelName, token);
 
 
-        // Update the doctorAvailability to mark the slot as booked
-        await prisma.doctorAvailability.updateMany({
-            where: {
-                doctorId,
-                startTime: slotStartTime, // Use adjusted time
-                endTime: slotEndTime // Use adjusted time
-            },
-            data: {
-                isBooked: "yes"
-            }
-        });
+       
 
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);
@@ -1901,19 +1891,49 @@ export const verifyPatientOtp = async (req, res) => {
 }
 
 
-export const getSlotsInOneHours = async (req, res) => {
+export const getOneHourSlots = async (req, res) => {
     const doctorId = +req.params.doctorId
     try {
+        // Fetch the availabilities for the specified doctor
         const availabilities = await prisma.doctorAvailability.findMany({
             where: { doctorId: doctorId },
         })
 
-        let splitAvailabilities = []
+        let oneHourSlots = []
 
 
- 
-       
-    
+        for (const availability of availabilities) {
+            const { startTime, endTime } = availability
+
+         
+            const adjustedStart = moment(startTime).add(5, 'hours').add(30, 'minutes');
+            const adjustedEnd = moment(endTime).add(5, 'hours').add(30, 'minutes');
+
+  
+            let currentSlotStart = adjustedStart.clone();
+
+            while (currentSlotStart.isBefore(adjustedEnd)) {
+                oneHourSlots.push({
+                    id: availability.id, 
+                    startTime: currentSlotStart.toISOString(), // Start time of the slot in ISO format
+                    endTime: currentSlotStart.clone().add(1, 'hours').toISOString(), // End time of the slot in ISO format
+                    doctorId: doctorId,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                });
+
+                // Move to the next hour
+                currentSlotStart.add(1, 'hours');
+            }
+        }
+
+        console.log('One Hour Slots:', oneHourSlots);
+
+        // Respond with the generated one-hour slots
+        res.status(200).json({
+            status: 200,
+            oneHourSlots
+        });
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
