@@ -1946,8 +1946,8 @@ export const getSlotsInOneHours = async (req, res) => {
 
         for (const availability of availabilities) {
             const { startTime, endTime } = availability;
-            const start = moment(startTime);
-            const end = moment(endTime);
+            const start = moment(startTime); // Assuming startTime is in ISO format
+            const end = moment(endTime); // Assuming endTime is in ISO format
     
             const diffInHours = end.diff(start, 'hours');
             
@@ -1955,39 +1955,43 @@ export const getSlotsInOneHours = async (req, res) => {
             if (diffInHours > 1) {
                 // Add the first hour slot
                 splitAvailabilities.push({
-                    startTime: start.toDate(),
-                    endTime: start.clone().add(1, 'hours').toDate(),
+                    startTime: start.toISOString(), // Return in ISO format
+                    endTime: start.clone().add(1, 'hours').toISOString(), // Return in ISO format
                     doctorId: doctorId,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
+                    createdAt: new Date().toISOString(), // Return in ISO format
+                    updatedAt: new Date().toISOString(), // Return in ISO format
                 });
 
                 // Iterate to create additional hour slots
                 while (start.add(1, 'hours').isBefore(end)) {
                     splitAvailabilities.push({
-                        startTime: start.toDate(),
-                        endTime: start.clone().add(1, 'hours').toDate(),
+                        startTime: start.toISOString(), // Return in ISO format
+                        endTime: start.clone().add(1, 'hours').toISOString(), // Return in ISO format
                         doctorId: doctorId,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
+                        createdAt: new Date().toISOString(), // Return in ISO format
+                        updatedAt: new Date().toISOString(), // Return in ISO format
                     });
                 }
 
                 // Push the last segment to include the remaining time
                 splitAvailabilities.push({
-                    startTime: start.toDate(),
-                    endTime: end.toDate(),
+                    startTime: start.toISOString(),
+                    endTime: end.toISOString(), 
                     doctorId: doctorId,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
+                    createdAt: new Date().toISOString(), 
+                    updatedAt: new Date().toISOString(), 
                 });
             } else {
-                // If the difference is 1 hour or less, just add it as it is
-                splitAvailabilities.push(availability);
+            
+                splitAvailabilities.push({
+                    ...availability,
+                    startTime: moment(availability.startTime).toISOString(),
+                    endTime: moment(availability.endTime).toISOString(),
+                });
             }
         }
 
-        const count  = splitAvailabilities.length
+        const count = splitAvailabilities.length;
 
         console.log('Split availabilities:', splitAvailabilities);
 
@@ -1995,7 +1999,7 @@ export const getSlotsInOneHours = async (req, res) => {
             status: 200,
             count,
             splitAvailabilities
-        })
+        });
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
@@ -2004,4 +2008,3 @@ export const getSlotsInOneHours = async (req, res) => {
         });
     }
 }
-
