@@ -1936,21 +1936,23 @@ export const verifyPatientOtp = async (req, res) => {
 }
 
 
-export const getSlotsInOneHours = async(req,res)=>{
-    const doctorId = +req.params.doctorId
+export const getSlotsInOneHours = async (req, res) => {
+    const doctorId = +req.params.doctorId;
+    console.log(`Received request for doctorId: ${doctorId}`);
     try {
         const availabilities = await prisma.doctorAvailability.findMany({
             where: { doctorId: doctorId },
         })
+        
+        console.log('Fetched availabilities:', availabilities);
 
-        let splitAvailabilities = []
+        let splitAvailabilities = [];
 
         for (const availability of availabilities) {
             const { startTime, endTime } = availability;
             const start = moment(startTime);
             const end = moment(endTime);
     
-
             const diffInHours = end.diff(start, 'hours');
             if (diffInHours > 1) {
                 while (start.add(1, 'hours').isBefore(end)) {
@@ -1962,7 +1964,6 @@ export const getSlotsInOneHours = async(req,res)=>{
                         updatedAt: new Date(),
                     });
                 }
-     
                 splitAvailabilities.push({
                     startTime: start.toDate(),
                     endTime: end.toDate(),
@@ -1974,9 +1975,19 @@ export const getSlotsInOneHours = async(req,res)=>{
                 splitAvailabilities.push(availability);
             }
         }
-        res.status(200).json({status:200,splitAvailabilities})
+
+        console.log('Split availabilities:', splitAvailabilities);
+        
+        // Sending response with proper structure
+        res.status(200).json({
+            status: 200,
+            splitAvailabilities
+        });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        console.log('Error occurred:', error);
+        res.status(500).json({
+            status: 500,
+            msg: 'Something went wrong'
+        });
     }
 }

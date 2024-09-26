@@ -10,7 +10,9 @@ import http from 'http'
 import process from 'process'
 import checkApiKey from './middleware/apiKey.js'
 import helmet from 'helmet'
+import bodyParser from 'body-parser'
 import { reminderAutomate } from './controllers/reminder/reminder.js'
+
 
 const ncpus = numCPUs.cpus().length
 // console.log(ncpus)
@@ -32,6 +34,7 @@ if(cluster.isPrimary){
   
   app.use(helmet())
   app.use(cors())
+  app.use(bodyParser.json())
   app.use(express.json())
   app.use(express.urlencoded({extended:false}))
   app.use('/api',checkApiKey,ApiRoutes)
