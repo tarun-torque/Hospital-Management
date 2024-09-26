@@ -1935,12 +1935,6 @@ export const verifyPatientOtp = async (req, res) => {
     }
 }
 
-
-import { PrismaClient } from '@prisma/client';
-import moment from 'moment';
-
-const prisma = new PrismaClient();
-
 export const getSlotsInOneHours = async (req, res) => {
     const doctorId = +req.params.doctorId;
     try {
