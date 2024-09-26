@@ -1305,44 +1305,9 @@ export const updateAvailability = async (req, res) => {
 // get available slots of particular docotor
 export const getAvailableSlotsDoctor = async (req, res) => {
     const doctorId = +req.params.doctorId
-
-    // Get current date and time in IST
-    const now = new Date();
-    const nowIST = new Date(now.getTime() + (5.5 * 60 * 60 * 1000))
-
-    const todayIST = new Date(nowIST);
-    todayIST.setHours(0, 0, 0, 0)
-
-    const nextWeekIST = new Date(todayIST);
-    nextWeekIST.setDate(todayIST.getDate() + 7); // 7-day window
-
     try {
-        // Fetch available slots in the upcoming 7 days, considering the IST time zone
-        const availableSlots = await prisma.doctorAvailability.findMany({
-            where: {
-                doctorId,
-                startTime: {
-                    gte: todayIST,   // Use the adjusted IST date for the query
-                    lte: nextWeekIST
-                },
-                isBooked: "no"
-            }
-        })
-
-        if (availableSlots.length === 0) {
-            return res.status(400).json({ status: 400, msg: 'No Slots are available' });
-        }
-
-        // Adjust the startTime and endTime of the fetched slots to IST
-        const availableSlotsIST = availableSlots.map(slot => ({
-            ...slot,
-            startTime: new Date(slot.startTime.getTime() + (5.5 * 60 * 60 * 1000)), // Convert to IST
-            endTime: new Date(slot.endTime.getTime() + (5.5 * 60 * 60 * 1000))     // Convert to IST
-        }));
-
-        // Send the original response format with IST adjusted slots
-        res.status(200).json({ status: 200, msg: availableSlotsIST });
-
+        const availableSlots = await prisma.doctorAvailability.findMany({where:{doctorId}})
+        res.status(200).json({ status: 200, msg: availableSlots })        
     } catch (error) {
         res.status(500).json({ error: 'Error fetching available slots' });
         console.log(error.message);
@@ -1945,41 +1910,10 @@ export const getSlotsInOneHours = async (req, res) => {
 
         let splitAvailabilities = []
 
-        for (const availability of availabilities) {
-            const { startTime, endTime } = availability;
-            const start = moment(startTime)
-            const end = moment(endTime)
-    
-            const diffInHours = end.diff(start, 'hours');
-            if (diffInHours > 1) {
-                while (start.add(1, 'hours').isBefore(end)) {
-                    splitAvailabilities.push({
-                        startTime: start.toDate(),
-                        endTime: start.clone().add(1, 'hours').toDate(),
-                        doctorId: doctorId,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    });
-                }
-                splitAvailabilities.push({
-                    startTime: start.toDate(),
-                    endTime: end.toDate(),
-                    doctorId: doctorId,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                });
-            } else {
-                splitAvailabilities.push(availability);
-            }
-        }
 
-        console.log('Split availabilities:', splitAvailabilities);
-        
-        // Sending response with proper structure
-        res.status(200).json({
-            status: 200,
-            splitAvailabilities
-        });
+ 
+       
+    
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
