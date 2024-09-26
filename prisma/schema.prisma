@@ -293,6 +293,7 @@ model Booking {
   Rating       Rating[]
 }
 
+
 model Rating {
   id        Int      @id @default(autoincrement())
   patientId Int
@@ -302,11 +303,9 @@ model Rating {
   review    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  Patient Patient @relation(fields: [patientId], references: [id])
-  Doctor  Doctor  @relation(fields: [doctorId], references: [id])
-  Booking Booking @relation(fields: [bookingId], references: [id])
-
+  Patient   Patient  @relation(fields: [patientId], references: [id])
+  Doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  Booking   Booking  @relation(fields: [bookingId], references: [id])
   @@unique([bookingId, patientId, doctorId])
 }
 

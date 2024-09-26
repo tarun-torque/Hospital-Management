@@ -1933,3 +1933,65 @@ export const verifyPatientOtp = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
+
+
+// Helper function to add hours to a Date object
+const addHours = (date, hours) => {
+    const newDate = new Date(date);
+    newDate.setHours(newDate.getHours() + hours);
+    return newDate;
+  }
+
+  // Function to break a slot into 1-hour intervals
+  const breakIntoOneHourSlots = (startTime, endTime) => {
+    const slots = [];
+    let currentStartTime = new Date(startTime);
+    let currentEndTime = addHours(currentStartTime, 1);
+  
+    while (currentEndTime <= new Date(endTime)) {
+      slots.push({
+        start: currentStartTime.toISOString().replace('T', ' ').substring(0, 19),
+        end: currentEndTime.toISOString().replace('T', ' ').substring(0, 19)
+      });
+      currentStartTime = new Date(currentEndTime); // Move to the next slot
+      currentEndTime = addHours(currentStartTime, 1);
+    }
+  
+    // If the endTime doesn't align perfectly with 1-hour slots
+    if (currentStartTime < new Date(endTime)) {
+      slots.push({
+        start: currentStartTime.toISOString().replace('T', ' ').substring(0, 19),
+        end: new Date(endTime).toISOString().replace('T', ' ').substring(0, 19)
+      });
+    }
+  
+    return slots;
+  }
+
+
+// Controller to get the doctor availability and break into 1-hour slots
+export const getSlotsInOneHours = async (req, res) => {
+    try {
+      const { doctorId } = req.params
+      
+      // Fetch availability from the doctorAvailability model using Prisma
+      const availabilities = await prisma.doctorAvailability.findMany({
+        where: { doctorId: parseInt(doctorId) }
+      })
+   
+      if (!availabilities.length) {
+        return res.status(404).json({ message: 'No availability found' });
+      }
+  
+      // Process each availability entry to break it into 1-hour slots
+      const allSlots = availabilities.flatMap(availability => {
+        return breakIntoOneHourSlots(availability.startTime, availability.endTime);
+      })
+
+      res.status(200).json(allSlots);
+    } catch (error) {
+      console.error('Error fetching availability:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+}
