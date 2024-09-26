@@ -243,6 +243,7 @@ model Doctor {
   assignedManager    String?
   doctorAvailability DoctorAvailability[]
   booking            Booking[]
+  availableSlots     availableSlots[]
   doctorServices     DoctorService[]
   doctorPrice        DoctorPrice[]
   Rating             Rating[]
@@ -263,7 +264,16 @@ model DoctorAvailability {
   endTime   DateTime
   Doctor    Doctor   @relation(fields: [doctorId], references: [id])
   doctorId  Int
-  isBooked  String   @default("no")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model availableSlots {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  Doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -277,6 +287,7 @@ model Booking {
   slotEnd      DateTime
   channelName  String
   notes        String?
+  isCompleted  String   @default("false")
   Doctor       Doctor   @relation(fields: [doctorId], references: [id])
   Patient      Patient  @relation(fields: [patientId], references: [id])
   Rating       Rating[]
