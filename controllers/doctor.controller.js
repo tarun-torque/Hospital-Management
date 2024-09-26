@@ -9,6 +9,7 @@ import { toDoctor } from './push_notification/notification.js';
 import extractContent from '../utils/htmlExtractor.js';
 import { allPatient } from './admin.controller.js';
 import path from 'path'
+import moment from 'moment'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from 'constants';
@@ -1935,65 +1936,47 @@ export const verifyPatientOtp = async (req, res) => {
 }
 
 
-
-// Helper function to add hours to a Date object
-const addHours = (date, hours) => {
-    const newDate = new Date(date);
-    newDate.setHours(newDate.getHours() + hours);
-    return newDate;
-  }
-
-  // Function to break a slot into 1-hour intervals
-  const breakIntoOneHourSlots = (startTime, endTime) => {
-    const slots = [];
-    let currentStartTime = new Date(startTime);
-    let currentEndTime = addHours(currentStartTime, 1);
-  
-    while (currentEndTime <= new Date(endTime)) {
-      slots.push({
-        start: currentStartTime.toISOString().replace('T', ' ').substring(0, 19),
-        end: currentEndTime.toISOString().replace('T', ' ').substring(0, 19)
-      });
-      currentStartTime = new Date(currentEndTime); // Move to the next slot
-      currentEndTime = addHours(currentStartTime, 1);
-    }
-  
-    // If the endTime doesn't align perfectly with 1-hour slots
-    if (currentStartTime < new Date(endTime)) {
-      slots.push({
-        start: currentStartTime.toISOString().replace('T', ' ').substring(0, 19),
-        end: new Date(endTime).toISOString().replace('T', ' ').substring(0, 19)
-      });
-    }
-    return slots;
-  }
-
-// Controller to get the doctor availability and break into 1-hour slots
-export const getSlotsInOneHours = async (req, res) => {
+export const getSlotsInOneHours = async(req,res)=>{
+    const doctorId = +req.params.doctorId
     try {
-      const  doctorId  = +req.params.doctorId
+        const availabilities = await prisma.doctorAvailability.findMany({
+            where: { doctorId: doctorId },
+        })
 
-      if (!doctorId || isNaN(parseInt(doctorId))) {
-        return res.status(400).json({ status:400,msg: 'Invalid or missing doctorId' });
-      }
-  
-      // Fetch availability from the doctorAvailability model using Prisma
-      const availabilities = await prisma.doctorAvailability.findMany({
-        where: { doctorId:doctorId }
-      })
-   
-      if (!availabilities.length) {
-        return res.status(404).json({ status:404,msg: 'No Slots found' });
-      }
-  
-      // Process each availability entry to break it into 1-hour slots
-      const allSlots = availabilities.flatMap(availability => {
-        return breakIntoOneHourSlots(availability.startTime, availability.endTime);
-      })
+        let splitAvailabilities = []
 
-      res.status(200).json({status:200,allSlots});
+        for (const availability of availabilities) {
+            const { startTime, endTime } = availability;
+            const start = moment(startTime);
+            const end = moment(endTime);
+    
+
+            const diffInHours = end.diff(start, 'hours');
+            if (diffInHours > 1) {
+                while (start.add(1, 'hours').isBefore(end)) {
+                    splitAvailabilities.push({
+                        startTime: start.toDate(),
+                        endTime: start.clone().add(1, 'hours').toDate(),
+                        doctorId: doctorId,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    });
+                }
+     
+                splitAvailabilities.push({
+                    startTime: start.toDate(),
+                    endTime: end.toDate(),
+                    doctorId: doctorId,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                });
+            } else {
+                splitAvailabilities.push(availability);
+            }
+        }
+        res.status(200).json({status:200,splitAvailabilities})
     } catch (error) {
-      console.error('Error fetching availability:', error);
-      res.status(500).json({status:500, msg: 'Something went wrong' });
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
