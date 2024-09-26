@@ -165,8 +165,6 @@ model Patient {
   updatedAt     DateTime       @updatedAt
 }
 
-
-
 model Journal {
   id          String   @id @default(uuid()) @db.Uuid
   title       String
@@ -278,6 +276,7 @@ model Booking {
   serviceTitle String
   slotEnd      DateTime
   channelName  String
+  notes        String?
   Doctor       Doctor   @relation(fields: [doctorId], references: [id])
   Patient      Patient  @relation(fields: [patientId], references: [id])
   Rating       Rating[]

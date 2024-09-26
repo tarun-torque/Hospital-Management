@@ -378,29 +378,29 @@ export const registerPatient = async(req,res)=>{
 export const loginPatient = async (req, res) => {
     try {
         // get data
-        const { email, password } = req.body;
+        const { email, password,fcmToken } = req.body;
 
         // check email and password
         const isEmail = await prisma.patient.findUnique({ where: { email } })
         if (!isEmail) {
             return res.status(404).json({ message: 'Invalid Credentials' })
         }
+       
         const isPassword = bcrypt.compareSync(password, isEmail.password)
         if (!isPassword) {
             return res.status(404).json({ message: 'Invalid Credentials' })
         }
 
         //generate token
-        const data = { id: isEmail.id, username: isEmail.username, patient_name: isEmail.patient_name, profile_path: isEmail.profile_path }
+        const data = { id: isEmail.id, username: isEmail.username, patientName: isEmail.patientName, profile_path: isEmail.profileUrl}
+        const updateFcm = await prisma.patient.update({where:{email},data:{fcmToken}})
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
         res.status(200).json({status:200, msg: 'LoggedIn', token ,id:isEmail.id})
-
 
     } catch (error) {
         console.log(error)
         res.status(400).json({ message: error.message })
     }
-
 }
 
 // ////// forgot password implementation
@@ -517,14 +517,6 @@ export const resetPassword = async(req,res)=>{
         console.log(error) 
     }
 }
-
-
-
-// update patient profile
-
-
-
-//delete patient profile
 
 
 

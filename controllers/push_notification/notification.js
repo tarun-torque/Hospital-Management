@@ -4,6 +4,7 @@ import fs from 'fs';
 import cron from 'node-cron';
 import { fileURLToPath } from 'url';
 import prisma from '../../DB/db.config.js';
+import { title } from 'process';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -89,23 +90,25 @@ export const patientVideoCallStart = async (req, res) => {
     const bookingId = +req.params.bookingId
     try {
         // find fcmToken 
-        const patient = await prisma.patient.findUnique({where:{id:patientId}})
-        const getChannel = await prisma.booking.findUnique({where:{id:bookingId}})
+        const patient = await prisma.patient.findUnique({ where: { id: patientId } })
+        const getChannel = await prisma.booking.findUnique({ where: { id: bookingId } })
+        const findDoctorName = await prisma.doctor.findUnique({where:{id:getChannel.doctorId}})
+
         const message = {
             notification: {
-                title: 'Video Call Starting Now',
-                body: 'Your video call has started. Please join the call'
+                title: `${findDoctorName.doctorName}`,
+                body: 'Incomming video call'
             },
-            data:{
-                 type:'calling',
-                 channelName:getChannel.channelName,
-                 doctorId:String(getChannel.doctorId),
-                 bookId:String(bookingId)
+            data: {
+                type: 'calling',
+                channelName: getChannel.channelName,
+                doctorId: String(getChannel.doctorId),
+                bookId: String(bookingId)
             },
-            token:patient.fcmToken
+            token: patient.fcmToken
         }
         const response = await patientApp.messaging().send(message)
-        res.status(200).json({status:'200',msg:'Notification sent successfully'})
+        res.status(200).json({ status: '200', msg: 'Notification sent successfully' })
         console.log('Notification of starting video call is sent:', response);
     } catch (error) {
         console.log(error)
@@ -118,43 +121,68 @@ export const doctorReminder = async (doctorFcmToken) => {
     try {
         const message = {
             notification: {
-                title:'Upcoming Session Reminder',
-                body:'Your session starts in 10 minutes'
+                title: 'Upcoming Session Reminder',
+                body: 'Your session starts in 10 minutes'
             },
-            data:{
-                type:'calling'
+            data: {
+                type: 'calling'
             },
-            token:doctorFcmToken
+            token: doctorFcmToken
         }
         const response = await doctorApp.messaging().send(message)
-        console.log('reminder of doctor sent',response)
+        console.log('reminder of doctor sent', response)
     }
-      catch (error) {
+    catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
-}
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
 }
 
-export const patientReminder = async(doctorId,bookingId,channelName,patinetFcmToken)=>{
+export const patientReminder = async (doctorId, bookingId, channelName, patinetFcmToken) => {
     try {
         const message = {
-            notification:{
-                title:'Upcoming Session Reminder',
-                body:'Your session starts in 10 minutes'
+            notification: {
+                title: 'Upcoming Session Reminder',
+                body: 'Your session starts in 10 minutes'
             },
-            data:{
+            data: {
                 doctorId,
                 bookingId,
                 channelName,
-                type:'calling'
+                type: 'calling'
             },
-            token:patinetFcmToken
+            token: patinetFcmToken
         }
-
-        const response   = await patientApp.messaging().send(message)
-        console.log('remider for patient sent',response)
+        const response = await patientApp.messaging().send(message)
+        console.log('remider for patient sent', response)
     } catch (error) {
         console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+export const patinetDeclineVideoCall = async (req, res) => {
+    const doctorId = +req.params.doctorId
+    try {
+        const isDocotor = await prisma.doctor.findUnique({ where: { id: doctorId } })
+        const fcmToken = isDocotor.fcmToken
+        const message = {
+            notification: {
+                title: 'Call Rejected',
+                body: 'The patient has rejected the call.'
+            },
+            data: {
+                type: 'reject'
+            },
+            token: fcmToken
+        }
+        const response  = await patientApp.messaging().send(message)
+        console.log("decline noti send")
+        res.status(200).json({status:200,msg:'Patient reject the call successfully'})
+
+    } catch (error) {
         res.status(500).json({status:500,msg:'Something went wrong'})
+        console.log(error)
     }
 }

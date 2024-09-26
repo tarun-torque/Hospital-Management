@@ -1124,7 +1124,7 @@ export const signInDoctorFromGoogle = async (req, res) => {
 export const doctorLogin = async (req, res) => {
 
     try {
-        const { email, password } = req.body;
+        const { email, password,fcmToken } = req.body;
         const doctor = await prisma.doctor.findUnique({ where: { email } })
         if (doctor) {
             var isPassword = bcrypt.compareSync(password, doctor.password)
@@ -1149,7 +1149,7 @@ export const doctorLogin = async (req, res) => {
         }
 
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
-
+        const updateFcm = await prisma.doctor.update({where:{email},data:{fcmToken}})
         res.status(200).json({ status: 200, msg: 'LoggedIn succesfully', token })
 
     } catch (error) {
@@ -1352,7 +1352,7 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName, serviceTitle } = req.body;
+    const { slotStart, slotEnd, channelName, serviceTitle,notes } = req.body;
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
     console.log(slotStart, slotEnd);
@@ -1389,7 +1389,8 @@ export const bookSlot = async (req, res) => {
                 slotStart: slotStartTime.toISOString(), // Use adjusted time
                 slotEnd: slotEndTime.toISOString(), // Use adjusted time
                 channelName,
-                serviceTitle
+                serviceTitle,
+                notes
             },
         });
 
