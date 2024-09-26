@@ -1927,13 +1927,13 @@ export const getOneHourSlots = async (req, res) => {
             }
         }
 
-        console.log('One Hour Slots:', oneHourSlots);
+        const count  = oneHourSlots.length
 
-        // Respond with the generated one-hour slots
         res.status(200).json({
             status: 200,
-            oneHourSlots
-        });
+            count,
+            splitAvailabilities:oneHourSlots
+        })
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
