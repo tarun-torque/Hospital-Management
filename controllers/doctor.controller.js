@@ -1900,55 +1900,81 @@ export const verifyPatientOtp = async (req, res) => {
     }
 }
 
-
 export const getOneHourSlots = async (req, res) => {
-    const doctorId = +req.params.doctorId
+    const doctorId = +req.params.doctorId;
+
     try {
-        // Fetch the availabilities for the specified doctor
+
         const availabilities = await prisma.doctorAvailability.findMany({
             where: { doctorId: doctorId },
-        })
+        });
 
-        let oneHourSlots = []
-
+        let oneHourSlots = [];
 
         for (const availability of availabilities) {
-            const { startTime, endTime } = availability
-
+            const { startTime, endTime } = availability;
 
             const adjustedStart = moment(startTime).add(5, 'hours').add(30, 'minutes');
             const adjustedEnd = moment(endTime).add(5, 'hours').add(30, 'minutes');
 
-
             let currentSlotStart = adjustedStart.clone();
 
+    
             while (currentSlotStart.isBefore(adjustedEnd)) {
-                oneHourSlots.push({
-                    id: availability.id,
-                    startTime: currentSlotStart.toISOString(), // Start time of the slot in ISO format
-                    endTime: currentSlotStart.clone().add(1, 'hours').toISOString(), // End time of the slot in ISO format
-                    doctorId: doctorId,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
+                const slotEndTime = currentSlotStart.clone().add(1, 'hours');
+                const slotStartTimeISO = currentSlotStart.toISOString();
+                const slotEndTimeISO = slotEndTime.toISOString();
+
+      
+                const existingSlot = await prisma.availableSlots.findUnique({
+                    where: {
+                        doctorId_startTime_endTime: {
+                            doctorId: doctorId,
+                            startTime: slotStartTimeISO,
+                            endTime: slotEndTimeISO,
+                        },
+                    },
                 });
 
-                // Move to the next hour
+           
+                if (!existingSlot) {
+                    oneHourSlots.push({
+                        startTime: slotStartTimeISO, 
+                        endTime: slotEndTimeISO, 
+                        doctorId: doctorId,
+                        isBooked: "no",
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                    });
+                }
+
+    
                 currentSlotStart.add(1, 'hours');
             }
         }
 
-        await prisma.availableSlots.createMany({
-            data: oneHourSlots,
-        });
+        if (oneHourSlots.length > 0) {
+            await prisma.availableSlots.createMany({
+                data: oneHourSlots,
+                skipDuplicates: true, 
+            });
+        }
+  
 
         const availableSlots = await prisma.availableSlots.findMany({
-            where: { doctorId: doctorId, isBooked: "no" }, 
-        })
+            where: {
+                doctorId: doctorId,
+                isBooked: "no"
+            }
+        });
 
-        const count = availableSlots.length
+        const count = availableSlots.length;
 
-        res.status(200).json({status:200,count,availableSlots})
-       
+        res.status(200).json({
+            status: 200,
+            count,
+            availableSlots
+        });
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
@@ -1956,4 +1982,4 @@ export const getOneHourSlots = async (req, res) => {
             msg: 'Something went wrong'
         });
     }
-}
+};
