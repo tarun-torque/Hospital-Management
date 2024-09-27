@@ -22,10 +22,10 @@ export const reminderAutomate = crons.schedule('* * * * *', async () => {
                 const { patientId, doctorId, channelName, id: bookingId } = session;
 
                 const findDoctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
-                const doctorFcmToken = findDoctor?.fcmToken; // Use optional chaining to avoid errors
+                const doctorFcmToken = findDoctor?.fcmToken; 
 
                 const findPatient = await prisma.patientGoogleSingIn.findUnique({ where: { id: patientId } });
-                const patientFcmToken = findPatient?.fcmToken; // Use optional chaining to avoid errors
+                const patientFcmToken = findPatient?.fcmToken; 
 
                 if (doctorFcmToken) {
                     await doctorReminder(doctorFcmToken);

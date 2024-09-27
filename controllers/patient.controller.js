@@ -659,3 +659,53 @@ export const get_mood = async (req, res) => {
 
     }
 }
+
+
+
+// resheduling the session 
+export const rescheduleBooking = async (req, res) => {
+    const {newStartTime, newEndTime } = req.body
+    const bookingId = +req.params.bookingId
+    const doctorId = +req.params.doctorId
+    console.log("rescheduling time",newStartTime,newEndTime)
+    try {
+        const existingBooking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+        })
+
+        if (!existingBooking) {
+            return res.status(404).json({ status: 404, msg: 'Booking not found' });
+        }
+
+        const isSlotAvailable = await prisma.availableSlots.findUnique({
+            where: {
+                doctorId_startTime_endTime: {
+                    doctorId,
+                    startTime: newStartTime,
+                    endTime: newEndTime,
+                },
+            },
+        })
+
+        if (!isSlotAvailable || isSlotAvailable.isBooked === "yes") {
+            return res.status(400).json({ status: 400, msg: 'New time slot is not available' });
+        }
+
+        const updatedBooking = await prisma.Booking.update({
+            where: { id: bookingId },
+            data: {
+                slotStart: newStartTime,
+                slotEnd: newEndTime,
+            },
+        })
+
+        res.status(200).json({
+            status: 200,
+            msg: 'Booking rescheduled successfully',
+            booking: updatedBooking,
+        })
+    } catch (error) {
+        console.error('Error occurred while rescheduling booking:', error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+}

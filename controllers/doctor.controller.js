@@ -13,6 +13,7 @@ import moment from 'moment-timezone'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from 'constants';
+import router from '../routes/api.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -2090,6 +2091,35 @@ export const getOneHourSlots = async (req, res) => {
         });
     }
 };
+
+
+// to check booking is completely done or not
+export const isBookingCompleted = async(req,res)=>{
+    const bookingId = +req.params.bookingId
+    try {
+        const isBooking  = await prisma.booking.findUnique({where:{id:bookingId}})
+        if(isBooking){
+            return res.status(400).json({msg:'No Booking found'})
+        }
+
+        const completed = await prisma.booking.update({where:{id:bookingId},data:{isCompleted:'yes'}})
+        res.status(200).json({status:200,msg:'Session completed successfully'})
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
+    }
+}
+
+// get completed session till now
+
+
+
+
+
+
+
+
 
 
 
