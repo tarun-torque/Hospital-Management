@@ -604,7 +604,7 @@ export const upcomingSession = async (req, res) => {
     try {
         const doctorId = +req.params.doctorId;
         const currentDateTime = new Date()
-        
+
         const startOfDay = new Date(currentDateTime);
         startOfDay.setHours(0, 0, 0, 0)
 
@@ -1125,7 +1125,7 @@ export const signInDoctorFromGoogle = async (req, res) => {
 export const doctorLogin = async (req, res) => {
 
     try {
-        const { email, password,fcmToken } = req.body;
+        const { email, password, fcmToken } = req.body;
         const doctor = await prisma.doctor.findUnique({ where: { email } })
         if (doctor) {
             var isPassword = bcrypt.compareSync(password, doctor.password)
@@ -1150,7 +1150,7 @@ export const doctorLogin = async (req, res) => {
         }
 
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
-        const updateFcm = await prisma.doctor.update({where:{email},data:{fcmToken}})
+        const updateFcm = await prisma.doctor.update({ where: { email }, data: { fcmToken } })
         res.status(200).json({ status: 200, msg: 'LoggedIn succesfully', token })
 
     } catch (error) {
@@ -1306,8 +1306,8 @@ export const updateAvailability = async (req, res) => {
 export const getAvailableSlotsDoctor = async (req, res) => {
     const doctorId = +req.params.doctorId
     try {
-        const availableSlots = await prisma.doctorAvailability.findMany({where:{doctorId}})
-        res.status(200).json({ status: 200, msg: availableSlots })        
+        const availableSlots = await prisma.doctorAvailability.findMany({ where: { doctorId } })
+        res.status(200).json({ status: 200, msg: availableSlots })
     } catch (error) {
         res.status(500).json({ error: 'Error fetching available slots' });
         console.log(error.message);
@@ -1318,15 +1318,15 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName, serviceTitle,notes } = req.body;
+    const { slotStart, slotEnd, channelName, serviceTitle, notes } = req.body;
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
-    console.log(slotStart, slotEnd);
+    console.log("slotStart and slotEndTime", slotStart, slotEnd);
     try {
         // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
         const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
-
+        console.log("after substract 5 hr", slotStart, slotEndTime)
         // Check if the slot is already booked
         const existingBooking = await prisma.booking.findFirst({
             where: {
@@ -1392,7 +1392,17 @@ export const bookSlot = async (req, res) => {
             data: {
                 noOfBooking: { increment: 1 }
             },
-        });
+        })
+
+        // await prisma.availableSlots.update({
+        //     where: {
+        //         doctorId: doctorId, startTime:slotStartTime, endTime:slotEndTime
+        //     },
+        //     data: { isBooked: 'yes' }
+        // })
+
+
+
 
         const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
         const token = doctor.fcmToken;
@@ -1404,7 +1414,7 @@ export const bookSlot = async (req, res) => {
         await toDoctor(title, body, channelName, token);
 
 
-       
+
 
         // Calculate the next available time with a 2-minute buffer
         const nextAvailableTime = new Date(slotEndTime);
@@ -1905,16 +1915,16 @@ export const getOneHourSlots = async (req, res) => {
         for (const availability of availabilities) {
             const { startTime, endTime } = availability
 
-         
+
             const adjustedStart = moment(startTime).add(5, 'hours').add(30, 'minutes');
             const adjustedEnd = moment(endTime).add(5, 'hours').add(30, 'minutes');
 
-  
+
             let currentSlotStart = adjustedStart.clone();
 
             while (currentSlotStart.isBefore(adjustedEnd)) {
                 oneHourSlots.push({
-                    id: availability.id, 
+                    id: availability.id,
                     startTime: currentSlotStart.toISOString(), // Start time of the slot in ISO format
                     endTime: currentSlotStart.clone().add(1, 'hours').toISOString(), // End time of the slot in ISO format
                     doctorId: doctorId,
@@ -1927,13 +1937,18 @@ export const getOneHourSlots = async (req, res) => {
             }
         }
 
-        const count  = oneHourSlots.length
+        await prisma.availableSlots.createMany({
+            data: oneHourSlots,
+        });
 
-        res.status(200).json({
-            status: 200,
-            count,
-            splitAvailabilities:oneHourSlots
+        const availableSlots = await prisma.availableSlots.findMany({
+            where: { doctorId: doctorId, isBooked: "no" }, 
         })
+
+        const count = availableSlots.length
+
+        res.status(200).json({status:200,count,availableSlots})
+       
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
