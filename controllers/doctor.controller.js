@@ -1912,7 +1912,7 @@ export const getOneHourSlots = async (req, res) => {
 
         let oneHourSlots = []
         const now = moment()
-        console.log(now)
+        console.log("==========check moment time ---------------------",now)
 
         for (const availability of availabilities) {
             const { startTime, endTime } = availability;
