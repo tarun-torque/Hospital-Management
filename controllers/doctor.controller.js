@@ -2003,7 +2003,7 @@ export const getOneHourSlots = async (req, res) => {
         // Fetch the availabilities for the specified doctor
         const availabilities = await prisma.doctorAvailability.findMany({
             where: { doctorId: doctorId },
-        });
+        })
 
         let oneHourSlots = [];
         const now = moment(); // Current time
@@ -2080,8 +2080,8 @@ export const getOneHourSlots = async (req, res) => {
         res.status(200).json({
             status: 200,
             count,
-            availableSlots
-        });
+            splitAvailabilities:availableSlots
+        })
     } catch (error) {
         console.log('Error occurred:', error);
         res.status(500).json({
