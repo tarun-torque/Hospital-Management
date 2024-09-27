@@ -1900,10 +1900,6 @@ export const verifyPatientOtp = async (req, res) => {
     }
 }
 
-import moment from 'moment-timezone';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export const getOneHourSlots = async (req, res) => {
     const doctorId = +req.params.doctorId;
