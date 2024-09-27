@@ -2070,7 +2070,7 @@ export const getOneHourSlots = async (req, res) => {
                 doctorId: doctorId,
                 isBooked: "no",
                 startTime: {
-                    gte: moment().add(1, 'minute').toISOString(), // Ensure we're only getting future slots, excluding current time
+                    gte: moment().add(5, 'hours').add(30, 'minutes').add(1, 'minute').toISOString(), // Future slots only with timezone adjustment, // Ensure we're only getting future slots, excluding current time
                 },
             },
         });
