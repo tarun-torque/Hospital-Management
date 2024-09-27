@@ -1996,8 +1996,14 @@ export const verifyPatientOtp = async (req, res) => {
 //     }
 // }
 
+import moment from 'moment-timezone';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 export const getOneHourSlots = async (req, res) => {
     const doctorId = +req.params.doctorId;
+
     try {
         // Fetch the availabilities for the specified doctor
         const availabilities = await prisma.doctorAvailability.findMany({
@@ -2005,7 +2011,7 @@ export const getOneHourSlots = async (req, res) => {
         });
 
         let oneHourSlots = [];
-        const now = moment(); // Current time in the default timezone
+        const now = moment(); // Current time
         console.log("==========check moment time ---------------------", now.toISOString());
 
         for (const availability of availabilities) {
@@ -2069,7 +2075,7 @@ export const getOneHourSlots = async (req, res) => {
                 doctorId: doctorId,
                 isBooked: "no",
                 startTime: {
-                    gte: moment().toISOString(), // Ensure we're only getting future slots
+                    gte: moment().add(1, 'minute').toISOString(), // Ensure we're only getting future slots, excluding current time
                 },
             },
         });
