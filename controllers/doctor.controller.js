@@ -2090,3 +2090,24 @@ export const getOneHourSlots = async (req, res) => {
         });
     }
 };
+
+
+
+export const deleteAllAvailableSlots = async (req, res) => {
+    try {
+      // Delete all entries from the availableSlots table
+      await prisma.availableSlots.deleteMany();
+  
+      res.status(200).json({
+        status: 200,
+        message: 'All available slots have been deleted',
+      });
+    } catch (error) {
+      console.error('Error deleting available slots:', error);
+      res.status(500).json({
+        status: 500,
+        message: 'An error occurred while deleting available slots',
+      });
+    }
+  };
+  
