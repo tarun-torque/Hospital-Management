@@ -1900,6 +1900,11 @@ export const verifyPatientOtp = async (req, res) => {
     }
 }
 
+import moment from 'moment-timezone';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 export const getOneHourSlots = async (req, res) => {
     const doctorId = +req.params.doctorId;
 
@@ -1909,7 +1914,8 @@ export const getOneHourSlots = async (req, res) => {
             where: { doctorId: doctorId },
         });
 
-        let oneHourSlots = [];
+        let oneHourSlots = []
+        const now = moment()
 
         for (const availability of availabilities) {
             const { startTime, endTime } = availability;
@@ -1919,13 +1925,19 @@ export const getOneHourSlots = async (req, res) => {
 
             let currentSlotStart = adjustedStart.clone();
 
-    
             while (currentSlotStart.isBefore(adjustedEnd)) {
                 const slotEndTime = currentSlotStart.clone().add(1, 'hours');
                 const slotStartTimeISO = currentSlotStart.toISOString();
                 const slotEndTimeISO = slotEndTime.toISOString();
 
-      
+             
+                if (currentSlotStart.isBefore(now) || currentSlotStart.isSame(now, 'minute')) {
+                  
+                    currentSlotStart.add(1, 'hours');
+                    continue;
+                }
+
+ 
                 const existingSlot = await prisma.availableSlots.findUnique({
                     where: {
                         doctorId_startTime_endTime: {
@@ -1934,39 +1946,42 @@ export const getOneHourSlots = async (req, res) => {
                             endTime: slotEndTimeISO,
                         },
                     },
-                });
+                })
 
-           
                 if (!existingSlot) {
                     oneHourSlots.push({
-                        startTime: slotStartTimeISO, 
+                        startTime: slotStartTimeISO,
                         endTime: slotEndTimeISO, 
                         doctorId: doctorId,
-                        isBooked: "no",
+                        isBooked: "no", 
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     });
                 }
 
-    
+        
                 currentSlotStart.add(1, 'hours');
             }
         }
 
+        
         if (oneHourSlots.length > 0) {
             await prisma.availableSlots.createMany({
                 data: oneHourSlots,
-                skipDuplicates: true, 
+                skipDuplicates: true,
             });
         }
-  
 
+    
         const availableSlots = await prisma.availableSlots.findMany({
             where: {
                 doctorId: doctorId,
-                isBooked: "no"
-            }
-        });
+                isBooked: "no",
+                startTime: {
+                    gte: moment().toISOString(), 
+                },
+            },
+        })
 
         const count = availableSlots.length;
 
