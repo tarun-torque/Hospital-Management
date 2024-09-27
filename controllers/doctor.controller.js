@@ -1912,6 +1912,7 @@ export const getOneHourSlots = async (req, res) => {
 
         let oneHourSlots = []
         const now = moment()
+        console.log(now)
 
         for (const availability of availabilities) {
             const { startTime, endTime } = availability;
@@ -1993,4 +1994,4 @@ export const getOneHourSlots = async (req, res) => {
             msg: 'Something went wrong'
         });
     }
-};
+}
