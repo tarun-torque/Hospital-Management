@@ -288,13 +288,12 @@ router.post('/verify/doctor/otp',verifyDoctorOtp)
 router.post('/doctor/:doctorId/completeProfile', upload.fields([{ name: 'doctorProfile' }, { name: 'doctorDocument' }]), completeDoctorProfile);
 router.post('/mark/session/completed',isBookingCompleted)
 
+
 // patient registration
 router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/profile/:patientId',getPatientProfile)
 router.post('/register/patient',registerPatient)
 router.post('/verify/patient/otp',verifyPatientOtp)
-
-
 
 
 // managers Notification

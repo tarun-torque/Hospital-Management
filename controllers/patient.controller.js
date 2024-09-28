@@ -412,9 +412,9 @@ export const otpSend = async (req, res) => {
         if(! isPatient){
             return res.status(404).json({msg:"User not Found"})
         }
-
+        
         // otp
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
         // store otp in db
@@ -427,7 +427,7 @@ export const otpSend = async (req, res) => {
             subject: 'OTP to reset Password',
             html:
                 `
-            Dear ${isPatient.patient_name},
+            Dear ${isPatient.patientName},
 
             <p>We received a request to change your password.To proceed, please use the One-Time Password (OTP) provided below. </p>
 
