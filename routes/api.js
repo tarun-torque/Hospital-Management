@@ -292,7 +292,7 @@ router.post('/mark/session/completed',isBookingCompleted)
 // patient registration
 router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/profile/:patientId',getPatientProfile)
-router.post('/register/patient',registerPatient)
+router.post('/register/patient',upload.single('patientImage'),registerPatient)
 router.post('/verify/patient/otp',verifyPatientOtp)
 
 

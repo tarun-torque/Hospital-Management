@@ -1803,7 +1803,8 @@ export const completeDoctorProfile = async (req, res) => {
 }
 
 export const registerPatient = async (req, res) => {
-    const { dob, contactNumber, profileUrl, country, gender, email, patientName, password, fcmToken } = req.body
+    const { dob, contactNumber, country, gender, email, patientName, password, fcmToken } = req.body
+    const fileInfo = req.file
     try {
         const requiredField = ['dob', 'gender', 'country', 'contactNumber', 'email', 'patientName', 'password', 'fcmToken']
         for (const field of requiredField) {
@@ -1812,6 +1813,21 @@ export const registerPatient = async (req, res) => {
             }
         }
 
+        if(!fileInfo){
+            return res.status(400).json({ status: 400, msg:'Profile Image is required' })
+        }
+
+        const fileType = fileInfo.mimetype
+        const fileSizeMB = fileInfo.size / (1024 * 1024)
+        const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
+        if (!isImage) {
+            return res.status(400).json({
+                status: 400,
+                msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
+            })
+        }
+
+    
         const isPatient = await prisma.patient.findUnique({ where: { email } })
         if (isPatient) {
             return res.status(400).json({ status: 400, msg: 'Patient with this mail is already present' })
@@ -1823,7 +1839,7 @@ export const registerPatient = async (req, res) => {
         const otpNumber = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
-        const data = { dob, contactNumber, profileUrl, country, gender, patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
+        const data = { dob, contactNumber, profileUrl:fileInfo.path, country, gender, patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,
