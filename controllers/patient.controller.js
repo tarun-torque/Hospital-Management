@@ -4,34 +4,34 @@ import jwt from 'jsonwebtoken'
 import 'dotenv/config'
 import transporter from "../utils/transporter.js";
 import path from 'path'
-import { fileURLToPath } from 'url';
+import { fileURLToPath, parse } from 'url';
 import { dirname, join } from 'path';
 import exp from "constants";
 import { title } from "process";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const getBookingOfPatient = async(req,res)=>{
+export const getBookingOfPatient = async (req, res) => {
     const patientId = +req.params.patientId
     try {
         const appointment = await prisma.booking.findMany({
             where: { patientId },
             include: { Doctor: true },
             orderBy: [
-              { slotStart: 'asc' }, 
-              { slotEnd: 'asc' }    
+                { slotStart: 'asc' },
+                { slotEnd: 'asc' }
             ]
-          })
+        })
         const appointmentCount = appointment.length
-        if(appointment.length === 0){
-            return res.status(400).json({status:400,msg:'No Appointment'})
+        if (appointment.length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No Appointment' })
         }
 
-        res.status(200).json({status:200,appointmentCount,appointment})
+        res.status(200).json({ status: 200, appointmentCount, appointment })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -39,82 +39,82 @@ export const getBookingOfPatient = async(req,res)=>{
 
 
 // to add journal patient journal 
-export const patientJournal = async(req,res)=>{
+export const patientJournal = async (req, res) => {
     const patientId = +req.params.patientId
-    const {title,description} = req.body;
+    const { title, description } = req.body;
     try {
-        if(!title){
-            return res.status(400).json({status:400,msg:'Title is required'})
+        if (!title) {
+            return res.status(400).json({ status: 400, msg: 'Title is required' })
         }
-        if(!description){
-            return res.status(400).json({status:400,msg:'Description is required'})
+        if (!description) {
+            return res.status(400).json({ status: 400, msg: 'Description is required' })
         }
 
-        const saveJournal = await prisma.journal.create({data:{patientId,title,description}})
-         res.status(201).json({status:201,msg:'Journal is added'})
+        const saveJournal = await prisma.journal.create({ data: { patientId, title, description } })
+        res.status(201).json({ status: 201, msg: 'Journal is added' })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // to update journal
-export const updateJounal = async(req,res)=>{
+export const updateJounal = async (req, res) => {
     const journalId = req.params.journalId
-    const {title,description} = req.body
+    const { title, description } = req.body
     try {
         const updatedData = {}
-        if(title){
-            updatedData.title=title
+        if (title) {
+            updatedData.title = title
         }
-        if(description){
-            updatedData.description=description
-        }
-
-        if(Object.keys(updatedData).length===0){
-            return res.status(400).json({ status:400,msg:'No fields to update' });
+        if (description) {
+            updatedData.description = description
         }
 
-        const updateJounal  = await prisma.journal.update({where:{id:journalId},data:updatedData})
-        res.status(200).json({ status:200,msg:'Journal Updated Successfully' });
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No fields to update' });
+        }
+
+        const updateJounal = await prisma.journal.update({ where: { id: journalId }, data: updatedData })
+        res.status(200).json({ status: 200, msg: 'Journal Updated Successfully' });
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // to delete journal 
-export const deleteJournal  = async(req,res)=>{
+export const deleteJournal = async (req, res) => {
     const journalId = req.params.journalId
     try {
-        const deleteJournal = await prisma.journal.delete({where:{id:journalId}})
-        if(! deleteJournal){
-            return res.status(400).json({status:400,msg:'Journal does not exist'})
+        const deleteJournal = await prisma.journal.delete({ where: { id: journalId } })
+        if (!deleteJournal) {
+            return res.status(400).json({ status: 400, msg: 'Journal does not exist' })
         }
-        res.status(200).json({status:200,msg:'Journal deleted Successfully'})
+        res.status(200).json({ status: 200, msg: 'Journal deleted Successfully' })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
 // get all patient specific journal
-export const patientJournalAll = async(req,res)=>{
-    const patientId =  + req.params.patientId
+export const patientJournalAll = async (req, res) => {
+    const patientId = + req.params.patientId
     try {
-        const journal = await prisma.journal.findMany({where:{patientId}})
+        const journal = await prisma.journal.findMany({ where: { patientId } })
 
-        if(journal.length===0){
-            return res.status(404).json({status:404,msg:'No Journal found'})
+        if (journal.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No Journal found' })
         }
-        res.status(200).json({status:200,journal})
+        res.status(200).json({ status: 200, journal })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
 
     }
 }
@@ -123,69 +123,71 @@ export const patientJournalAll = async(req,res)=>{
 
 
 //rating to the docttor 
-export const giveRatingToDoctor  = async(req,res)=>{
+export const giveRatingToDoctor = async (req, res) => {
     const bookingId = +req.params.bookingId
     const patientId = +req.params.patientId
     const doctorId = +req.params.doctorId
-    const {stars,review} =  req.body
+    const { stars, review } = req.body
 
     try {
 
-        if(!stars){
-            return res.status(400).json({status:400,msg:'Please give rating first'})
+        if (!stars) {
+            return res.status(400).json({ status: 400, msg: 'Please give rating first' })
         }
 
-        if(stars<1 || stars>5){
-            return res.status(400).json({status:400,msg:'Give stars between 1 to 5'})
+        if (stars < 1 || stars > 5) {
+            return res.status(400).json({ status: 400, msg: 'Give stars between 1 to 5' })
         }
 
         const existingRating = await prisma.rating.findUnique({
             where: {
-              bookingId_patientId_doctorId: {
-                bookingId,
-                patientId,
-                doctorId
-              }
+                bookingId_patientId_doctorId: {
+                    bookingId,
+                    patientId,
+                    doctorId
+                }
             }
-          });
-      
-          if (existingRating) {
-            return res.status(400).json({ status:400,msg: 'You have already rated' });
-          }
+        });
 
-          const rating = await prisma.rating.create({
+        if (existingRating) {
+            return res.status(400).json({ status: 400, msg: 'You have already rated' });
+        }
+
+        const rating = await prisma.rating.create({
             data: {
-              patientId,
-              doctorId,
-              bookingId,
-              stars,
-              review
+                patientId,
+                doctorId,
+                bookingId,
+                stars,
+                review
             }
-          })
+        })
 
 
         // send notification for manager
         // find assigned manager id of doctor
-        const patient = await prisma.patient.findUnique({where:{id:patientId}})
-        const doctor = await prisma.doctor.findUnique({where:{id:doctorId}})
-        const findManager= await prisma.manager.findUnique({where:{username:doctor.assignedManager}})
-        const sendNotification = await prisma.managerNotificaton.create({data:{
-            managerId:findManager.id,
-            title:`${patient.patient_name} rated Consultant ${doctor.doctorName} with ${stars} stars`,
-            content:`${patient.patient_name} commented: "${review}"`,
-            data:JSON.stringify({
-                    doctorId:doctorId,
-                    patientId:patientId,
-                    bookingId:bookingId,
-                    patientProfilePath:patient.profile_path,
-            })
-        }})
+        const patient = await prisma.patient.findUnique({ where: { id: patientId } })
+        const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } })
+        const findManager = await prisma.manager.findUnique({ where: { username: doctor.assignedManager } })
+        const sendNotification = await prisma.managerNotificaton.create({
+            data: {
+                managerId: findManager.id,
+                title: `${patient.patient_name} rated Consultant ${doctor.doctorName} with ${stars} stars`,
+                content: `${patient.patient_name} commented: "${review}"`,
+                data: JSON.stringify({
+                    doctorId: doctorId,
+                    patientId: patientId,
+                    bookingId: bookingId,
+                    patientProfilePath: patient.profile_path,
+                })
+            }
+        })
 
-         res.status(201).json({status:201,msg:'Thanks for giving rating'})
-        
+        res.status(201).json({ status: 201, msg: 'Thanks for giving rating' })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -206,35 +208,35 @@ export const signInPatientFromGoogle = async (req, res) => {
 
         const data = { patientName, email, profileUrl, fcmToken }
         if (patient) {
-          const updatePatient =   await prisma.patient.update({
+            const updatePatient = await prisma.patient.update({
                 where: { email },
                 data: { fcmToken }
             })
-            const token = jwt.sign({ token:updatePatient }, process.env.SECRET_KEY, { expiresIn: '999h' });
+            const token = jwt.sign({ token: updatePatient }, process.env.SECRET_KEY, { expiresIn: '999h' });
             return res.status(200).json({ status: 200, msg: 'Token refreshed', token });
         } else {
-            const saveDoctor =  await prisma.patient.create({ data });
-            const newToken = jwt.sign({ token:saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
-            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token:newToken });
+            const saveDoctor = await prisma.patient.create({ data });
+            const newToken = jwt.sign({ token: saveDoctor }, process.env.SECRET_KEY, { expiresIn: '999h' })
+            return res.status(201).json({ status: 201, msg: 'Profile created successfully', token: newToken });
         }
-        
+
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: error.message });
     }
 }
 
-export const getPatientProfile = async(req,res)=>{
-    const patientId =  +req.params.patientId;
+export const getPatientProfile = async (req, res) => {
+    const patientId = +req.params.patientId;
     try {
-        if(!patientId){
-            return res.status(400).json({status:400,msg:'PatientId id is required'})
+        if (!patientId) {
+            return res.status(400).json({ status: 400, msg: 'PatientId id is required' })
         }
-        const profile  = await prisma.patient.findUnique({where:{id:patientId}})
-        res.status(200).json({status:200,msg:profile})
+        const profile = await prisma.patient.findUnique({ where: { id: patientId } })
+        res.status(200).json({ status: 200, msg: profile })
     } catch (error) {
         console.log(error)
-        res.status(500).json({msg:'Something went wrong'})
+        res.status(500).json({ msg: 'Something went wrong' })
     }
 }
 
@@ -256,7 +258,7 @@ export const verifyPatientEmail = async (req, res, next) => {
         const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
         const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' });
 
-        
+
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,
@@ -294,11 +296,11 @@ export const verifyPatientEmail = async (req, res, next) => {
         };
 
 
-      const mailSent =   transporter.sendMail (mailOptions, async(error, info) => {
+        const mailSent = transporter.sendMail(mailOptions, async (error, info) => {
             if (error) {
-                return res.status(400).json({msg:'OTP not sent'})
+                return res.status(400).json({ msg: 'OTP not sent' })
             } else {
-                return res.status(200).json({msg:'OTP sent check your Email'})
+                return res.status(200).json({ msg: 'OTP sent check your Email' })
             }
         });
 
@@ -318,13 +320,13 @@ export const verifyPatientOTP = async (req, res, next) => {
         }
 
         const retrieveOtp = await prisma.patient.findUnique({ where: { email } });
-    
+
         const realOtp = retrieveOtp.otp;
         const payload = jwt.verify(realOtp, process.env.SECRET_KEY);
 
         if (payload.otpNumber === otp) {
             return res.status(200).json({ msg: 'Email is verified' });
-           
+
         } else {
             return res.status(400).json({ msg: 'OTP is invalid or expired' });
         }
@@ -336,39 +338,39 @@ export const verifyPatientOTP = async (req, res, next) => {
 
 
 // register patient
-export const registerPatient = async(req,res)=>{
+export const registerPatient = async (req, res) => {
     try {
-        
-        const {username,patient_name,country,contact_number,dob,gender,new_patient,password} = req.body
-        const fileInfo =  req.file;
+
+        const { username, patient_name, country, contact_number, dob, gender, new_patient, password } = req.body
+        const fileInfo = req.file;
         const email = req.params.email
 
         const requiredField = ['username', 'patient_name', 'country', 'contact_number', 'dob', 'gender', 'new_patient', 'password']
-        for (const field of requiredField){
-            if(req.body[field]===undefined || req.body[field]==='' || req.body ===null ){
-                return res.status(400).json({msg:`${field} is required`})
+        for (const field of requiredField) {
+            if (req.body[field] === undefined || req.body[field] === '' || req.body === null) {
+                return res.status(400).json({ msg: `${field} is required` })
             }
         }
 
-        const fileType = fileInfo.mimetype =='image/jpeg' || fileInfo.mimetype =='image/png'
-        const fileSize = fileInfo.size / (1024 * 1024) <=2 
+        const fileType = fileInfo.mimetype == 'image/jpeg' || fileInfo.mimetype == 'image/png'
+        const fileSize = fileInfo.size / (1024 * 1024) <= 2
 
 
-        if(!fileType || !fileSize){
-            return res.status(400).json({msg:'File size must be less than 2 MB and PNG or JPG type'})
+        if (!fileType || !fileSize) {
+            return res.status(400).json({ msg: 'File size must be less than 2 MB and PNG or JPG type' })
         }
 
         // hash password 
-        const salt =  bcrypt.genSaltSync(10)
-        const hash_pass=bcrypt.hashSync(password,salt)
+        const salt = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(password, salt)
 
-        const data = {username,patient_name,country,contact_number,dob,gender,new_patient,password:hash_pass,profile_path:fileInfo.path,profileType:fileInfo.mimetype}
-        const saveData = await prisma.patient.update({where:{email},data:{data}})
+        const data = { username, patient_name, country, contact_number, dob, gender, new_patient, password: hash_pass, profile_path: fileInfo.path, profileType: fileInfo.mimetype }
+        const saveData = await prisma.patient.update({ where: { email }, data: { data } })
 
         res.send("saved")
 
     } catch (error) {
-        res.status(400).json({msg:error.message})
+        res.status(400).json({ msg: error.message })
     }
 }
 
@@ -378,24 +380,24 @@ export const registerPatient = async(req,res)=>{
 export const loginPatient = async (req, res) => {
     try {
         // get data
-        const { email, password,fcmToken } = req.body;
+        const { email, password, fcmToken } = req.body;
 
         // check email and password
         const isEmail = await prisma.patient.findUnique({ where: { email } })
         if (!isEmail) {
             return res.status(404).json({ message: 'Invalid Credentials' })
         }
-       
+
         const isPassword = bcrypt.compareSync(password, isEmail.password)
         if (!isPassword) {
             return res.status(404).json({ message: 'Invalid Credentials' })
         }
 
         //generate token
-        const data = { id: isEmail.id, username: isEmail.username, patientName: isEmail.patientName, profile_path: isEmail.profileUrl}
-        const updateFcm = await prisma.patient.update({where:{email},data:{fcmToken}})
+        const data = { id: isEmail.id, username: isEmail.username, patientName: isEmail.patientName, profile_path: isEmail.profileUrl }
+        const updateFcm = await prisma.patient.update({ where: { email }, data: { fcmToken } })
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({status:200, msg: 'LoggedIn', token ,id:isEmail.id})
+        res.status(200).json({ status: 200, msg: 'LoggedIn', token, id: isEmail.id })
 
     } catch (error) {
         console.log(error)
@@ -409,16 +411,16 @@ export const otpSend = async (req, res) => {
     try {
         const { email } = req.body;
         const isPatient = await prisma.patient.findUnique({ where: { email } })
-        if(! isPatient){
-            return res.status(404).json({msg:"User not Found"})
+        if (!isPatient) {
+            return res.status(404).json({ msg: "User not Found" })
         }
-        
+
         // otp
         const otp = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
         // store otp in db
-        const saveOtp = await prisma.patient.update({ where: { email }, data: { otp:otpToken} })
+        const saveOtp = await prisma.patient.update({ where: { email }, data: { otp: otpToken } })
 
         // send OTP via mail
         const mailOptions = {
@@ -482,39 +484,39 @@ export const otpSend = async (req, res) => {
 }
 
 // reset patient password  
-export const resetPassword = async(req,res)=>{
+export const resetPassword = async (req, res) => {
     try {
-        const {otp,email,newPassword} = req.body;
+        const { otp, email, newPassword } = req.body;
 
-        const checkOtp =  await prisma.patient.findUnique({where:{email}})
+        const checkOtp = await prisma.patient.findUnique({ where: { email } })
 
-        if(!checkOtp){
-            return res.status(400).json({msg:'Invalid Email or OTP'})
+        if (!checkOtp) {
+            return res.status(400).json({ msg: 'Invalid Email or OTP' })
         }
 
-        if(checkOtp.otp === null){
-            return res.status(400).json({msg:'Invalid Email or OTP'})
+        if (checkOtp.otp === null) {
+            return res.status(400).json({ msg: 'Invalid Email or OTP' })
         }
 
         // verify otp
-        const decodedOtp = jwt.verify(checkOtp.otp,process.env.SECRET_KEY)
+        const decodedOtp = jwt.verify(checkOtp.otp, process.env.SECRET_KEY)
 
-        if(decodedOtp.otp !== otp){
-            return res.status(400).json({msg:'Invalid OTP'}) 
+        if (decodedOtp.otp !== otp) {
+            return res.status(400).json({ msg: 'Invalid OTP' })
         }
 
         // hash password
-        const salt  = bcrypt.genSaltSync(10)
-        const hash_pass = bcrypt.hashSync(newPassword,salt)
+        const salt = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(newPassword, salt)
 
         // update password in database 
-        const updatePassword  = await prisma.patient.update({where:{email},data:{password:hash_pass}})
- 
-        res.status(200).json({msg:'Password reset successful'})
-     
+        const updatePassword = await prisma.patient.update({ where: { email }, data: { password: hash_pass } })
+
+        res.status(200).json({ msg: 'Password reset successful' })
+
     } catch (error) {
         res.status(400).json({ message: 'Invalid or expired OTP' })
-        console.log(error) 
+        console.log(error)
     }
 }
 
@@ -664,10 +666,10 @@ export const get_mood = async (req, res) => {
 
 // resheduling the session 
 export const rescheduleBooking = async (req, res) => {
-    const {newStartTime, newEndTime } = req.body
+    const { newStartTime, newEndTime } = req.body
     const bookingId = +req.params.bookingId
     const doctorId = +req.params.doctorId
-    console.log("rescheduling time",newStartTime,newEndTime)
+    console.log("rescheduling time", newStartTime, newEndTime)
     try {
         const existingBooking = await prisma.booking.findUnique({
             where: { id: bookingId },
@@ -707,5 +709,34 @@ export const rescheduleBooking = async (req, res) => {
     } catch (error) {
         console.error('Error occurred while rescheduling booking:', error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+}
+
+
+// update patient profile
+export const updatePatientProfile = async (req, res) => {
+    const patientId = +req.params.patientId
+    const fileInfo = req.file
+    try {
+        if (!fileInfo) {
+            return res.status(400).json({ status: 400, msg: 'Profile image is required' })
+        }
+
+        const fileType = fileInfo.mimetype
+        const fileSizeMB = fileInfo.size / (1024 * 1024)
+        const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
+        if (!isImage) {
+            return res.status(400).json({
+                status: 400,
+                msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
+            })
+        }
+
+        const updateImage = await prisma.patient.update({ where: { id: patientId }, data: { profileUrl: fileInfo.path } })
+        res.status(200).json({ status: 200, msg: 'Profile Image is updated Succesfully' })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }

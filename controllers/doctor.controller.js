@@ -1159,35 +1159,7 @@ export const doctorLogin = async (req, res) => {
     }
 }
 
-// update profile
-export const updateDoctorProfile = async (req, res) => {
-    try {
 
-        const DoctorId = +req.params.DoctorId;
-        const { email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession } = req.body;
-
-        // check doctor
-        const isDoctor = await prisma.doctor.findUnique({ where: { id: DoctorId } })
-        if (!isDoctor) {
-            return res.send(404).json({ messages: 'Doctor is not found' })
-        }
-
-        //update information
-        const info = await prisma.doctor.update({
-            where: { id: DoctorId }, data: {
-                email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession
-
-            }
-        })
-
-        res.status(201).json({ message: 'Profile updated succesfully' })
-
-    } catch (error) {
-        res.send(error)
-        console.log(error)
-    }
-
-}
 
 // // delete profile
 export const deleteDoctor_profile = async (req, res) => {
@@ -1827,7 +1799,6 @@ export const registerPatient = async (req, res) => {
             })
         }
 
-    
         const isPatient = await prisma.patient.findUnique({ where: { email } })
         if (isPatient) {
             return res.status(400).json({ status: 400, msg: 'Patient with this mail is already present' })
@@ -2157,3 +2128,31 @@ export const deleteAllAvailableSlots = async (req, res) => {
     }
   };
   
+
+  // update doctor profile
+export const updateDoctorProfile = async (req, res) => {
+    const doctorId = +req.params.doctorId
+    const fileInfo = req.file
+    try {
+        if (!fileInfo) {
+            return res.status(400).json({ status: 400, msg: 'Profile image is required' })
+        }
+
+        const fileType = fileInfo.mimetype
+        const fileSizeMB = fileInfo.size / (1024 * 1024)
+        const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
+        if (!isImage) {
+            return res.status(400).json({
+                status: 400,
+                msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
+            })
+        }
+
+        const updateImage = await prisma.doctor.update({ where: { id: doctorId }, data: { profileUrl: fileInfo.path } })
+        res.status(200).json({ status: 200, msg: 'Profile Image is updated Succesfully' })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
