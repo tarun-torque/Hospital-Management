@@ -1768,7 +1768,7 @@ export const completeDoctorProfile = async (req, res) => {
         const doctorDocument_size = doctorDocument.size / (1024 * 1024); // size in MB
 
         // Validate profile pic
-        const isProfilePic = (doctorProfile_type === 'image/jpg' || doctorProfile_type === 'image/png') && (doctorProfile_size <= 2);
+        const isProfilePic = (doctorProfile_type === 'image/jpeg' || doctorProfile_type === 'image/png') && (doctorProfile_size <= 2);
         if (!isProfilePic) {
             return res.status(400).json({ status: 400, msg: 'Profile photo must be jpg or png and size less than 2MB' });
         }
