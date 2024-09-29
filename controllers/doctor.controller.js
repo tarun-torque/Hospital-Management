@@ -1776,10 +1776,12 @@ export const completeDoctorProfile = async (req, res) => {
 
 export const registerPatient = async (req, res) => {
     const { dob, contactNumber, country, gender, email, patientName, password, fcmToken } = req.body
+    console.log(req.body)
     const fileInfo = req.file
     try {
         const requiredField = ['dob', 'gender', 'country', 'contactNumber', 'email', 'patientName', 'password', 'fcmToken']
         for (const field of requiredField) {
+            console.log(`${field}:`, req.body[field]);
             if (req.body[field] === undefined || req.body[field] === '' || req.body[field] === null) {
                 return res.status(400).json({ status: 400, msg: `${field} is required` })
             }
