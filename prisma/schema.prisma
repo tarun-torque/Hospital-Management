@@ -283,10 +283,10 @@ model availableSlots {
 }
 
 model Booking {
-  id        Int      @id @default(autoincrement())
-  patientId Int
-  doctorId  Int
-  slotStart DateTime
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  doctorId    Int
+  slotStart   DateTime
   serviceId   Int
   slotEnd     DateTime
   channelName String
@@ -295,7 +295,7 @@ model Booking {
   Doctor      Doctor   @relation(fields: [doctorId], references: [id])
   Patient     Patient  @relation(fields: [patientId], references: [id])
   Rating      Rating[]
-  Service     Service @relation(fields: [serviceId], references: [id])
+  Service     Service  @relation(fields: [serviceId], references: [id])
 }
 
 model Rating {

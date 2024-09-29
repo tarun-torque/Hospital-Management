@@ -1228,27 +1228,22 @@ export const bookSlot = async (req, res) => {
 
     console.log("slotStart and slotEndTime", slotStart, slotEnd)
     try {
-        const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000);
-        const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000);
+        const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000)
+        const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000)
 
-        // Check if the slot is already booked
-        const existingBooking = await prisma.booking.findFirst({
-            where: {
-                doctorId,
-                OR: [
-                    { slotStart: slotStartTime },
-                    { slotEnd: slotStartTime },
-                    {
-                        AND: [
-                            { slotStart: { lte: slotEndTime } },
-                            { slotEnd: { gte: slotStartTime } },
-                        ],
-                    },
-                ],
-            },
-        })
 
-        if (existingBooking) {
+        // check slot is booked
+        // const existingSlot = await prisma.availableSlots.findUnique({
+        //     where: {
+        //         doctorId_startTime_endTime: {
+        //             doctorId,
+        //             startTime: slotStartTime, 
+        //             endTime: slotEndTime, 
+        //         },
+        //     },
+        // })
+        
+        if (existingSlot && existingSlot.isBooked === 'yes') {
             return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         }
 
@@ -1263,7 +1258,22 @@ export const bookSlot = async (req, res) => {
                 serviceId, 
                 notes
             },
-        });
+        })
+
+
+        // mark slot as booked
+        // const markBooked = await prisma.availableSlots.update({
+        //     where: {
+        //         doctorId_startTime_endTime: {
+        //             doctorId,
+        //             startTime: slotStartTime,
+        //             endTime: slotEndTime,
+        //         },
+        //     },
+        //     data: {
+        //         isBooked: 'yes',
+        //     },
+        // })
 
         // Extract and adjust times for the response
         const startDate = new Date(booking.slotStart);
@@ -1303,7 +1313,6 @@ export const bookSlot = async (req, res) => {
         const token = doctor.fcmToken
         const title = 'Appointment Booked'
         const body = `Appointment Booked on ${formattedStartDate} at ${formattedStartTime} - ${formattedEndTime}.`;
-
         await toDoctor(title, body, channelName, token);
 
         // Respond with success message and booking details

@@ -26,6 +26,8 @@ const patientApp = admin.initializeApp({
     credential: admin.credential.cert(serviceAccountPatient)
 }, 'patientApp')
 
+
+
 // testing for doctor
 export const testFirebase = async (req, res) => {
     try {
@@ -177,7 +179,7 @@ export const patinetDeclineVideoCall = async (req, res) => {
             },
             token: fcmToken
         }
-        const response  = await patientApp.messaging().send(message)
+        const response  = await doctorApp.messaging().send(message)
         console.log("decline noti send")
         res.status(200).json({status:200,msg:'Patient reject the call successfully'})
     } catch (error) {
