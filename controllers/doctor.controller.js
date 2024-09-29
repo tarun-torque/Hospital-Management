@@ -1228,6 +1228,7 @@ export const bookSlot = async (req, res) => {
     console.log("service", serviceId)
     console.log("doctor", doctorId)
     console.log("patient", patientId)
+    
     console.log("slotStart and slotEndTime", slotStart, slotEnd);
     try {
         // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
