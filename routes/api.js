@@ -77,7 +77,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter })
 
 //                                 CREATOR APIs---->
 router.post('/login/creator', login_creator)
-router.get('/creator/:creatorId/search/bar',creatorSearchBar)
+router.get('/creator/:creatorId/search/bar', creatorSearchBar)
 router.post('/user/:id/createYtContent', create_yt_Content)
 router.post('/user/:id/createBlogContent', create_blog_content)
 router.post('/user/:id/createArticleContent', upload.single('articleImage'), create_arcticle_content)

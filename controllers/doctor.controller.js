@@ -1227,7 +1227,6 @@ export const bookSlot = async (req, res) => {
     const doctorId = +req.params.doctorId;
 
     console.log("slotStart and slotEndTime", slotStart, slotEnd)
-
     try {
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000);
         const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000);

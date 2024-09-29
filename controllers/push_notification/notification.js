@@ -58,7 +58,7 @@ export async function toDoctor(title, body, channelName, token) {
             },
             token,
         }
-        const response = await doctorApp.messaging().send(message);
+        const response = await patientApp.messaging().send(message);
         console.log('Doctor message sent successfully:', response);
     } catch (error) {
         console.error('Error sending message to doctor:', error);
@@ -180,7 +180,6 @@ export const patinetDeclineVideoCall = async (req, res) => {
         const response  = await patientApp.messaging().send(message)
         console.log("decline noti send")
         res.status(200).json({status:200,msg:'Patient reject the call successfully'})
-
     } catch (error) {
         res.status(500).json({status:500,msg:'Something went wrong'})
         console.log(error)
