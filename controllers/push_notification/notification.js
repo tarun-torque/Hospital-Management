@@ -60,7 +60,7 @@ export async function toDoctor(title, body, channelName, token) {
             },
             token,
         }
-        const response = await patientApp.messaging().send(message);
+        const response = await doctorApp.messaging().send(message);
         console.log('Doctor message sent successfully:', response);
     } catch (error) {
         console.error('Error sending message to doctor:', error);
