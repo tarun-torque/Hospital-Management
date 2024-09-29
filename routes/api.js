@@ -309,6 +309,7 @@ router.get('/notify/patient/:patientId/:bookingId/video/call/started',patientVid
 router.get('/decline/doctor/call/:doctorId',patinetDeclineVideoCall)
 
 
+
 // slots in one hours
 router.get('/get/one/hours/slots/:doctorId',getOneHourSlots)
 router.delete('/delete',deleteAllAvailableSlots)
