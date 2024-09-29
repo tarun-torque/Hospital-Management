@@ -1221,10 +1221,13 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName,notes } = req.body
+    const { slotStart, slotEnd, channelName, notes } = req.body
     const serviceId = +req.params.serviceId
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
+    console.log("service", serviceId)
+    console.log("doctor", doctorId)
+    console.log("patient", patientId)
     console.log("slotStart and slotEndTime", slotStart, slotEnd);
     try {
         // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
@@ -2110,7 +2113,7 @@ export const updateDoctorProfile = async (req, res) => {
         }
 
         if (Object.keys(updatedData).length === 0) {
-            return res.status(400).json({status: 400,msg: 'No fields to update'})
+            return res.status(400).json({ status: 400, msg: 'No fields to update' })
         }
 
         const update = await prisma.doctor.update({ where: { id: doctorId }, data: updatedData })
