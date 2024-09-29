@@ -484,41 +484,58 @@ export const otpSend = async (req, res) => {
 }
 
 // reset patient password  
-export const resetPassword = async (req, res) => {
+export const patientVerifyForgotOtp = async (req, res) => {
+    const { otp } = req.body
+    const patientId = +req.params.patientId
     try {
-        const { otp, email, newPassword } = req.body;
+        if (otp) {
+            return res.status(400).json({ status: 400, msg: 'OTP is required' })
+        }
 
-        const checkOtp = await prisma.patient.findUnique({ where: { email } })
+        const checkOtp = await prisma.patient.findUnique({ where: { id: patientId } })
 
         if (!checkOtp) {
-            return res.status(400).json({ msg: 'Invalid Email or OTP' })
+            return res.status(400).json({ status: 400, msg: 'Invalid Email or OTP' })
         }
 
         if (checkOtp.otp === null) {
-            return res.status(400).json({ msg: 'Invalid Email or OTP' })
+            return res.status(400).json({ status: 400, msg: 'Invalid Email or OTP' })
         }
 
         // verify otp
         const decodedOtp = jwt.verify(checkOtp.otp, process.env.SECRET_KEY)
 
         if (decodedOtp.otp !== otp) {
-            return res.status(400).json({ msg: 'Invalid OTP' })
+            return res.status(400).json({ status: 400, msg: 'OTP is Invalid or expired' })
         }
 
-        // hash password
-        const salt = bcrypt.genSaltSync(10)
-        const hash_pass = bcrypt.hashSync(newPassword, salt)
-
-        // update password in database 
-        const updatePassword = await prisma.patient.update({ where: { email }, data: { password: hash_pass } })
-
-        res.status(200).json({ msg: 'Password reset successful' })
+        res.status(200).json({ status: 200, msg: 'OTP verified  successful' })
 
     } catch (error) {
         res.status(400).json({ message: 'Invalid or expired OTP' })
         console.log(error)
     }
 }
+
+// patient reset password
+export const resetPatientPassword = async (req, res) => {
+    const patientId = +req.params.patientId
+    const { newPassword } = req.body
+    try {
+        if (newPassword) {
+            return res.status(400).json({ status: 200, msg: 'New Password is required' })
+        }
+        //  hash password 
+        const salt = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(newPassword, salt)
+        const updatePswd = await prisma.patient.update({ where: { id: patientId }, data: { password: hash_pass } })
+        res.status(200).json({ status: 200, msg: 'Password reset Succesfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
 
 
 
@@ -717,24 +734,33 @@ export const rescheduleBooking = async (req, res) => {
 export const updatePatientProfile = async (req, res) => {
     const patientId = +req.params.patientId
     const fileInfo = req.file
+    const { contactNumber } = req.body
     try {
-        if (!fileInfo) {
-            return res.status(400).json({ status: 400, msg: 'Profile image is required' })
+
+        const updatedData = {}
+        if (contactNumber) {
+            updatedData.contactNumber = contactNumber
         }
 
-        const fileType = fileInfo.mimetype
-        const fileSizeMB = fileInfo.size / (1024 * 1024)
-        const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
-        if (!isImage) {
-            return res.status(400).json({
-                status: 400,
-                msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
-            })
+        if (fileInfo) {
+
+            const fileType = fileInfo.mimetype
+            const fileSizeMB = fileInfo.size / (1024 * 1024)
+            const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
+            if (!isImage) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
+                })
+            }
+            updatedData.profileUrl = fileInfo.path
         }
 
-        const updateImage = await prisma.patient.update({ where: { id: patientId }, data: { profileUrl: fileInfo.path } })
-        res.status(200).json({ status: 200, msg: 'Profile Image is updated Succesfully' })
-
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({status: 400,msg: 'No fields to update'})
+        }
+        const update = await prisma.patient.update({ where: { id: patientId }, data:updatedData })
+        res.status(200).json({ status: 200, msg: 'Profile  is updated Succesfully' })
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })

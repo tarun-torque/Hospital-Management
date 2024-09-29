@@ -6,8 +6,8 @@ import bcrypt from 'bcryptjs'
 const router = Router()
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
-import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, creatorSearchBar, deleteAllAvailableSlots, deleteDoctor_profile, deletePatientSupport, doctorLogin, DoctorOtpSend, doctorPrice, DoctorResetPassword, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getOneHourSlots, getServiceFromId, getServicesByDoctorId, isBookingCompleted, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, registerPatient, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp, verifyPatientOtp } from "../controllers/doctor.controller.js";
-import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, post_support, rescheduleBooking, resetPassword, signInPatientFromGoogle, update_support, updateJounal, updatePatientProfile, verifyPatientEmail, verifyPatientOTP } from "../controllers/patient.controller.js";
+import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, creatorSearchBar, deleteAllAvailableSlots, deleteDoctor_profile, deletePatientSupport, doctorLogin, DoctorOtpSend, doctorPrice, doctorVerifyForgotOtp, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getOneHourSlots, getServiceFromId, getServicesByDoctorId, isBookingCompleted, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, registerPatient, resetDoctorPassword, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp, verifyPatientOtp } from "../controllers/doctor.controller.js";
+import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientJournal, patientJournalAll, patientVerifyForgotOtp, post_support, rescheduleBooking, resetPatientPassword, signInPatientFromGoogle, update_support, updateJounal, updatePatientProfile } from "../controllers/patient.controller.js";
 import { creator_profile,approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile,statusOfContent , articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId} from "../controllers/admin.controller.js";
 import {eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager } from "../controllers/manager.controller.js";
 import { patientVideoCallStart, patinetDeclineVideoCall, testFirebase, testFirebasePatient } from "../controllers/push_notification/notification.js";
@@ -150,9 +150,6 @@ router.get('/get/patient/journal/:patientId',patientJournalAll)
 router.delete('/delete/journal/:journalId',deleteJournal)
 
 
-// doctor forgort password 
-router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
-router.post('/doctor/reset/password',DoctorResetPassword)
 
 
 router.post('/doctor/login',doctorLogin)
@@ -167,10 +164,6 @@ router.post('/booking/:patientId/:doctorId',bookSlot)
 router.post('/reschedule/booking/:doctorId/:bookingId',rescheduleBooking)
 
 
-
-
-
-
 router.post('/login/patient',loginPatient)
 router.post('/:patientId/support',post_support)
 router.put('/update/:patientId/:supportId',update_support)
@@ -179,9 +172,11 @@ router.delete('/delete/:supportId',delete_support)
 router.post('/mood/:patientId',mood)
 router.get('/get/:patientId/mood',get_mood)
 
+// doctor forgort password 
+router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
+router.post('/doctor/verify/forgot/otp/:doctorId',doctorVerifyForgotOtp)
+router.put('/doctor/reset/password/:doctorId',resetDoctorPassword)
 
-router.post('/forgot/password',otpSend)
-router.post('/reset/password',resetPassword)
 
 
 // admin routes
@@ -290,12 +285,17 @@ router.put('/update/doctor/profile/:doctorId',upload.single('doctorProfile'),upd
 router.post('/mark/session/completed',isBookingCompleted)
 
 
-// patient registration
+// PATIENT APIS -->
 router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/profile/:patientId',getPatientProfile)
 router.post('/register/patient',upload.single('patientImage'),registerPatient)
 router.post('/verify/patient/otp',verifyPatientOtp)
 router.put('/update/patient/profile/:patientId',upload.single('patientProfile'),updatePatientProfile)
+// patient forgot pswd
+router.post('/patient/forgot/password/send/otp',otpSend)
+router.post('/patient/verify/forgot/otp/:patientId',patientVerifyForgotOtp)
+router.put('/patient/reset/password/:patient',resetPatientPassword)
+
 
 // managers Notification
 router.get('/get/manager/:managerId/unread/notification',getManagerUnreadNotification)

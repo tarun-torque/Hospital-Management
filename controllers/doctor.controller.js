@@ -1480,6 +1480,7 @@ export const getAllAvailableSlots = async (req, res) => {
 
 
 // doctor forgot password :
+//  ------send otp to the doctor
 export const DoctorOtpSend = async (req, res) => {
     try {
         const { email } = req.body;
@@ -1490,7 +1491,6 @@ export const DoctorOtpSend = async (req, res) => {
         // otp
         const otp = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otp }, process.env.SECRET_KEY, { expiresIn: '2m' })
-
         // store otp in db
         const saveOtp = await prisma.doctor.update({ where: { email }, data: { otp: otpToken } })
 
@@ -1501,7 +1501,7 @@ export const DoctorOtpSend = async (req, res) => {
             subject: 'OTP to reset Password',
             html:
                 `
-            Dear ${isDoctor.doctor_name},
+            Dear ${isDoctor.doctorName},
 
             <p>We received a request to change your password.To proceed, please use the One-Time Password (OTP) provided below. </p>
 
@@ -1552,40 +1552,61 @@ export const DoctorOtpSend = async (req, res) => {
     }
 }
 
-// doctor reset password
-export const DoctorResetPassword = async (req, res) => {
+// doctor verify otp :  
+export const doctorVerifyForgotOtp = async (req, res) => {
+    const doctorId = +req.params.doctorId
+    const { otp } = req.body
     try {
-        const { otp, email, newPassword } = req.body;
-        const checkOtp = await prisma.doctor.findUnique({ where: { email } })
+        if (otp) {
+            return res.status(400).json({ status: 400, msg: 'OTP is required' })
+        }
+        const checkOtp = await prisma.doctor.findUnique({ where: { id: doctorId } })
 
         if (!checkOtp) {
-            return res.status(400).json({ msg: 'Invalid Email or OTP' })
+            return res.status(400).json({ msg: 'Invalid Or Expired OTP' })
         }
 
         if (checkOtp.otp === null) {
-            return res.status(400).json({ msg: 'Invalid Email or OTP' })
+            return res.status(400).json({ status: 400, msg: 'Invalid Email or OTP' })
         }
 
         // verify otp
         const decodedOtp = jwt.verify(checkOtp.otp, process.env.SECRET_KEY)
 
         if (decodedOtp.otp !== otp) {
-            return res.status(400).json({ msg: 'Invalid OTP' })
+            return res.status(400).json({ status: 400, msg: 'Invalid OTP' })
         }
-
-        // hash password
-        const salt = bcrypt.genSaltSync(10)
-        const hash_pass = bcrypt.hashSync(newPassword, salt)
-
-        // update password in database 
-        const updatePassword = await prisma.doctor.update({ where: { email }, data: { password: hash_pass } })
-        res.status(200).json({ status: 200, msg: 'Password reset successful' })
-
+        res.status(200).json({ status: 200, msg: 'OTP is verified' })
     } catch (error) {
-        res.status(400).json({ message: 'Invalid or expired OTP' })
         console.log(error)
+        if (error.message === 'jwt expired') {
+            return res.status(400).json({ status: 400, msg: 'OTP is invalid or expired' })
+        }
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
+// reset doctor password 
+export const resetDoctorPassword = async (req, res) => {
+    const doctorId = +req.params.doctorId
+    const { newPassword } = req.body
+    try {
+        if (newPassword) {
+            return res.status(400).json({ status: 200, msg: 'New Password is required' })
+        }
+        //  hash password
+        const salt = bcrypt.genSaltSync(10)
+        const hash_pass = bcrypt.hashSync(newPassword, salt)
+        const updatePswd = await prisma.doctor.update({ where: { id: doctorId }, data: { password: hash_pass } })
+        res.status(200).json({ status: 200, msg: 'Password reset Succesfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+
 
 // to get category from doctor id 
 export const getCategoriesByDoctorId = async (req, res) => {
@@ -1787,8 +1808,8 @@ export const registerPatient = async (req, res) => {
             }
         }
 
-        if(!fileInfo){
-            return res.status(400).json({ status: 400, msg:'Profile Image is required' })
+        if (!fileInfo) {
+            return res.status(400).json({ status: 400, msg: 'Profile Image is required' })
         }
 
         const fileType = fileInfo.mimetype
@@ -1812,7 +1833,7 @@ export const registerPatient = async (req, res) => {
         const otpNumber = Math.floor(1000 + Math.random() * 9000).toString();
         const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
 
-        const data = { dob, contactNumber, profileUrl:fileInfo.path, country, gender, patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
+        const data = { dob, contactNumber, profileUrl: fileInfo.path, country, gender, patientName, password: hash_pswd, email, fcmToken, otp: otpToken }
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,
@@ -1917,14 +1938,14 @@ export const verifyPatientOtp = async (req, res) => {
 //                 const slotStartTimeISO = currentSlotStart.toISOString();
 //                 const slotEndTimeISO = slotEndTime.toISOString();
 
-             
+
 //                 if (currentSlotStart.isBefore(now) || currentSlotStart.isSame(now, 'minute')) {
-                  
+
 //                     currentSlotStart.add(1, 'hours');
 //                     continue;
 //                 }
 
- 
+
 //                 const existingSlot = await prisma.availableSlots.findUnique({
 //                     where: {
 //                         doctorId_startTime_endTime: {
@@ -1946,12 +1967,12 @@ export const verifyPatientOtp = async (req, res) => {
 //                     });
 //                 }
 
-        
+
 //                 currentSlotStart.add(1, 'hours');
 //             }
 //         }
 
-        
+
 //         if (oneHourSlots.length > 0) {
 //             await prisma.availableSlots.createMany({
 //                 data: oneHourSlots,
@@ -1959,7 +1980,7 @@ export const verifyPatientOtp = async (req, res) => {
 //             });
 //         }
 
-    
+
 //         const availableSlots = await prisma.availableSlots.findMany({
 //             where: {
 //                 doctorId: doctorId,
@@ -2070,7 +2091,7 @@ export const getOneHourSlots = async (req, res) => {
         res.status(200).json({
             status: 200,
             count,
-            splitAvailabilities:availableSlots
+            splitAvailabilities: availableSlots
         })
     } catch (error) {
         console.log('Error occurred:', error);
@@ -2083,20 +2104,20 @@ export const getOneHourSlots = async (req, res) => {
 
 
 // to check booking is completely done or not
-export const isBookingCompleted = async(req,res)=>{
+export const isBookingCompleted = async (req, res) => {
     const bookingId = +req.params.bookingId
     try {
-        const isBooking  = await prisma.booking.findUnique({where:{id:bookingId}})
-        if(isBooking){
-            return res.status(400).json({msg:'No Booking found'})
+        const isBooking = await prisma.booking.findUnique({ where: { id: bookingId } })
+        if (isBooking) {
+            return res.status(400).json({ msg: 'No Booking found' })
         }
 
-        const completed = await prisma.booking.update({where:{id:bookingId},data:{isCompleted:'yes'}})
-        res.status(200).json({status:200,msg:'Session completed successfully'})
+        const completed = await prisma.booking.update({ where: { id: bookingId }, data: { isCompleted: 'yes' } })
+        res.status(200).json({ status: 200, msg: 'Session completed successfully' })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -2114,44 +2135,60 @@ export const isBookingCompleted = async(req,res)=>{
 
 export const deleteAllAvailableSlots = async (req, res) => {
     try {
-      // Delete all entries from the availableSlots table
-      await prisma.availableSlots.deleteMany();
-  
-      res.status(200).json({
-        status: 200,
-        message: 'All available slots have been deleted',
-      });
-    } catch (error) {
-      console.error('Error deleting available slots:', error);
-      res.status(500).json({
-        status: 500,
-        message: 'An error occurred while deleting available slots',
-      });
-    }
-  };
-  
+        // Delete all entries from the availableSlots table
+        await prisma.availableSlots.deleteMany();
 
-  // update doctor profile
+        res.status(200).json({
+            status: 200,
+            message: 'All available slots have been deleted',
+        });
+    } catch (error) {
+        console.error('Error deleting available slots:', error);
+        res.status(500).json({
+            status: 500,
+            message: 'An error occurred while deleting available slots',
+        });
+    }
+};
+
+
+// update doctor profile
 export const updateDoctorProfile = async (req, res) => {
     const doctorId = +req.params.doctorId
     const fileInfo = req.file
+    const { contactNumber, description, maximumEducation } = req.body
     try {
-        if (!fileInfo) {
-            return res.status(400).json({ status: 400, msg: 'Profile image is required' })
+        const updatedData = {}
+        if (contactNumber) {
+            updatedData.contactNumber = contactNumber
+        }
+        if (description) {
+            updatedData.description = description
+        }
+        if (maximumEducation) {
+            updatedData.maximumEducation = maximumEducation
         }
 
-        const fileType = fileInfo.mimetype
-        const fileSizeMB = fileInfo.size / (1024 * 1024)
-        const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
-        if (!isImage) {
-            return res.status(400).json({
-                status: 400,
-                msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
-            })
+
+        if (fileInfo) {
+            const fileType = fileInfo.mimetype
+            const fileSizeMB = fileInfo.size / (1024 * 1024)
+            const isImage = (fileType === 'image/jpeg' || fileType === 'image/png') && fileSizeMB <= 2
+            if (!isImage) {
+                return res.status(400).json({
+                    status: 400,
+                    msg: 'Profile Image must  be a JPG or PNG image and size must be less than 2MB',
+                })
+            }
+            updatedData.profileUrl = fileInfo.path
         }
 
-        const updateImage = await prisma.doctor.update({ where: { id: doctorId }, data: { profileUrl: fileInfo.path } })
-        res.status(200).json({ status: 200, msg: 'Profile Image is updated Succesfully' })
+        if (Object.keys(updatedData).length === 0) {
+            return res.status(400).json({status: 400,msg: 'No fields to update'})
+        }
+
+        const update = await prisma.doctor.update({ where: { id: doctorId }, data: updatedData })
+        res.status(200).json({ status: 200, msg: 'Profile is updated Succesfully' })
 
     } catch (error) {
         console.log(error)
