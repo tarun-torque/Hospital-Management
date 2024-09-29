@@ -1243,9 +1243,9 @@ export const bookSlot = async (req, res) => {
         //     },
         // })
         
-        if (existingSlot && existingSlot.isBooked === 'yes') {
-            return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
-        }
+        // if (existingSlot && existingSlot.isBooked === 'yes') {
+        //     return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
+        // }
 
         // Create a booking for the patient with the specified doctor and time slot
         const booking = await prisma.booking.create({
