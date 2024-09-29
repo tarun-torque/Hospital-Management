@@ -1226,15 +1226,9 @@ export const bookSlot = async (req, res) => {
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
 
-    // Check if serviceId is a valid number
-    if (isNaN(serviceId)) {
-        return res.status(400).json({ status: 400, msg: 'Invalid service ID' });
-    }
-
-    console.log("slotStart and slotEndTime", slotStart, slotEnd);
+    console.log("slotStart and slotEndTime", slotStart, slotEnd)
 
     try {
-        // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000);
         const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000);
 
@@ -1253,7 +1247,7 @@ export const bookSlot = async (req, res) => {
                     },
                 ],
             },
-        });
+        })
 
         if (existingBooking) {
             return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
@@ -1267,7 +1261,7 @@ export const bookSlot = async (req, res) => {
                 slotStart: slotStartTime.toISOString(),
                 slotEnd: slotEndTime.toISOString(),
                 channelName,
-                serviceId,  // Ensure serviceId is passed correctly
+                serviceId, 
                 notes
             },
         });
@@ -1307,9 +1301,8 @@ export const bookSlot = async (req, res) => {
 
         // Notify the doctor
         const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
-        const token = doctor?.fcmToken;
-
-        const title = 'Appointment Booked';
+        const token = doctor.fcmToken
+        const title = 'Appointment Booked'
         const body = `Appointment Booked on ${formattedStartDate} at ${formattedStartTime} - ${formattedEndTime}.`;
 
         await toDoctor(title, body, channelName, token);
@@ -1324,7 +1317,7 @@ export const bookSlot = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Error booking slot' });
     }
-};
+}
 
 
 // get all available slots
