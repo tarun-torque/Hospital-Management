@@ -2,7 +2,6 @@ import { Router } from "express";
 import multer from "multer";
 import path from 'path'
 import fs from 'fs'
-import bcrypt from 'bcryptjs'
 const router = Router()
 
 import {create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator } from "../controllers/creater.controller.js";
@@ -172,10 +171,6 @@ router.delete('/delete/:supportId',delete_support)
 router.post('/mood/:patientId',mood)
 router.get('/get/:patientId/mood',get_mood)
 
-// doctor forgort password 
-router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
-router.post('/doctor/verify/forgot/otp/:doctorId',doctorVerifyForgotOtp)
-router.put('/doctor/reset/password/:doctorId',resetDoctorPassword)
 
 
 
@@ -275,17 +270,22 @@ router.get('/get/booking/:patientId',getBookingOfPatient)
 router.get('/get/category/from/:doctorId',getCategoriesByDoctorId)
 
 
-// doctor registration
+// DOCTOR APIs  -->
 router.post('/doctor/google/signIn',signInDoctorFromGoogle)
 router.get('/get/doctor/profile/:doctorId',getDoctorProfile)
 router.post('/register/doctor',registerDoctor)
 router.post('/verify/doctor/otp',verifyDoctorOtp)
 router.post('/doctor/:doctorId/completeProfile', upload.fields([{ name: 'doctorProfile' }, { name: 'doctorDocument' }]), completeDoctorProfile)
 router.put('/update/doctor/profile/:doctorId',upload.single('doctorProfile'),updateDoctorProfile)
+// doctor forgort password 
+router.post('/doctor/forgot/password/send/otp',DoctorOtpSend)
+router.post('/doctor/verify/forgot/otp/:doctorId',doctorVerifyForgotOtp)
+router.put('/doctor/reset/password/:doctorId',resetDoctorPassword)
 router.post('/mark/session/completed',isBookingCompleted)
 
 
-// PATIENT APIS -->
+
+// PATIENT APIs -->
 router.post('/patient/signIn/google',signInPatientFromGoogle)
 router.get('/get/patient/profile/:patientId',getPatientProfile)
 router.post('/register/patient',upload.single('patientImage'),registerPatient)
@@ -294,7 +294,7 @@ router.put('/update/patient/profile/:patientId',upload.single('patientProfile'),
 // patient forgot pswd
 router.post('/patient/forgot/password/send/otp',otpSend)
 router.post('/patient/verify/forgot/otp/:patientId',patientVerifyForgotOtp)
-router.put('/patient/reset/password/:patient',resetPatientPassword)
+router.put('/patient/reset/password/:patientId',resetPatientPassword)
 
 
 // managers Notification
