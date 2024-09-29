@@ -1221,20 +1221,23 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName, notes } = req.body
-    const serviceId = +req.params.serviceId
+    const { slotStart, slotEnd, channelName, notes } = req.body;
+    const serviceId = +req.params.serviceId;
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
-    console.log("service", serviceId)
-    console.log("doctor", doctorId)
-    console.log("patient", patientId)
-    
+
+    // Check if serviceId is a valid number
+    if (isNaN(serviceId)) {
+        return res.status(400).json({ status: 400, msg: 'Invalid service ID' });
+    }
+
     console.log("slotStart and slotEndTime", slotStart, slotEnd);
+
     try {
         // Adjust the time by subtracting 5 hours and 30 minutes (if needed)
-        const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
-        const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000); // Adjust to UTC
-        console.log("after substract 5 hr", slotStart, slotEndTime)
+        const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000);
+        const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000);
+
         // Check if the slot is already booked
         const existingBooking = await prisma.booking.findFirst({
             where: {
@@ -1250,7 +1253,8 @@ export const bookSlot = async (req, res) => {
                     },
                 ],
             },
-        })
+        });
+
         if (existingBooking) {
             return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         }
@@ -1260,39 +1264,38 @@ export const bookSlot = async (req, res) => {
             data: {
                 patientId,
                 doctorId,
-                slotStart: slotStartTime.toISOString(), // Use adjusted time
-                slotEnd: slotEndTime.toISOString(), // Use adjusted time
+                slotStart: slotStartTime.toISOString(),
+                slotEnd: slotEndTime.toISOString(),
                 channelName,
-                serviceId,
+                serviceId,  // Ensure serviceId is passed correctly
                 notes
             },
         });
 
-        // Directly extract slotStart and slotEnd from the booking object
+        // Extract and adjust times for the response
         const startDate = new Date(booking.slotStart);
         const endDate = new Date(booking.slotEnd);
 
-        const adjustedStartDate = new Date(startDate.getTime() + 5.5 * 60 * 60 * 1000)
-        const adjustedEndDate = new Date(endDate.getTime() + 5.5 * 60 * 60 * 1000)
+        const adjustedStartDate = new Date(startDate.getTime() + 5.5 * 60 * 60 * 1000);
+        const adjustedEndDate = new Date(endDate.getTime() + 5.5 * 60 * 60 * 1000);
 
-        // Convert ISO to a human-readable format using toLocaleString (adjust locale as needed)
         const formattedStartDate = adjustedStartDate.toLocaleString('en-US', {
             month: 'short',
             day: 'numeric',
             year: 'numeric',
-        })
+        });
 
         const formattedStartTime = adjustedStartDate.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        })
+        });
 
         const formattedEndTime = adjustedEndDate.toLocaleString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
             hour12: true,
-        })
+        });
 
         // Increment the noOfBooking for the doctor
         await prisma.doctor.update({
@@ -1300,39 +1303,28 @@ export const bookSlot = async (req, res) => {
             data: {
                 noOfBooking: { increment: 1 }
             },
-        })
+        });
 
-        // await prisma.availableSlots.update({
-        //     where: {
-        //         doctorId: doctorId, startTime:slotStartTime, endTime:slotEndTime
-        //     },
-        //     data: { isBooked: 'yes' }
-        // })
-
-
-
-
+        // Notify the doctor
         const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
-        const token = doctor.fcmToken;
+        const token = doctor?.fcmToken;
 
         const title = 'Appointment Booked';
         const body = `Appointment Booked on ${formattedStartDate} at ${formattedStartTime} - ${formattedEndTime}.`;
 
-        // Send notification to doctor
         await toDoctor(title, body, channelName, token);
 
         // Respond with success message and booking details
         res.status(200).json({
             status: 200,
             msg: 'Slot booked successfully',
-            booking,
-            nextAvailableTime: nextAvailableTime.toISOString(),
+            booking
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Error booking slot' });
     }
-}
+};
 
 
 // get all available slots

@@ -251,7 +251,7 @@ router.put('/update/journal/:journalId', updateJounal)
 router.get('/get/patient/journal/:patientId', patientJournalAll)
 router.delete('/delete/journal/:journalId', deleteJournal)
 router.get('/doctor/:doctorId/availability', getAvailableSlotsDoctor)
-router.post('/booking/:patientId/:doctorId', bookSlot)
+router.post('/booking/:patientId/:doctorId/:serviceId', bookSlot)
 router.post('/reschedule/booking/:doctorId/:bookingId', rescheduleBooking)
 router.get('/get/booking/:patientId', getBookingOfPatient)
 
