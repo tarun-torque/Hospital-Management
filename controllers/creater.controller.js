@@ -1,10 +1,7 @@
 import 'dotenv/config'
 import prisma from '../DB/db.config.js'
-// import creator_vaidation from '../validations/validatons.js';
-import vine from '@vinejs/vine';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { messages } from '@vinejs/vine/defaults';
 import extractContent from '../utils/htmlExtractor.js';
 
 
@@ -12,21 +9,15 @@ import extractContent from '../utils/htmlExtractor.js';
 // login creator
 export const login_creator = async (req, res) => {
     try {
-
         const { email, password } = req.body;
-
         const isCreator = await prisma.creator.findUnique({ where: { email } })
-
         if (!isCreator) {
             return res.status(404).json({ message: 'Incorrect Email or Password' })
         }
-
         const isPassword = bcrypt.compareSync(password, isCreator.password)
-
         if (!isPassword) {
             return res.status(404).json({ message: 'Incorrect Email or Password' })
         }
-
         const data = {
             role:isCreator.role,
             id: isCreator.id,
@@ -36,12 +27,80 @@ export const login_creator = async (req, res) => {
             language: isCreator.language,
             profile_path: isCreator.profile_path
         }
-        
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
         res.status(200).json({status:200, messages: 'Logged In', token: token, id: isCreator.id,profile:isCreator})
-
     } catch (error) {
         res.status(400).json({ message: error.message })
+    }
+}
+
+// creator search bar
+export const creatorSearchBar = async (req, res) => {
+    const { creatorId } = req.params;
+    const { query } = req.query;
+
+    try {
+
+        const creatorDetails = await prisma.creator.findUnique({
+            where: { id: parseInt(creatorId) },
+            include: {
+                yt_contents: {
+                    where: {
+                        OR: [
+                            { heading: { contains: query, mode: 'insensitive' } },
+                            { content: { contains: query, mode: 'insensitive' } },
+                            { tags: { has: query } }
+                        ],
+                    },
+                    select: {
+                        heading: true,
+                        content: true,
+                        views: true,
+                        tags: true,
+                        verified: true
+                    }
+                },
+                blog_contents: {
+                    where: {
+                        OR: [
+                            { content: { contains: query, mode: 'insensitive' } },
+                            { tags: { has: query } }
+                        ]
+                    },
+                    select: {
+                        content: true,
+                        tags: true,
+                        views: true,
+                        verified: true
+                    }
+                },
+                article_content: {
+                    where: {
+                        OR: [
+                            { heading: { contains: query, mode: 'insensitive' } },
+                            { content: { contains: query, mode: 'insensitive' } },
+                            { tags: { has: query } }
+                        ]
+                    },
+                    select: {
+                        heading: true,
+                        content: true,
+                        articleImagePath: true,
+                        views: true,
+                        verified: true
+                    }
+                }
+            }
+        });
+
+        if (!creatorDetails) {
+            return res.status(404).json({ status: 404, msg: 'No results found' });
+        }
+
+        res.status(200).json({ status: 200, creatorDetails });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
 }
 

@@ -483,76 +483,6 @@ export const managerSearchBar = async (req, res) => {
     }
 }
 
-// creator dashboard search bar
-export const creatorSearchBar = async (req, res) => {
-    const { creatorId } = req.params;
-    const { query } = req.query;
-
-    try {
-
-        const creatorDetails = await prisma.creator.findUnique({
-            where: { id: parseInt(creatorId) },
-            include: {
-                yt_contents: {
-                    where: {
-                        OR: [
-                            { heading: { contains: query, mode: 'insensitive' } },
-                            { content: { contains: query, mode: 'insensitive' } },
-                            { tags: { has: query } }
-                        ],
-                    },
-                    select: {
-                        heading: true,
-                        content: true,
-                        views: true,
-                        tags: true,
-                        verified: true
-                    }
-                },
-                blog_contents: {
-                    where: {
-                        OR: [
-                            { content: { contains: query, mode: 'insensitive' } },
-                            { tags: { has: query } }
-                        ]
-                    },
-                    select: {
-                        content: true,
-                        tags: true,
-                        views: true,
-                        verified: true
-                    }
-                },
-                article_content: {
-                    where: {
-                        OR: [
-                            { heading: { contains: query, mode: 'insensitive' } },
-                            { content: { contains: query, mode: 'insensitive' } },
-                            { tags: { has: query } }
-                        ]
-                    },
-                    select: {
-                        heading: true,
-                        content: true,
-                        articleImagePath: true,
-                        views: true,
-                        verified: true
-                    }
-                }
-            }
-        });
-
-        if (!creatorDetails) {
-            return res.status(404).json({ status: 404, msg: 'No results found' });
-        }
-
-        res.status(200).json({ status: 200, creatorDetails });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ status: 500, msg: 'Something went wrong' });
-    }
-};
-
 
 
 //get doctor profile
@@ -1291,7 +1221,8 @@ export const getAvailableSlotsDoctor = async (req, res) => {
 
 // to book slot 
 export const bookSlot = async (req, res) => {
-    const { slotStart, slotEnd, channelName, serviceTitle, notes } = req.body;
+    const { slotStart, slotEnd, channelName,notes } = req.body
+    const serviceId = +req.params.serviceId
     const patientId = +req.params.patientId;
     const doctorId = +req.params.doctorId;
     console.log("slotStart and slotEndTime", slotStart, slotEnd);
@@ -1328,7 +1259,7 @@ export const bookSlot = async (req, res) => {
                 slotStart: slotStartTime.toISOString(), // Use adjusted time
                 slotEnd: slotEndTime.toISOString(), // Use adjusted time
                 channelName,
-                serviceTitle,
+                serviceId,
                 notes
             },
         });
@@ -1386,13 +1317,6 @@ export const bookSlot = async (req, res) => {
         // Send notification to doctor
         await toDoctor(title, body, channelName, token);
 
-
-
-
-        // Calculate the next available time with a 2-minute buffer
-        const nextAvailableTime = new Date(slotEndTime);
-        nextAvailableTime.setMinutes(nextAvailableTime.getMinutes() + 2);
-
         // Respond with success message and booking details
         res.status(200).json({
             status: 200,
@@ -1405,6 +1329,8 @@ export const bookSlot = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Error booking slot' });
     }
 }
+
+
 // get all available slots
 export const getAllAvailableSlots = async (req, res) => {
     const today = new Date();
