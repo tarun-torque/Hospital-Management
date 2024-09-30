@@ -485,14 +485,13 @@ export const otpSend = async (req, res) => {
 
 // reset patient password  
 export const patientVerifyForgotOtp = async (req, res) => {
-    const { otp } = req.body
-    const patientId = +req.params.patientId
+    const { otp,email } = req.body
     try {
         if (otp) {
             return res.status(400).json({ status: 400, msg: 'OTP is required' })
         }
 
-        const checkOtp = await prisma.patient.findUnique({ where: { id: patientId } })
+        const checkOtp = await prisma.patient.findUnique({ where: { email } })
 
         if (!checkOtp) {
             return res.status(400).json({ status: 400, msg: 'Invalid Email or OTP' })
@@ -519,8 +518,7 @@ export const patientVerifyForgotOtp = async (req, res) => {
 
 // patient reset password
 export const resetPatientPassword = async (req, res) => {
-    const patientId = +req.params.patientId
-    const { newPassword } = req.body
+    const { newPassword,email } = req.body
     try {
         if (newPassword) {
             return res.status(400).json({ status: 200, msg: 'New Password is required' })
@@ -528,7 +526,7 @@ export const resetPatientPassword = async (req, res) => {
         //  hash password 
         const salt = bcrypt.genSaltSync(10)
         const hash_pass = bcrypt.hashSync(newPassword, salt)
-        const updatePswd = await prisma.patient.update({ where: { id: patientId }, data: { password: hash_pass } })
+        const updatePswd = await prisma.patient.update({ where: { email }, data: { password: hash_pass } })
         res.status(200).json({ status: 200, msg: 'Password reset Succesfully' })
     } catch (error) {
         console.log(error)

@@ -1477,13 +1477,12 @@ export const DoctorOtpSend = async (req, res) => {
 
 // doctor verify otp :  
 export const doctorVerifyForgotOtp = async (req, res) => {
-    const doctorId = +req.params.doctorId
-    const { otp } = req.body
+    const { otp ,email} = req.body
     try {
         if (otp) {
             return res.status(400).json({ status: 400, msg: 'OTP is required' })
         }
-        const checkOtp = await prisma.doctor.findUnique({ where: { id: doctorId } })
+        const checkOtp = await prisma.doctor.findUnique({ where: { email } })
 
         if (!checkOtp) {
             return res.status(400).json({ msg: 'Invalid Or Expired OTP' })
@@ -1511,8 +1510,7 @@ export const doctorVerifyForgotOtp = async (req, res) => {
 
 // reset doctor password 
 export const resetDoctorPassword = async (req, res) => {
-    const doctorId = +req.params.doctorId
-    const { newPassword } = req.body
+    const { newPassword,email } = req.body
     try {
         if (newPassword) {
             return res.status(400).json({ status: 200, msg: 'New Password is required' })
@@ -1520,7 +1518,7 @@ export const resetDoctorPassword = async (req, res) => {
         //  hash password
         const salt = bcrypt.genSaltSync(10)
         const hash_pass = bcrypt.hashSync(newPassword, salt)
-        const updatePswd = await prisma.doctor.update({ where: { id: doctorId }, data: { password: hash_pass } })
+        const updatePswd = await prisma.doctor.update({ where: { email }, data: { password: hash_pass } })
         res.status(200).json({ status: 200, msg: 'Password reset Succesfully' })
     } catch (error) {
         console.log(error)
