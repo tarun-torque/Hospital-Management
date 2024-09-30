@@ -777,8 +777,8 @@ export const patientDashboardStats = async (req, res) => {
         const servicesCount = service.length
         // meeting till now
         const meeting = await prisma.booking.findMany({ where: { patientId, isCompleted: 'yes' } })
-        const meetingsCount = meeting.length
-        res.status(200).json({ status: 200, consultantsCount, servicesCount, meetingsCount })
+        const meetingsTillNowCount = meeting.length
+        res.status(200).json({ status: 200, consultantsCount, servicesCount, meetingsTillNowCount })
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
