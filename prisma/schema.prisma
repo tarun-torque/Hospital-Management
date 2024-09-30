@@ -208,11 +208,14 @@ model Support {
 }
 
 model Mood {
-  int             Int     @id @default(autoincrement())
-  patientId       Int
-  patient         Patient @relation(fields: [patientId], references: [id])
-  your_mood_today String
-  note            String //optional 
+  int       Int      @id @default(autoincrement())
+  patientId Int
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  mood      String
+  note      String
+  factor    String? 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // doctor model

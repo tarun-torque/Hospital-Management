@@ -87,7 +87,7 @@ export const updateJounal = async (req, res) => {
 
 // to delete journal 
 export const deleteJournal = async (req, res) => {
-    const journalId = req.params.journalId
+    const journalId = +req.params.journalId
     try {
         const deleteJournal = await prisma.journal.delete({ where: { id: journalId } })
         if (!deleteJournal) {
@@ -637,22 +637,21 @@ export const mood = async (req, res) => {
     try {
         // get info
         const patientId = +req.params.patientId
-        const { your_mood_today, title } = req.body;
+        const { mood, note,factor } = req.body;
 
         // check patient present or not 
         const isPatient = await prisma.patient.findUnique({ where: { patientId } })
         if (!isPatient) {
-            return res.status(404).json({ message: 'Patient is not found' })
+            return res.status(404).json({status:404, msg: 'Patient is not found' })
         }
         // save in db 
-        const info = await prisma.mood.create({ where: { patientId }, data: { your_mood_today, title } })
+        const info = await prisma.mood.create({ where: { patientId }, data: {mood,note,factor} } )
         // send succesfull note 
-        res.status(201).json({ message: 'Thank you' })
+        res.status(201).json({ status:201,msg: 'Thank you' })
 
     } catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
-
+        res.status(500).json({ status:500,msg: error.message })
     }
 }
 // get mood patient
@@ -661,18 +660,18 @@ export const get_mood = async (req, res) => {
         const patientId = +req.params.patientId;
         const isPatient = await prisma.mood.findUnique({ where: { patientId } })
         if (!isPatient) {
-            return res.status(404).json({ message: 'Patient is not found' })
+            return res.status(404).json({ status:404,msg: 'Patient is not found' })
         }
 
         const mood = await prisma.mood.findMany({ where: { patientId } })
         if (mood.length == 0) {
-            return res.status(404).json({ message: 'No mood is post by the patient till now' })
+            return res.status(404).json({ status:404,msg: 'No mood is post by the patient till now' })
         }
-        res.status(200).json({ message: mood })
+        res.status(200).json({ status:200,mood })
 
     } catch (error) {
         console.log(error)
-        res.status(400).json({ message: error.message })
+        res.status(500).json({ status:500,msg: error.message })
 
     }
 }
