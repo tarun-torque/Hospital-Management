@@ -1479,7 +1479,7 @@ export const DoctorOtpSend = async (req, res) => {
 export const doctorVerifyForgotOtp = async (req, res) => {
     const { otp ,email} = req.body
     try {
-        if (otp) {
+        if (!otp) {
             return res.status(400).json({ status: 400, msg: 'OTP is required' })
         }
         const checkOtp = await prisma.doctor.findUnique({ where: { email } })
@@ -1512,7 +1512,7 @@ export const doctorVerifyForgotOtp = async (req, res) => {
 export const resetDoctorPassword = async (req, res) => {
     const { newPassword,email } = req.body
     try {
-        if (newPassword) {
+        if (! newPassword) {
             return res.status(400).json({ status: 200, msg: 'New Password is required' })
         }
         //  hash password

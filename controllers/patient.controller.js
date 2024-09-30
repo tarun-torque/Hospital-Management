@@ -487,7 +487,7 @@ export const otpSend = async (req, res) => {
 export const patientVerifyForgotOtp = async (req, res) => {
     const { otp,email } = req.body
     try {
-        if (otp) {
+        if (!otp) {
             return res.status(400).json({ status: 400, msg: 'OTP is required' })
         }
 
@@ -520,7 +520,7 @@ export const patientVerifyForgotOtp = async (req, res) => {
 export const resetPatientPassword = async (req, res) => {
     const { newPassword,email } = req.body
     try {
-        if (newPassword) {
+        if ( ! newPassword) {
             return res.status(400).json({ status: 200, msg: 'New Password is required' })
         }
         //  hash password 
