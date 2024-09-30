@@ -2021,7 +2021,7 @@ export const getOneHourSlots = async (req, res) => {
             msg: 'Something went wrong'
         });
     }
-};
+}
 
 
 // to check booking is completely done or not
@@ -2030,12 +2030,10 @@ export const isBookingCompleted = async (req, res) => {
     try {
         const isBooking = await prisma.booking.findUnique({ where: { id: bookingId } })
         if (isBooking) {
-            return res.status(400).json({ msg: 'No Booking found' })
+            return res.status(404).json({sttatus:404,msg: 'No Booking found' })
         }
-
         const completed = await prisma.booking.update({ where: { id: bookingId }, data: { isCompleted: 'yes' } })
         res.status(200).json({ status: 200, msg: 'Session completed successfully' })
-
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
@@ -2111,6 +2109,26 @@ export const updateDoctorProfile = async (req, res) => {
         const update = await prisma.doctor.update({ where: { id: doctorId }, data: updatedData })
         res.status(200).json({ status: 200, msg: 'Profile is updated Succesfully' })
 
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// doctor dashboard stats
+export const doctorDashboardStats = async (req, res) => {
+    const doctorId = +req.params.doctorId
+    try {
+        // upcoming session
+        const session = await prisma.booking.findMany({ where: { doctorId,isCompleted: 'no' } })
+        const upcommingSessionCount = session.length
+        // total services
+        const service = await prisma.doctorService.findMany({where:{doctorId}})
+        const servicesCount = service.length
+        // meetings till now
+        const meeting = await prisma.booking.findMany({ where: { doctorId, isCompleted: 'yes' } })
+        const meetingsCount = meeting.length
+        res.status(200).json({ status: 200, upcommingSessionCount, servicesCount, meetingsCount })
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })

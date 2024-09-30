@@ -8,6 +8,7 @@ import { fileURLToPath, parse } from 'url';
 import { dirname, join } from 'path';
 import exp from "constants";
 import { title } from "process";
+import { consultants } from "./admin.controller.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -485,7 +486,7 @@ export const otpSend = async (req, res) => {
 
 // reset patient password  
 export const patientVerifyForgotOtp = async (req, res) => {
-    const { otp,email } = req.body
+    const { otp, email } = req.body
     try {
         if (!otp) {
             return res.status(400).json({ status: 400, msg: 'OTP is required' })
@@ -518,9 +519,9 @@ export const patientVerifyForgotOtp = async (req, res) => {
 
 // patient reset password
 export const resetPatientPassword = async (req, res) => {
-    const { newPassword,email } = req.body
+    const { newPassword, email } = req.body
     try {
-        if ( ! newPassword) {
+        if (!newPassword) {
             return res.status(400).json({ status: 200, msg: 'New Password is required' })
         }
         //  hash password 
@@ -637,21 +638,21 @@ export const mood = async (req, res) => {
     try {
         // get info
         const patientId = +req.params.patientId
-        const { mood, note,factor } = req.body;
+        const { mood, note, factor } = req.body;
 
         // check patient present or not 
         const isPatient = await prisma.patient.findUnique({ where: { patientId } })
         if (!isPatient) {
-            return res.status(404).json({status:404, msg: 'Patient is not found' })
+            return res.status(404).json({ status: 404, msg: 'Patient is not found' })
         }
         // save in db 
-        const info = await prisma.mood.create({ where: { patientId }, data: {mood,note,factor} } )
+        const info = await prisma.mood.create({ where: { patientId }, data: { mood, note, factor } })
         // send succesfull note 
-        res.status(201).json({ status:201,msg: 'Thank you' })
+        res.status(201).json({ status: 201, msg: 'Thank you' })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({ status:500,msg: error.message })
+        res.status(500).json({ status: 500, msg: error.message })
     }
 }
 // get mood patient
@@ -660,18 +661,18 @@ export const get_mood = async (req, res) => {
         const patientId = +req.params.patientId;
         const isPatient = await prisma.mood.findUnique({ where: { patientId } })
         if (!isPatient) {
-            return res.status(404).json({ status:404,msg: 'Patient is not found' })
+            return res.status(404).json({ status: 404, msg: 'Patient is not found' })
         }
 
         const mood = await prisma.mood.findMany({ where: { patientId } })
         if (mood.length == 0) {
-            return res.status(404).json({ status:404,msg: 'No mood is post by the patient till now' })
+            return res.status(404).json({ status: 404, msg: 'No mood is post by the patient till now' })
         }
-        res.status(200).json({ status:200,mood })
+        res.status(200).json({ status: 200, mood })
 
     } catch (error) {
         console.log(error)
-        res.status(500).json({ status:500,msg: error.message })
+        res.status(500).json({ status: 500, msg: error.message })
 
     }
 }
@@ -754,10 +755,30 @@ export const updatePatientProfile = async (req, res) => {
         }
 
         if (Object.keys(updatedData).length === 0) {
-            return res.status(400).json({status: 400,msg: 'No fields to update'})
+            return res.status(400).json({ status: 400, msg: 'No fields to update' })
         }
-        const update = await prisma.patient.update({ where: { id: patientId }, data:updatedData })
+        const update = await prisma.patient.update({ where: { id: patientId }, data: updatedData })
         res.status(200).json({ status: 200, msg: 'Profile  is updated Succesfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// patient dashboard stats
+export const patientDashboardStats = async (req, res) => {
+    const patientId = +req.params.patientId
+    try {
+        // total consultant
+        const consultant = await prisma.doctor.findMany({ where: { verified: 'yes' } })
+        const consultantsCount = consultant.length
+        // total services
+        const service = await prisma.service.findMany()
+        const servicesCount = service.length
+        // meeting till now
+        const meeting = await prisma.booking.findMany({ where: { patientId, isCompleted: 'yes' } })
+        const meetingsCount = meeting.length
+        res.status(200).json({ status: 200, consultantsCount, servicesCount, meetingsCount })
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
