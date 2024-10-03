@@ -642,7 +642,7 @@ export const mood = async (req, res) => {
         const { mood, note, factor } = req.body;
 
         // save in db 
-        const info = await prisma.mood.create({ where: { patientId }, data: { mood, note, factor } })
+        const info = await prisma.mood.create({data: { mood, note, factor } })
         // send succesfull note 
         res.status(201).json({ status: 201, msg: 'Thank you' })
 
