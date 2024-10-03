@@ -641,11 +641,6 @@ export const mood = async (req, res) => {
         const patientId = +req.params.patientId
         const { mood, note, factor } = req.body;
 
-        // check patient present or not 
-        const isPatient = await prisma.patient.findUnique({ where: { patientId } })
-        if (!isPatient) {
-            return res.status(404).json({ status: 404, msg: 'Patient is not found' })
-        }
         // save in db 
         const info = await prisma.mood.create({ where: { patientId }, data: { mood, note, factor } })
         // send succesfull note 
