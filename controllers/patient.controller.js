@@ -9,6 +9,7 @@ import { dirname, join } from 'path';
 import exp from "constants";
 import { title } from "process";
 import { consultants } from "./admin.controller.js";
+import { assert } from "console";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -658,22 +659,19 @@ export const mood = async (req, res) => {
 // get mood patient
 export const get_mood = async (req, res) => {
     try {
-        const patientId = +req.params.patientId;
-        const isPatient = await prisma.mood.findUnique({ where: { patientId } })
+        const patientId = +req.params.patientId
+        const isPatient = await prisma.mood.findFirst({ where: { patientId } })
         if (!isPatient) {
             return res.status(404).json({ status: 404, msg: 'Patient is not found' })
         }
-
         const mood = await prisma.mood.findMany({ where: { patientId } })
-        if (mood.length == 0) {
+        if (mood.length === 0) {
             return res.status(404).json({ status: 404, msg: 'No mood is post by the patient till now' })
         }
         res.status(200).json({ status: 200, mood })
-
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: error.message })
-
     }
 }
 
@@ -782,5 +780,19 @@ export const patientDashboardStats = async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+// patient upcomming session 
+export const patinetUpcommingSession = async(req,res)=>{
+    const patientId = +req.params.patientId
+    try {
+        const upcomingSession = await prisma.patient.findMany({where:{patientId,isCompleted:'no'}})
+        const service = await prisma.service.findUnique({where:{serviceId:upcomingSession.serviceId}})
+        res.status(200).json({status:200,upcomingSession,serviceTitle:service.title})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status:500,msg:'Something went wrong'})
     }
 }
