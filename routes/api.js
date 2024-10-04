@@ -259,7 +259,6 @@ router.get('/patient/dashboard/stats/:patientId', patientAuthInfo, patientDashbo
 router.get('/get/patient/upcomming/session/:patientId', patinetUpcommingSession)
 router.get('get/patient/session/history/:bookingId', patientSessionHistory)
 
-
 // router.post('/:patientId/support',post_support)
 // router.put('/update/:patientId/:supportId',update_support)
 // router.get('/get/support/:id',get_support)
@@ -273,6 +272,6 @@ router.get('/test/firebase', testFirebase)
 
 // slots in one hours
 router.delete('/delete', deleteAllAvailableSlots)
-router.get('/limit', apiLimiter, check)
+router.get('/limit',patientAuthInfo,apiLimiter, check)
 
 export default router

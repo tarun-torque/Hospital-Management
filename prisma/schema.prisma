@@ -213,7 +213,7 @@ model Mood {
   patient   Patient  @relation(fields: [patientId], references: [id])
   mood      String
   note      String
-  factor    String? 
+  factor    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -250,7 +250,17 @@ model Doctor {
   availableSlots     availableSlots[]
   doctorServices     DoctorService[]
   doctorPrice        DoctorPrice[]
+  doctorNotification doctorNotification[]
   Rating             Rating[]
+}
+
+model doctorNotification {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  isRead      Boolean @default(false)
+  Doctor      Doctor  @relation(fields: [doctorId], references: [id])
+  doctorId    Int
 }
 
 model DoctorService {
@@ -295,7 +305,7 @@ model Booking {
   channelName String
   notes       String?
   isCompleted String   @default("no")
-  notified Boolean @default(false)
+  notified    Boolean  @default(false)
   Doctor      Doctor   @relation(fields: [doctorId], references: [id])
   Patient     Patient  @relation(fields: [patientId], references: [id])
   Rating      Rating[]
@@ -314,6 +324,7 @@ model Rating {
   Patient   Patient  @relation(fields: [patientId], references: [id])
   Doctor    Doctor   @relation(fields: [doctorId], references: [id])
   Booking   Booking  @relation(fields: [bookingId], references: [id])
+
   @@unique([bookingId, patientId, doctorId])
 }
 

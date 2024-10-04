@@ -1054,9 +1054,9 @@ export const signInDoctorFromGoogle = async (req, res) => {
 
 // login doctor
 export const doctorLogin = async (req, res) => {
-
     try {
-        const { email, password, fcmToken } = req.body;
+        const { email, password, fcmToken } = req.body
+        console.log(fcmToken)
         const doctor = await prisma.doctor.findUnique({ where: { email } })
         if (doctor) {
             var isPassword = bcrypt.compareSync(password, doctor.password)
@@ -2129,7 +2129,6 @@ export const doctorDashboardStats = async (req, res) => {
     }
 }
 
-
 // doctor session history
 export const doctorSessionHistory = async (req, res) => {
     const bookingId = +req.params.bookingId
@@ -2163,3 +2162,6 @@ export const doctorSessionHistory = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
+// doctor notification mark as read 
+// get doctor notification
