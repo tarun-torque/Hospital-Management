@@ -219,7 +219,7 @@ router.put('/doctor/update/price/:doctorId/:serviceId', updateDoctorPrice)
 router.get('/get/doctor/price/:doctorId/:serviceId', getDoctorPrice)
 router.post('/doctor/add/service', addDoctorService)
 router.get('/doctor/dashboard/stats/:doctorId', doctorDashboardStats)
-router.get('get/doctor/session/history/:bookingId', doctorSessionHistory)
+router.get('/get/doctor/session/history/:bookingId', doctorSessionHistory)
 
 
 //                                PATIENT APIs -->
@@ -257,7 +257,7 @@ router.post('/reschedule/booking/:doctorId/:bookingId', rescheduleBooking)
 router.get('/get/booking/:patientId', getBookingOfPatient)
 router.get('/patient/dashboard/stats/:patientId', patientAuthInfo, patientDashboardStats)
 router.get('/get/patient/upcomming/session/:patientId', patinetUpcommingSession)
-router.get('get/patient/session/history/:bookingId', patientSessionHistory)
+router.get('/get/patient/session/history/:bookingId', patientSessionHistory)
 
 // router.post('/:patientId/support',post_support)
 // router.put('/update/:patientId/:supportId',update_support)

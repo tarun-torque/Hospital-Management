@@ -1079,7 +1079,7 @@ export const doctorLogin = async (req, res) => {
             maximum_education: doctor.maximumEducation,
             profile_pic: doctor.profile_pic
         }
-
+        
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
         const updateFcm = await prisma.doctor.update({ where: { email }, data: { fcmToken } })
         res.status(200).json({ status: 200, msg: 'LoggedIn succesfully', token })

@@ -2,7 +2,6 @@ import 'dotenv/config'
 import rateLimit from 'express-rate-limit'
 import jwt from 'jsonwebtoken'
 
-
 export const patientAuthInfo = async(req,res,next)=>{
         const token = req.header('Authorization').replace('Bearer','')
         if(!token){
@@ -12,8 +11,6 @@ export const patientAuthInfo = async(req,res,next)=>{
         const verifyToken = jwt.verify(token,process.env.SECRET_KEY)
         next()
 }
-
-
 
 export const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,  
