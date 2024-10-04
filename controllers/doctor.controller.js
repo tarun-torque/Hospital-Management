@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import exp from 'constants';
 import router from '../routes/api.js';
+import { profile } from 'console';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -2133,7 +2134,7 @@ export const doctorDashboardStats = async (req, res) => {
 export const doctorSessionHistory = async (req, res) => {
     const doctorId = +req.params.doctorId;
     try {
-        const bookings = await prisma.booking.findMany({ where: { doctorId,isCompleted:'yes' } });
+        const bookings = await prisma.booking.findMany({ where: { doctorId, isCompleted: 'yes' } });
 
         if (bookings.length === 0) {
             return res.status(404).json({ status: 404, msg: 'No bookings found for this doctor' });
@@ -2142,7 +2143,7 @@ export const doctorSessionHistory = async (req, res) => {
         const sessionHistories = await Promise.all(bookings.map(async (booking) => {
             const patient = await prisma.patient.findUnique({ where: { id: booking.patientId } });
             const service = await prisma.service.findUnique({ where: { id: booking.serviceId } });
-            const rating = await prisma.rating.findUnique({ 
+            const rating = await prisma.rating.findUnique({
                 where: { bookingId_patientId_doctorId: { bookingId: booking.id, patientId: booking.patientId, doctorId } }
             });
 
@@ -2168,5 +2169,32 @@ export const doctorSessionHistory = async (req, res) => {
 };
 
 
-// doctor notification mark as read 
-// get doctor notification
+// get reviews from doctor id 
+export const getReviewsFromDoctorId = async (req, res) => {
+    const doctorId = +req.params.doctorId
+    try {
+        const reviews = await prisma.rating.findMany({
+            where: { doctorId },
+            select: {
+                stars: true,
+                review: true
+            },
+            patient: {
+                select: {
+                    patientName: true,
+                    profileUrl: true
+                }
+            }
+        })
+
+        if (reviews.length === 0) {
+            return res.status(404).json({ status: 400, msg: 'No review found' })
+        }
+
+        res.status(200).json({ status: 200, reviews })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+
+    }
+}
