@@ -260,6 +260,7 @@ router.get('/patient/dashboard/stats/:patientId', patientAuthInfo, patientDashbo
 router.get('/get/patient/upcomming/session/:patientId',patientUpcomingSessions)
 router.get('/get/patient/session/history/:patientId', patientSessionHistory)
 router.post('/post/continumm/:patientId',patientAuthInfo,apiLimiter,createContinum)
+router.get('')
 
 
 // router.post('/:patientId/support',post_support)

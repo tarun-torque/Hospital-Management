@@ -1973,7 +1973,7 @@ export const getOneHourSlots = async (req, res) => {
                         startTime: slotStartTimeISO,
                         endTime: slotEndTimeISO,
                         doctorId: doctorId,
-                        isBooked: "no", // Default to not booked
+                        isBooked: "no", 
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     });
@@ -2179,7 +2179,7 @@ export const getReviewsFromDoctorId = async (req, res) => {
                 stars: true,
                 review: true
             },
-            patient: {
+            Patient: {
                 select: {
                     patientName: true,
                     profileUrl: true
