@@ -1265,7 +1265,6 @@ export const bookSlot = async (req, res) => {
             },
         })
 
-
         // mark slot as booked
         const markBooked = await prisma.availableSlots.update({
             where: {

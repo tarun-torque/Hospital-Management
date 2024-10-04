@@ -1,5 +1,13 @@
 import rateLimit from 'express-rate-limit'
 
+export const patientAuthInfo = async(req,res,next)=>{
+        const token = req.header('Authorization').replace('Bearer','')
+        console.log(token)
+        next()
+}
+
+
+
 export const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,  
     max: 2,  
