@@ -1232,6 +1232,9 @@ export const bookSlot = async (req, res) => {
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000)
         const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000)
         console.log("after adjust ", slotStartTime, slotEndTime)
+        const slotStartTimeISO = new Date(slotStart).toISOString();
+        const slotEndTimeISO = new Date(slotEnd).toISOString();
+
 
         // check slot is booked
         // const existingSlot = await prisma.availableSlots.findUnique({
@@ -1243,7 +1246,7 @@ export const bookSlot = async (req, res) => {
         //         },
         //     },
         // })
-        
+
         // if (existingSlot && existingSlot.isBooked === 'yes') {
         //     return res.status(400).json({ status: 400, msg: 'Slot is already booked' });
         // }
@@ -1253,21 +1256,21 @@ export const bookSlot = async (req, res) => {
             data: {
                 patientId,
                 doctorId,
-                slotStart: slotStartTime.toISOString(),
-                slotEnd: slotEndTime.toISOString(),
+                slotStart: slotStartTimeISO,
+                slotEnd: slotEndTimeISO,
                 channelName,
-                serviceId, 
+                serviceId,
                 notes
             },
         })
 
-
+        
         // mark slot as booked
         const markBooked = await prisma.availableSlots.update({
             where: {
                 doctorId_startTime_endTime: {
                     doctorId,
-                    startTime: slotStart.toISOString(),
+                    startTime: slotStart.Date(toString()),
                     endTime: slotEnd.toISOString(),
                 },
             },
@@ -1276,7 +1279,7 @@ export const bookSlot = async (req, res) => {
             },
         })
 
-        console.log("after iso",slotStart.toISOString(),slotEnd.toISOString())
+        console.log("after iso", slotStart.toISOString(), slotEnd.toISOString())
 
         // Extract and adjust times for the response
         const startDate = new Date(booking.slotStart);
@@ -1480,7 +1483,7 @@ export const DoctorOtpSend = async (req, res) => {
 
 // doctor verify otp :  
 export const doctorVerifyForgotOtp = async (req, res) => {
-    const { otp ,email} = req.body
+    const { otp, email } = req.body
     try {
         if (!otp) {
             return res.status(400).json({ status: 400, msg: 'OTP is required' })
@@ -1513,9 +1516,9 @@ export const doctorVerifyForgotOtp = async (req, res) => {
 
 // reset doctor password 
 export const resetDoctorPassword = async (req, res) => {
-    const { newPassword,email } = req.body
+    const { newPassword, email } = req.body
     try {
-        if (! newPassword) {
+        if (!newPassword) {
             return res.status(400).json({ status: 200, msg: 'New Password is required' })
         }
         //  hash password
@@ -2033,7 +2036,7 @@ export const isBookingCompleted = async (req, res) => {
     try {
         const isBooking = await prisma.booking.findUnique({ where: { id: bookingId } })
         if (isBooking) {
-            return res.status(404).json({sttatus:404,msg: 'No Booking found' })
+            return res.status(404).json({ sttatus: 404, msg: 'No Booking found' })
         }
         const completed = await prisma.booking.update({ where: { id: bookingId }, data: { isCompleted: 'yes' } })
         res.status(200).json({ status: 200, msg: 'Session completed successfully' })
@@ -2123,10 +2126,10 @@ export const doctorDashboardStats = async (req, res) => {
     const doctorId = +req.params.doctorId
     try {
         // upcoming session
-        const session = await prisma.booking.findMany({ where: { doctorId,isCompleted: 'no' } })
+        const session = await prisma.booking.findMany({ where: { doctorId, isCompleted: 'no' } })
         const upcommingSessionCount = session.length
         // total services
-        const service = await prisma.doctorService.findMany({where:{doctorId}})
+        const service = await prisma.doctorService.findMany({ where: { doctorId } })
         const doctorServicesCount = service.length
         // meetings till now
         const meeting = await prisma.booking.findMany({ where: { doctorId, isCompleted: 'yes' } })
