@@ -353,7 +353,7 @@ model managerNotification {
 
 model continum {
   id        Int     @id @default(autoincrement())
-  value     String
+  value     Int
   Patient   Patient @relation(fields: [patientId], references: [id])
   patientId Int
 }
