@@ -4,9 +4,8 @@ import { doctorReminder, patientReminder } from '../push_notification/notificati
 
 export const reminderAutomate = crons.schedule('* * * * *', async () => {
     const nowUTC = new Date();
-    
     // Add 5 hours and 30 minutes to the current UTC time
-    const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000)); 
+    const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000));
     const tenMinutesLaterIST = new Date(nowIST.getTime() + 10 * 60000);
     console.log("Current IST time is", nowIST.toISOString()); // Log the current IST time
     console.log("Checking for bookings between", nowIST.toISOString(), "and", tenMinutesLaterIST.toISOString());
@@ -24,10 +23,10 @@ export const reminderAutomate = crons.schedule('* * * * *', async () => {
                 const { patientId, doctorId, channelName, id: bookingId } = session
 
                 const findDoctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
-                const doctorFcmToken = findDoctor?.fcmToken; 
+                const doctorFcmToken = findDoctor?.fcmToken;
 
-                const findPatient = await prisma.patientGoogleSingIn.findUnique({ where: { id: patientId } });
-                const patientFcmToken = findPatient?.fcmToken; 
+                const findPatient = await prisma.patient.findUnique({ where: { id: patientId } });
+                const patientFcmToken = findPatient?.fcmToken;
 
                 if (doctorFcmToken) {
                     await doctorReminder(doctorFcmToken);
