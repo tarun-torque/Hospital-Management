@@ -1267,14 +1267,16 @@ export const bookSlot = async (req, res) => {
             where: {
                 doctorId_startTime_endTime: {
                     doctorId,
-                    startTime: slotStart,
-                    endTime: slotEnd,
+                    startTime: slotStart.toISOString(),
+                    endTime: slotEnd.toISOString(),
                 },
             },
             data: {
                 isBooked: 'yes',
             },
         })
+
+        console.log("after iso",slotStart.toISOString(),slotEnd.toISOString())
 
         // Extract and adjust times for the response
         const startDate = new Date(booking.slotStart);
