@@ -1235,6 +1235,7 @@ export const bookSlot = async (req, res) => {
         const slotStartTimeISO = new Date(slotStart).toISOString();
         const slotEndTimeISO = new Date(slotEnd).toISOString();
 
+        console.log("after iso", slotStartTimeISO, slotEndTime)
 
         // check slot is booked
         // const existingSlot = await prisma.availableSlots.findUnique({
@@ -1279,7 +1280,6 @@ export const bookSlot = async (req, res) => {
             },
         })
 
-        console.log("after iso", slotStart.toISOString(), slotEnd.toISOString())
 
         // Extract and adjust times for the response
         const startDate = new Date(booking.slotStart);
