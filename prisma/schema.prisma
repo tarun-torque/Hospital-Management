@@ -314,7 +314,6 @@ model Rating {
   Patient   Patient  @relation(fields: [patientId], references: [id])
   Doctor    Doctor   @relation(fields: [doctorId], references: [id])
   Booking   Booking  @relation(fields: [bookingId], references: [id])
-
   @@unique([bookingId, patientId, doctorId])
 }
 

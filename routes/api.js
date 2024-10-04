@@ -5,8 +5,8 @@ import fs from 'fs'
 const router = Router()
 
 import { create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator, creatorSearchBar } from "../controllers/creater.controller.js";
-import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, deleteAllAvailableSlots, deleteDoctor_profile, deletePatientSupport, doctorDashboardStats, doctorLogin, DoctorOtpSend, doctorPrice, doctorVerifyForgotOtp, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getOneHourSlots, getServiceFromId, getServicesByDoctorId, isBookingCompleted, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, registerPatient, resetDoctorPassword, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp, verifyPatientOtp } from "../controllers/doctor.controller.js";
-import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientDashboardStats, patientJournal, patientJournalAll, patientVerifyForgotOtp, patinetUpcommingSession, post_support, rescheduleBooking, resetPatientPassword, signInPatientFromGoogle, update_support, updateJounal, updatePatientProfile } from "../controllers/patient.controller.js";
+import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, deleteAllAvailableSlots, deleteDoctor_profile, deletePatientSupport, doctorDashboardStats, doctorLogin, DoctorOtpSend, doctorPrice, doctorSessionHistory, doctorVerifyForgotOtp, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getOneHourSlots, getServiceFromId, getServicesByDoctorId, isBookingCompleted, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, registerPatient, resetDoctorPassword, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp, verifyPatientOtp } from "../controllers/doctor.controller.js";
+import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientDashboardStats, patientJournal, patientJournalAll, patientSessionHistory, patientVerifyForgotOtp, patinetUpcommingSession, post_support, rescheduleBooking, resetPatientPassword, signInPatientFromGoogle, update_support, updateJounal, updatePatientProfile } from "../controllers/patient.controller.js";
 import { creator_profile, approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile, statusOfContent, articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId } from "../controllers/admin.controller.js";
 import { eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager } from "../controllers/manager.controller.js";
 import { patientVideoCallStart, patinetDeclineVideoCall, testFirebase, testFirebasePatient } from "../controllers/push_notification/notification.js";
@@ -207,7 +207,7 @@ router.get('/get/service/:serviceId', getServiceFromId)
 router.get('/upcoming/session/:doctorId', upcomingSession)
 router.get('/get/service/from/:doctorId', getServicesByDoctorId)
 router.get('/get/doctor/from/:serviceId', getDoctorsByServiceId)
-router.put('/mark/session/completed/:bookingId',isBookingCompleted)
+router.put('/mark/session/completed/:bookingId', isBookingCompleted)
 router.get('/get/one/hours/slots/:doctorId', getOneHourSlots)
 router.get('/notify/patient/:patientId/:bookingId/video/call/started', patientVideoCallStart)
 router.delete('/delete/doctor/profile/:DoctorId', deleteDoctor_profile)
@@ -217,9 +217,9 @@ router.post('/doctor/:doctorId/availability', updateAvailability)
 router.post('/doctor/price/:doctorId/:serviceId', doctorPrice)
 router.put('/doctor/update/price/:doctorId/:serviceId', updateDoctorPrice)
 router.get('/get/doctor/price/:doctorId/:serviceId', getDoctorPrice)
-router.post('/doctor/add/service',addDoctorService)
-router.get('/doctor/dashboard/stats/:doctorId',doctorDashboardStats)
-router.get('/get/patient/upcomming/session/:patientId',patinetUpcommingSession)
+router.post('/doctor/add/service', addDoctorService)
+router.get('/doctor/dashboard/stats/:doctorId', doctorDashboardStats)
+router.get('get/doctor/session/history/:bookingId', doctorSessionHistory)
 
 
 //                                PATIENT APIs -->
@@ -255,7 +255,9 @@ router.get('/doctor/:doctorId/availability', getAvailableSlotsDoctor)
 router.post('/booking/:patientId/:doctorId/:serviceId', bookSlot)
 router.post('/reschedule/booking/:doctorId/:bookingId', rescheduleBooking)
 router.get('/get/booking/:patientId', getBookingOfPatient)
-router.get('/patient/dashboard/stats/:patientId',patientAuthInfo,patientDashboardStats)
+router.get('/patient/dashboard/stats/:patientId', patientAuthInfo, patientDashboardStats)
+router.get('/get/patient/upcomming/session/:patientId', patinetUpcommingSession)
+router.get('get/patient/session/history/:bookingId', patientSessionHistory)
 
 
 // router.post('/:patientId/support',post_support)

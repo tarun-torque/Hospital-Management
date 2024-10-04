@@ -641,7 +641,7 @@ export const mood = async (req, res) => {
         const patientId = +req.params.patientId
         const { mood, note, factor } = req.body
         // save in db 
-        const info = await prisma.mood.create({data: { mood, note, factor,patientId } })
+        const info = await prisma.mood.create({ data: { mood, note, factor, patientId } })
         // send succesfull note 
         res.status(201).json({ status: 201, msg: 'Thank you' })
     } catch (error) {
@@ -699,7 +699,7 @@ export const rescheduleBooking = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'New time slot is not available' });
         }
 
-        const updatedBooking = await prisma.Booking.update({
+        const updatedBooking = await prisma.booking.update({
             where: { id: bookingId },
             data: {
                 slotStart: newStartTime,
@@ -778,14 +778,46 @@ export const patientDashboardStats = async (req, res) => {
 
 
 // patient upcomming session 
-export const patinetUpcommingSession = async(req,res)=>{
+export const patinetUpcommingSession = async (req, res) => {
     const patientId = +req.params.patientId
     try {
-        const upcomingSession = await prisma.patient.findMany({where:{patientId,isCompleted:'no'}})
-        const service = await prisma.service.findUnique({where:{serviceId:upcomingSession.serviceId}})
-        res.status(200).json({status:200,upcomingSession,serviceTitle:service.title})
+        const upcomingSession = await prisma.booking.findMany({ where: { patientId, isCompleted: 'no' } })
+        const service = await prisma.service.findUnique({ where: { serviceId: upcomingSession.serviceId } })
+        res.status(200).json({ status: 200, upcomingSession, serviceTitle: service.title })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// patient session history
+export const patientSessionHistory = async (req, res) => {
+    const bookingId = +req.params.bookingId
+    try {
+        const booking = await prisma.booking.findUnique({ where: { id: booking } })
+        const patientId = booking.patientId
+        const doctorId = booking.doctorId
+        const serviceId = booking.serviceId
+        const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } })
+        const service = await prisma.service.findUnique({ where: { id: serviceId } })
+        const rating = await prisma.rating.findUnique({ where: { bookingId_patientId_doctorId: { bookingId, patientId, doctorId } } })
+        // doctor name 
+        // gender
+        // rating
+        // date and time
+        // price 
+        res.status(200).json({
+            status: 200,
+            doctorName: doctor.doctorName,
+            doctorImageUrl: doctor.profileUrl,
+            gender: doctor.gender,
+            price: service.price,
+            dateAndTime: booking.slotStart,
+            stars: rating.stars,
+            review: rating.review
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({status: 500, msg: 'Something went wrong'})
     }
 }
