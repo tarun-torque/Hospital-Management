@@ -1,8 +1,15 @@
+import 'dotenv/config'
 import rateLimit from 'express-rate-limit'
+import jwt from 'jsonwebtoken'
+
 
 export const patientAuthInfo = async(req,res,next)=>{
         const token = req.header('Authorization').replace('Bearer','')
+        if(!token){
+            res.status(401).json({status:401,msg:'Please login first'})
+        }
         console.log(token)
+        const verifyToken = jwt.verify(token,process.env.SECRET_KEY)
         next()
 }
 
