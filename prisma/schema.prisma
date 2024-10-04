@@ -295,6 +295,7 @@ model Booking {
   channelName String
   notes       String?
   isCompleted String   @default("no")
+  notified Boolean @default(false)
   Doctor      Doctor   @relation(fields: [doctorId], references: [id])
   Patient     Patient  @relation(fields: [patientId], references: [id])
   Rating      Rating[]

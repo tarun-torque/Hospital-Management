@@ -148,9 +148,9 @@ export const patientReminder = async (doctorId, bookingId, channelName, patinetF
                 body: 'Your session starts in 10 minutes'
             },
             data: {
-                doctorId,
-                bookingId,
-                channelName,
+                doctorId: String(doctorId),
+                bookingId: String(bookingId), 
+                channelName: String(channelName),
                 type: 'calling'
             },
             token: patinetFcmToken

@@ -2,7 +2,7 @@ import crons from 'node-cron';
 import prisma from '../../DB/db.config.js';
 import { doctorReminder, patientReminder } from '../push_notification/notification.js';
 
-export const reminderAutomate = crons.schedule('* * * * *', async (req,res) => {
+export const reminderAutomate = crons.schedule('* * * * *', async (req, res) => {
     const nowUTC = new Date();
     // Add 5 hours and 30 minutes to the current UTC time
     const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000));
@@ -15,12 +15,13 @@ export const reminderAutomate = crons.schedule('* * * * *', async (req,res) => {
                 slotStart: {
                     gte: nowIST.toISOString(), // Compare with ISO string in IST
                     lte: tenMinutesLaterIST.toISOString() // Compare with ISO string in IST
-                }
+                },
+                notified: false
             }
         })
         if (upcomingBookings.length > 0) {
             for (const session of upcomingBookings) {
-                const { patientId, doctorId, channelName, id: bookingId } = session
+                const { patientId, doctorId, channelName, id:bookingId } = session
 
                 const findDoctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
                 const doctorFcmToken = findDoctor?.fcmToken;
@@ -39,6 +40,11 @@ export const reminderAutomate = crons.schedule('* * * * *', async (req,res) => {
                 } else {
                     console.log(`No FCM token found for patient ID: ${patientId}`);
                 }
+                //mark as notified
+                await prisma.booking.update({
+                    where: { id: bookingId },
+                    data: { notified: true }
+                })
                 console.log("Reminder notification sent for both patient and doctor");
             }
         }
