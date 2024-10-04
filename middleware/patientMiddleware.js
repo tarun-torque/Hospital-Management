@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import rateLimit from 'express-rate-limit'
 import jwt from 'jsonwebtoken'
+import prisma from '../DB/db.config.js'
 
 export const patientAuthInfo = async (req, res, next) => {
     try {
@@ -9,8 +10,7 @@ export const patientAuthInfo = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({ status: 401, msg: 'Please login first' });
         }
-
-        console.log("Token received:", token);
+        console.log("Token received:", token)
 
         const verifyToken = jwt.verify(token, process.env.SECRET_KEY);
         console.log("Token verification successful");
@@ -25,22 +25,45 @@ export const patientAuthInfo = async (req, res, next) => {
 
 
 export const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,  
-    max: 2,  
-    message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,  
-    legacyHeaders: false, 
+    windowMs: 24 * 60 * 60 * 1000,
+    max: 1,
+    message: 'You can only send one request per day.',
+    keyGenerator: (req) => req.user?.id || req.ip,
     handler: (req, res, next, options) => {
-   
-        console.log(`Rate limit exceeded for IP: ${req.ip}`);
-
-
+        console.log(`Rate limit exceeded for user: ${req.user?.id || req.ip}`);
         res.status(options.statusCode).json({
             message: options.message
         });
-    }
+    },
+    standardHeaders: true,
+    legacyHeaders: false
 })
 
-export const check  =async(req,res)=>{
-  res.send('this is limit api')
+// create continum
+export const createContinum = async (req, res) => {
+    const patientId = +req.params.doctorId
+    const { value } = req.body
+    try {
+        if (!value) {
+            res.status(400).json({ status: 400, msg: 'Value is Required' })
+        }
+        const createContt = await prisma.continum.create({ data: { value, patientId } })
+        res.status(200).json({ status: 200, msg: 'Your Continumm saved ' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+// get continumm
+export const getContinum = async (req, res) => {
+    const patientId = +req.params.patientId
+    try {
+        const continum = await prisma.continum.findMany({ where: { patientId } })
+        res.status(200).json({ status: 200, msg: continum })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
 }
