@@ -4,16 +4,18 @@ import { doctorReminder, patientReminder } from '../push_notification/notificati
 
 export const reminderAutomate = crons.schedule('* * * * *', async () => {
     const nowUTC = new Date();
-    const tenMinutesLaterUTC = new Date(nowUTC.getTime() + 10 * 60000);
-    console.log("Current UTC time is", nowUTC.toISOString()); // Log the current UTC time
-    console.log("Checking for bookings between", nowUTC.toISOString(), "and", tenMinutesLaterUTC.toISOString());
-
+    
+    // Add 5 hours and 30 minutes to the current UTC time
+    const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000)); 
+    const tenMinutesLaterIST = new Date(nowIST.getTime() + 10 * 60000);
+    console.log("Current IST time is", nowIST.toISOString()); // Log the current IST time
+    console.log("Checking for bookings between", nowIST.toISOString(), "and", tenMinutesLaterIST.toISOString());
     try {
         const upcomingBookings = await prisma.booking.findMany({
             where: {
                 slotStart: {
-                    gte: nowUTC.toISOString(), // Compare with ISO string
-                    lte: tenMinutesLaterUTC.toISOString() // Compare with ISO string
+                    gte: nowIST.toISOString(), // Compare with ISO string in IST
+                    lte: tenMinutesLaterIST.toISOString() // Compare with ISO string in IST
                 }
             }
         })
