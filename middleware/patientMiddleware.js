@@ -2,15 +2,27 @@ import 'dotenv/config'
 import rateLimit from 'express-rate-limit'
 import jwt from 'jsonwebtoken'
 
-export const patientAuthInfo = async(req,res,next)=>{
-        const token = req.header('Authorization').replace('Bearer','')
-        if(!token){
-            res.status(401).json({status:401,msg:'Please login first'})
+export const patientAuthInfo = async (req, res, next) => {
+    try {
+        const token = req.header('Authorization')?.replace('Bearer ', '').trim();
+
+        if (!token) {
+            return res.status(401).json({ status: 401, msg: 'Please login first' });
         }
-        console.log(token)
-        const verifyToken = jwt.verify(token,process.env.SECRET_KEY)
-        next()
+
+        console.log("Token received:", token);
+
+        const verifyToken = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("Token verification successful");
+
+        req.user = verifyToken
+        next();
+    } catch (error) {
+        console.error("Error during token verification:", error);
+        res.status(401).json({ status: 401, msg: 'Invalid or expired token' });
+    }
 }
+
 
 export const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,  
