@@ -1079,7 +1079,7 @@ export const doctorLogin = async (req, res) => {
             maximum_education: doctor.maximumEducation,
             profile_pic: doctor.profile_pic
         }
-        
+
         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
         const updateFcm = await prisma.doctor.update({ where: { email }, data: { fcmToken } })
         res.status(200).json({ status: 200, msg: 'LoggedIn succesfully', token })
@@ -2131,37 +2131,42 @@ export const doctorDashboardStats = async (req, res) => {
 
 // doctor session history
 export const doctorSessionHistory = async (req, res) => {
-    const bookingId = +req.params.bookingId
+    const doctorId = +req.params.doctorId;
     try {
-        const booking = await prisma.booking.findUnique({ where: { id: bookingId } })
-        const patientId = booking.patientId
-        const serviceId = booking.serviceId
-        const doctorId = booking.doctorId
+        const bookings = await prisma.booking.findMany({ where: { doctorId } });
 
-        const patient = await prisma.patient.findUnique({ where: { id: patientId } })
-        const service = await prisma.service.findUnique({ where: { id: serviceId } })
-        const rating = await prisma.rating.findUnique({ where: { bookingId_patientId_doctorId: { bookingId, patientId, doctorId } } })
-        // patient name 
-        // gender
-        // rating
-        // date and time
-        // price 
+        if (bookings.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No bookings found for this doctor' });
+        }
+
+        const sessionHistories = await Promise.all(bookings.map(async (booking) => {
+            const patient = await prisma.patient.findUnique({ where: { id: booking.patientId } });
+            const service = await prisma.service.findUnique({ where: { id: booking.serviceId } });
+            const rating = await prisma.rating.findUnique({ 
+                where: { bookingId_patientId_doctorId: { bookingId: booking.id, patientId: booking.patientId, doctorId } }
+            });
+
+            return {
+                patientName: patient?.patientName || "Unknown",
+                patientImageUrl: patient?.profileUrl || null,
+                patientGender: patient?.gender || "Unknown",
+                price: service?.price || null,
+                stars: rating?.stars || null,
+                review: rating?.review || null,
+                dateAndTime: booking.slotStart
+            };
+        }));
 
         res.status(200).json({
             status: 200,
-            patientName: patient.patientName,
-            patientImageUrl: patient.profileUrl,
-            patientGender: patient.gender,
-            price: service.price,
-            stars: rating.stars,
-            review: rating.review,
-            dateAndTime: booking.slotStart
-        })
+            sessionHistories
+        });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        console.log('Error fetching doctor session history:', error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
 
 // doctor notification mark as read 
 // get doctor notification

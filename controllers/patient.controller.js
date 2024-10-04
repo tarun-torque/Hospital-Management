@@ -778,46 +778,71 @@ export const patientDashboardStats = async (req, res) => {
 
 
 // patient upcomming session 
-export const patinetUpcommingSession = async (req, res) => {
-    const patientId = +req.params.patientId
+export const patientUpcomingSessions = async (req, res) => {
+    const patientId = +req.params.patientId;
     try {
-        const upcomingSession = await prisma.booking.findMany({ where: { patientId, isCompleted: 'no' } })
-        const service = await prisma.service.findUnique({ where: { serviceId: upcomingSession.serviceId } })
-        res.status(200).json({ status: 200, upcomingSession, serviceTitle: service.title })
+        const upcomingSessions = await prisma.booking.findMany({
+            where: { patientId, isCompleted: 'no' },
+        });
+
+        const serviceIds = upcomingSessions.map(session => session.serviceId);
+        const services = await prisma.service.findMany({
+            where: { id: { in: serviceIds } },
+            select: { id: true, title: true }
+        });
+
+        const serviceMap = services.reduce((map, service) => {
+            map[service.id] = service.title;
+            return map;
+        }, {});
+
+        const sessionsWithServiceTitles = upcomingSessions.map(session => ({
+            ...session,
+            serviceTitle: serviceMap[session.serviceId]
+        }));
+
+        res.status(200).json({ status: 200, sessions: sessionsWithServiceTitles });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        console.log(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
 
 // patient session history
 export const patientSessionHistory = async (req, res) => {
-    const bookingId = +req.params.bookingId
+    const patientId = +req.params.patientId;
     try {
-        const booking = await prisma.booking.findUnique({ where: { id: booking } })
-        const patientId = booking.patientId
-        const doctorId = booking.doctorId
-        const serviceId = booking.serviceId
-        const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } })
-        const service = await prisma.service.findUnique({ where: { id: serviceId } })
-        const rating = await prisma.rating.findUnique({ where: { bookingId_patientId_doctorId: { bookingId, patientId, doctorId } } })
-        // doctor name 
-        // gender
-        // rating
-        // date and time
-        // price 
+        const bookings = await prisma.booking.findMany({ where: { patientId } });
+
+        if (bookings.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No bookings found for this patient' });
+        }
+
+        const sessionHistories = await Promise.all(bookings.map(async (booking) => {
+            const doctor = await prisma.doctor.findUnique({ where: { id: booking.doctorId } });
+            const service = await prisma.service.findUnique({ where: { id: booking.serviceId } });
+            const rating = await prisma.rating.findUnique({ 
+                where: { bookingId_patientId_doctorId: { bookingId: booking.id, patientId, doctorId: booking.doctorId } }
+            });
+
+            return {
+                doctorName: doctor.doctorName,
+                doctorImageUrl: doctor.profileUrl,
+                gender: doctor.gender,
+                price: service.price,
+                dateAndTime: booking.slotStart,
+                stars: rating?.stars || null,
+                review: rating?.review || null
+            };
+        }));
+
         res.status(200).json({
             status: 200,
-            doctorName: doctor.doctorName,
-            doctorImageUrl: doctor.profileUrl,
-            gender: doctor.gender,
-            price: service.price,
-            dateAndTime: booking.slotStart,
-            stars: rating.stars,
-            review: rating.review
-        })
+            sessionHistories
+        });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({status: 500, msg: 'Something went wrong'})
+        console.log(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
