@@ -2177,12 +2177,12 @@ export const getReviewsFromDoctorId = async (req, res) => {
             where: { doctorId },
             select: {
                 stars: true,
-                review: true
-            },
-            Patient: {
-                select: {
-                    patientName: true,
-                    profileUrl: true
+                review: true,
+                Patient:{
+                    select:{
+                        patientName:true,
+                        profileUrl:true
+                    }
                 }
             }
         })
