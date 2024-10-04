@@ -786,27 +786,45 @@ export const patientUpcomingSessions = async (req, res) => {
         });
 
         const serviceIds = upcomingSessions.map(session => session.serviceId);
+        const doctorIds = upcomingSessions.map(session => session.doctorId);
+
+        // Retrieve services with titles
         const services = await prisma.service.findMany({
             where: { id: { in: serviceIds } },
-            select: { id: true, title: true }
+            select: { id: true, title: true },
         });
 
+        // Retrieve doctors with names
+        const doctors = await prisma.doctor.findMany({
+            where: { id: { in: doctorIds } },
+            select: { id: true, doctorName: true },
+        });
+
+        // Map service and doctor information by their IDs
         const serviceMap = services.reduce((map, service) => {
             map[service.id] = service.title;
             return map;
         }, {});
 
-        const sessionsWithServiceTitles = upcomingSessions.map(session => ({
+        const doctorMap = doctors.reduce((map, doctor) => {
+            map[doctor.id] = doctor.doctorName;
+            return map;
+        }, {});
+
+        // Merge doctor name and service title with session details
+        const sessionsWithDetails = upcomingSessions.map(session => ({
             ...session,
-            serviceTitle: serviceMap[session.serviceId]
+            serviceTitle: serviceMap[session.serviceId],
+            doctorName: doctorMap[session.doctorId],
         }));
 
-        res.status(200).json({ status: 200, sessions: sessionsWithServiceTitles });
+        res.status(200).json({ status: 200, sessions: sessionsWithDetails });
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
+}
+
 
 
 // patient session history

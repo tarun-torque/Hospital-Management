@@ -162,6 +162,7 @@ model Patient {
   support       Support[]
   Rating        Rating[]
   Journal       Journal[]
+  continum      continum[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
@@ -358,4 +359,11 @@ model managerNotification {
   data      String
   manager   manager @relation(fields: [managerId], references: [id])
   managerId Int
+}
+
+model continum {
+  id        Int      @id @default(autoincrement())
+  value     String
+  Patient   Patient @relation(fields: [patientId], references: [id])
+  patientId Int
 }
