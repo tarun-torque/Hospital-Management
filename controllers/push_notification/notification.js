@@ -136,7 +136,7 @@ export const doctorReminder = async (doctorFcmToken) => {
     }
     catch (error) {
         console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        // res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -159,7 +159,7 @@ export const patientReminder = async (doctorId, bookingId, channelName, patinetF
         console.log('remider for patient sent', response)
     } catch (error) {
         console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        // res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 

@@ -2,7 +2,7 @@ import crons from 'node-cron';
 import prisma from '../../DB/db.config.js';
 import { doctorReminder, patientReminder } from '../push_notification/notification.js';
 
-export const reminderAutomate = crons.schedule('* * * * *', async () => {
+export const reminderAutomate = crons.schedule('* * * * *', async (req,res) => {
     const nowUTC = new Date();
     // Add 5 hours and 30 minutes to the current UTC time
     const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000));
