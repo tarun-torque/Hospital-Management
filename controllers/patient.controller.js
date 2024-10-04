@@ -639,13 +639,11 @@ export const mood = async (req, res) => {
     try {
         // get info
         const patientId = +req.params.patientId
-        const { mood, note, factor } = req.body;
-
+        const { mood, note, factor } = req.body
         // save in db 
         const info = await prisma.mood.create({data: { mood, note, factor,patientId } })
         // send succesfull note 
         res.status(201).json({ status: 201, msg: 'Thank you' })
-
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: error.message })

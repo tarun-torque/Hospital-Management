@@ -1227,10 +1227,11 @@ export const bookSlot = async (req, res) => {
     const doctorId = +req.params.doctorId;
 
     console.log("from frontend", slotStart, slotEnd)
+
     try {
         const slotStartTime = new Date(new Date(slotStart).getTime() - 5.5 * 60 * 60 * 1000)
         const slotEndTime = new Date(new Date(slotEnd).getTime() - 5.5 * 60 * 60 * 1000)
-        console.log("after adjust", slotStartTime, slotEndTime)
+        console.log("after adjust ", slotStartTime, slotEndTime)
 
         // check slot is booked
         // const existingSlot = await prisma.availableSlots.findUnique({
