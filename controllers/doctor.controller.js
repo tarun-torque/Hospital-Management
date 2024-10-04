@@ -1263,18 +1263,18 @@ export const bookSlot = async (req, res) => {
 
 
         // mark slot as booked
-        // const markBooked = await prisma.availableSlots.update({
-        //     where: {
-        //         doctorId_startTime_endTime: {
-        //             doctorId,
-        //             startTime: slotStart,
-        //             endTime: slotEnd,
-        //         },
-        //     },
-        //     data: {
-        //         isBooked: 'yes',
-        //     },
-        // })
+        const markBooked = await prisma.availableSlots.update({
+            where: {
+                doctorId_startTime_endTime: {
+                    doctorId,
+                    startTime: slotStart,
+                    endTime: slotEnd,
+                },
+            },
+            data: {
+                isBooked: 'yes',
+            },
+        })
 
         // Extract and adjust times for the response
         const startDate = new Date(booking.slotStart);
