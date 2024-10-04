@@ -826,12 +826,11 @@ export const patientUpcomingSessions = async (req, res) => {
 }
 
 
-
 // patient session history
 export const patientSessionHistory = async (req, res) => {
     const patientId = +req.params.patientId;
     try {
-        const bookings = await prisma.booking.findMany({ where: { patientId } });
+        const bookings = await prisma.booking.findMany({ where: { patientId,isCompleted:'yes' } });
 
         if (bookings.length === 0) {
             return res.status(404).json({ status: 404, msg: 'No bookings found for this patient' });

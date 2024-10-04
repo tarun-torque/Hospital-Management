@@ -251,17 +251,7 @@ model Doctor {
   availableSlots     availableSlots[]
   doctorServices     DoctorService[]
   doctorPrice        DoctorPrice[]
-  doctorNotification doctorNotification[]
   Rating             Rating[]
-}
-
-model doctorNotification {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String
-  isRead      Boolean @default(false)
-  Doctor      Doctor  @relation(fields: [doctorId], references: [id])
-  doctorId    Int
 }
 
 model DoctorService {
@@ -362,7 +352,7 @@ model managerNotification {
 }
 
 model continum {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   value     String
   Patient   Patient @relation(fields: [patientId], references: [id])
   patientId Int

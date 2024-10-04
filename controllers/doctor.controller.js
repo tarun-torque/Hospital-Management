@@ -2133,7 +2133,7 @@ export const doctorDashboardStats = async (req, res) => {
 export const doctorSessionHistory = async (req, res) => {
     const doctorId = +req.params.doctorId;
     try {
-        const bookings = await prisma.booking.findMany({ where: { doctorId } });
+        const bookings = await prisma.booking.findMany({ where: { doctorId,isCompleted:'yes' } });
 
         if (bookings.length === 0) {
             return res.status(404).json({ status: 404, msg: 'No bookings found for this doctor' });
