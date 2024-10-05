@@ -534,44 +534,45 @@ export const addDoctorService = async (req, res) => {
 export const upcomingSession = async (req, res) => {
     try {
         const doctorId = +req.params.doctorId;
-        const currentDateTime = new Date()
+        const currentDateTime = new Date();
 
+        
         const startOfDay = new Date(currentDateTime);
-        startOfDay.setHours(0, 0, 0, 0)
+        startOfDay.setHours(0, 0, 0, 0);
 
-        // Set the end of today (11:59 PM)
+   
         const endOfDay = new Date(currentDateTime);
-        endOfDay.setHours(23, 59, 59, 999)
+        endOfDay.setHours(23, 59, 59, 999);
 
-        const upcomingSession = await prisma.booking.findMany({
+      
+        const sessions = await prisma.booking.findMany({
             where: {
                 doctorId,
                 slotStart: {
-                    gte: currentDateTime,
-                    lte: endOfDay
+                    gte: startOfDay, 
+                    lte: endOfDay 
                 }
             },
             include: {
                 Patient: true
             },
             orderBy: {
-                slotStart: 'asc'
+                slotStart: 'asc' 
             }
-        });
+        })
 
-        if (upcomingSession.length === 0) {
-            return res.status(400).json({ status: 400, msg: 'No upcoming sessions for today' });
+        if (sessions.length === 0) {
+            return res.status(400).json({ status: 400, msg: 'No sessions for today' });
         }
-
-        const upcomingSessionCount = upcomingSession.length
-
-        res.status(200).json({ status: 200, upcomingSession, upcomingSessionCount });
+        const sessionCount = sessions.length
+        res.status(200).json({ status: 200, upcomingSession:sessions, upcomingSessionCount:sessionCount });
 
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
 
 // get service from its id 
 export const getServiceFromId = async (req, res) => {
@@ -1931,14 +1932,13 @@ export const getOneHourSlots = async (req, res) => {
     }
 }
 
-
-
+// mark as completed
 export const isBookingCompleted = async (req, res) => {
     const bookingId = +req.params.bookingId
     try {
         const isBooking = await prisma.booking.findUnique({ where: { id: bookingId } })
-        if (isBooking) {
-            return res.status(404).json({ sttatus: 404, msg: 'No Booking found' })
+        if (!(isBooking)) {
+            return res.status(404).json({ status: 404, msg: 'No Booking found' })
         }
         const completed = await prisma.booking.update({ where: { id: bookingId }, data: { isCompleted: 'yes' } })
         res.status(200).json({ status: 200, msg: 'Session completed successfully' })
