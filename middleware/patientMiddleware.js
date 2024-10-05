@@ -86,7 +86,7 @@ export const getContinum = async (req, res) => {
             mostRepeatedValue = 2;
         }
 
-        res.status(200).json({ status: 500, msg: mostRepeatedValue })
+        res.status(200).json({ status: 200, msg: mostRepeatedValue })
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
