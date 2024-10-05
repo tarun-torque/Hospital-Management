@@ -26,7 +26,7 @@ export const patientAuthInfo = async (req, res, next) => {
 
 export const apiLimiter = rateLimit({
     windowMs: 24 * 60 * 60 * 1000,
-    max: 1,
+    max: 10,
     message: 'You can only send one request per day.',
     keyGenerator: (req) => req.user?.id || req.ip,
     handler: (req, res, next, options) => {
@@ -55,7 +55,6 @@ export const createContinum = async (req, res) => {
     }
 }
 
-
 // get continumm
 export const getContinum = async (req, res) => {
     const patientId = +req.params.patientId
@@ -64,17 +63,16 @@ export const getContinum = async (req, res) => {
         const continumEntries = await prisma.continum.findMany({
             where: { patientId },
             select: { value: true },
-          });
-          
-          // Count occurrences of each value
+          })
+        
           const valueCounts = continumEntries.reduce((acc, entry) => {
-            acc[entry.value] = (acc[entry.value] || 0) + 1;
-            return acc;
-          }, {});
+            acc[entry.value] = (acc[entry.value] || 0) + 1
+            return acc
+          }, {})
           
-          // Find the most repeated value
-          let mostRepeatedValue = null;
-          let maxCount = 0;
+       
+          let mostRepeatedValue = null
+          let maxCount = 0
           
           for (const [value, count] of Object.entries(valueCounts)) {
             if (count > maxCount) {
