@@ -60,28 +60,33 @@ export const createContinum = async (req, res) => {
 export const getContinum = async (req, res) => {
     const patientId = +req.params.patientId
     try {
-
         const continumEntries = await prisma.continum.findMany({
             where: { patientId },
             select: { value: true },
-          })
-        
-          const valueCounts = continumEntries.reduce((acc, entry) => {
+        })
+
+        const valueCounts = continumEntries.reduce((acc, entry) => {
             acc[entry.value] = (acc[entry.value] || 0) + 1
             return acc
-          }, {})
-          
-       
-          let mostRepeatedValue = null
-          let maxCount = 0
-          
-          for (const [value, count] of Object.entries(valueCounts)) {
+        }, {})
+
+
+        let mostRepeatedValue = null
+        let maxCount = 0
+
+        for (const [value, count] of Object.entries(valueCounts)) {
             if (count > maxCount) {
-              maxCount = count;
-              mostRepeatedValue = value;
+                maxCount = count;
+                mostRepeatedValue = value;
             }
-          }
-          res.status(200).json({ status: 500, msg:mostRepeatedValue  })
+        }
+
+        // If no value is repeated
+        if (maxCount <= 1) {
+            mostRepeatedValue = 2;
+        }
+
+        res.status(200).json({ status: 500, msg: mostRepeatedValue })
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
