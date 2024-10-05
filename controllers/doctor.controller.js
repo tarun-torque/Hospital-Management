@@ -2087,7 +2087,8 @@ export const getReviewsFromDoctorId = async (req, res) => {
                 Patient:{
                     select:{
                         patientName:true,
-                        profileUrl:true
+                        profileUrl:true,
+                        createdAt:true
                     }
                 }
             }
