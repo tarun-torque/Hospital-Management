@@ -41,7 +41,7 @@ export const apiLimiter = rateLimit({
 
 // create continum
 export const createContinum = async (req, res) => {
-    const patientId = +req.params.doctorId
+    const patientId = +req.params.patientId
     const { value } = req.body
     try {
         if (!value) {
