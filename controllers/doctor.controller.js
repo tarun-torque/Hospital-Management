@@ -2080,7 +2080,7 @@ export const getReviewsFromDoctorId = async (req, res) => {
     const doctorId = +req.params.doctorId
     try {
         const reviews = await prisma.rating.findMany({
-            where: { doctorId },
+            where: { doctorId ,isPublic:'yes'},
             select: {
                 stars: true,
                 review: true,
