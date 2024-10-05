@@ -55,6 +55,7 @@ export const createContinum = async (req, res) => {
     }
 }
 
+
 // get continumm
 export const getContinum = async (req, res) => {
     const patientId = +req.params.patientId

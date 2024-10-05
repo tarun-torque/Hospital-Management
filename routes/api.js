@@ -10,7 +10,7 @@ import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatie
 import { creator_profile, approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile, statusOfContent, articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId } from "../controllers/admin.controller.js";
 import { eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager } from "../controllers/manager.controller.js";
 import { patientVideoCallStart, patinetDeclineVideoCall, testFirebase, testFirebasePatient } from "../controllers/push_notification/notification.js";
-import { apiLimiter, createContinum, patientAuthInfo } from "../middleware/patientMiddleware.js";
+import { apiLimiter, createContinum, getContinum, patientAuthInfo } from "../middleware/patientMiddleware.js";
 
 // to make dynamic directory
 function ensureDirectoryExistence(filePath) {
@@ -259,7 +259,7 @@ router.get('/patient/dashboard/stats/:patientId', patientAuthInfo, patientDashbo
 router.get('/get/patient/upcomming/session/:patientId', patientUpcomingSessions)
 router.get('/get/patient/session/history/:patientId', patientSessionHistory)
 router.post('/post/continumm/:patientId', patientAuthInfo, apiLimiter, createContinum)
-router.get('')
+router.get('/get/repeated/continum/:patientId',getContinum)
 
 
 // router.post('/:patientId/support',post_support)
