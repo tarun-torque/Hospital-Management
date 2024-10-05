@@ -1986,19 +1986,16 @@ export const deleteAllAvailableSlots = async (req, res) => {
 export const updateDoctorProfile = async (req, res) => {
     const doctorId = +req.params.doctorId
     const fileInfo = req.file
-    const { contactNumber, description, maximumEducation } = req.body
+    const { contactNumber, maximumEducation } = req.body
     try {
         const updatedData = {}
         if (contactNumber) {
             updatedData.contactNumber = contactNumber
         }
-        if (description) {
-            updatedData.description = description
-        }
+     
         if (maximumEducation) {
             updatedData.maximumEducation = maximumEducation
         }
-
 
         if (fileInfo) {
             const fileType = fileInfo.mimetype
