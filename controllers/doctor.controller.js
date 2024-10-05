@@ -544,7 +544,7 @@ export const upcomingSession = async (req, res) => {
       
         const sessions = await prisma.booking.findMany({
             where: {
-                doctorId,
+                doctorId,isCompleted:'no',
                 slotStart: {
                     gte: startOfDay, 
                     lte: endOfDay 
