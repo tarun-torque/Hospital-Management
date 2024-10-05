@@ -191,7 +191,6 @@ router.get('/manager/:managerId/search/bar', managerSearchBar)
 router.get('/get/manager/:managerId/unread/notification', getManagerUnreadNotification)
 router.get('/get/manager/:managerId/read/notification', getManagerReadNotification)
 
-
 //                                  DOCTOR APIs  -->
 router.post('/doctor/google/signIn', signInDoctorFromGoogle)
 router.get('/get/doctor/profile/:doctorId', getDoctorProfile)
@@ -220,7 +219,7 @@ router.get('/get/doctor/price/:doctorId/:serviceId', getDoctorPrice)
 router.post('/doctor/add/service', addDoctorService)
 router.get('/doctor/dashboard/stats/:doctorId', doctorDashboardStats)
 router.get('/get/doctor/session/history/:doctorId', doctorSessionHistory)
-router.get('/get/reviews/:doctorId',getReviewsFromDoctorId)
+router.get('/get/reviews/:doctorId', getReviewsFromDoctorId)
 
 
 //                                PATIENT APIs -->
@@ -257,9 +256,9 @@ router.post('/booking/:patientId/:doctorId/:serviceId', bookSlot)
 router.post('/reschedule/booking/:doctorId/:bookingId', rescheduleBooking)
 router.get('/get/booking/:patientId', getBookingOfPatient)
 router.get('/patient/dashboard/stats/:patientId', patientAuthInfo, patientDashboardStats)
-router.get('/get/patient/upcomming/session/:patientId',patientUpcomingSessions)
+router.get('/get/patient/upcomming/session/:patientId', patientUpcomingSessions)
 router.get('/get/patient/session/history/:patientId', patientSessionHistory)
-router.post('/post/continumm/:patientId',patientAuthInfo,apiLimiter,createContinum)
+router.post('/post/continumm/:patientId', patientAuthInfo, apiLimiter, createContinum)
 router.get('')
 
 

@@ -124,7 +124,7 @@ export const patientJournalAll = async (req, res) => {
 
 
 
-//rating to the docttor 
+//rating to the doctor 
 export const giveRatingToDoctor = async (req, res) => {
     const bookingId = +req.params.bookingId
     const patientId = +req.params.patientId
@@ -137,7 +137,7 @@ export const giveRatingToDoctor = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Please give rating first' })
         }
 
-        if (stars < 1 || stars > 5) {
+        if (stars > 1 || stars <= 5) {
             return res.status(400).json({ status: 400, msg: 'Give stars between 1 to 5' })
         }
 
@@ -149,7 +149,7 @@ export const giveRatingToDoctor = async (req, res) => {
                     doctorId
                 }
             }
-        });
+        })
 
         if (existingRating) {
             return res.status(400).json({ status: 400, msg: 'You have already rated' });
@@ -165,22 +165,21 @@ export const giveRatingToDoctor = async (req, res) => {
             }
         })
 
-
         // send notification for manager
         // find assigned manager id of doctor
         const patient = await prisma.patient.findUnique({ where: { id: patientId } })
         const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } })
         const findManager = await prisma.manager.findUnique({ where: { username: doctor.assignedManager } })
-        const sendNotification = await prisma.managerNotificaton.create({
+        const sendNotification = await prisma.managerNotification.create({
             data: {
                 managerId: findManager.id,
-                title: `${patient.patient_name} rated Consultant ${doctor.doctorName} with ${stars} stars`,
-                content: `${patient.patient_name} commented: "${review}"`,
+                title: `${patient.patientName} rated Consultant ${doctor.doctorName} with ${stars} stars`,
+                content: `${patient.patientName} commented: "${review}"`,
                 data: JSON.stringify({
                     doctorId: doctorId,
                     patientId: patientId,
                     bookingId: bookingId,
-                    patientProfilePath: patient.profile_path,
+                    patientProfilePath: patient.profileUrl,
                 })
             }
         })

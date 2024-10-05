@@ -309,6 +309,7 @@ model Rating {
   doctorId  Int
   bookingId Int
   stars     Int
+  isPublic  String   @default("no")
   review    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
