@@ -26,7 +26,7 @@ export const patientAuthInfo = async (req, res, next) => {
 
 export const apiLimiter = rateLimit({
     windowMs: 24 * 60 * 60 * 1000,
-    max: 10,
+    max: 1,
     message: 'You can only send one request per day.',
     keyGenerator: (req) => req.user?.id || req.ip,
     handler: (req, res, next, options) => {
