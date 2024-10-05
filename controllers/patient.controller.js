@@ -137,7 +137,7 @@ export const giveRatingToDoctor = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Please give rating first' })
         }
 
-        if (stars > 1 || stars <= 5) {
+        if (!(stars > 1 || stars <= 5)) {
             return res.status(400).json({ status: 400, msg: 'Give stars between 1 to 5' })
         }
 
