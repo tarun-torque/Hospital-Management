@@ -32,22 +32,22 @@ export const adminRegister = async (req, res) => {
 
         const isFile = (req.file.mimetype == 'image/png' || req.file.mimetype == 'image/jpeg') && ((req.file.size / (1024 * 1024)) <= 2)
         if (!isFile) {
-            return res.status(400).json({ status:400,msg: 'Profile picture should be jpg/png and size less than 2MB' })
+            return res.status(400).json({ status: 400, msg: 'Profile picture should be jpg/png and size less than 2MB' })
         }
 
         const salt = bcrypt.genSaltSync(10)
         const hash_pass = bcrypt.hashSync(password, salt)
         const hash_key = bcrypt.hashSync(secretKey, salt)
 
-        const data = {name,email,password:hash_pass,secretKey:hash_key,image:fileInfo.path}
-        const tokenData = {name,email}
+        const data = { name, email, password: hash_pass, secretKey: hash_key, image: fileInfo.path }
+        const tokenData = { name, email }
 
-        const token = jwt.sign(tokenData,process.env.SECRET_KEY,{expiresIn:'999h'})
-        const saveData = await prisma.admin.create({data})
-        res.status(201).json({ status:201,msg:'Registered Successfully',token,id:saveData.id })
+        const token = jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '999h' })
+        const saveData = await prisma.admin.create({ data })
+        res.status(201).json({ status: 201, msg: 'Registered Successfully', token, id: saveData.id })
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -69,15 +69,15 @@ export const adminLogin = async (req, res) => {
 
         const isAdmin = await prisma.admin.findUnique({ where: { email } })
         const checkPswd = bcrypt.compareSync(password, isAdmin.password)
-        const checkKey= bcrypt.compareSync(secretKey,isAdmin.secretKey)
+        const checkKey = bcrypt.compareSync(secretKey, isAdmin.secretKey)
 
-        if (!isAdmin || !checkPswd || !checkKey ) {
+        if (!isAdmin || !checkPswd || !checkKey) {
             return res.status(400).json({ status: 400, msg: 'Invalid credentials' })
         }
 
         const data = { name: isAdmin.name }
         const token = jwt.sign({ data }, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({ status: 200, msg: 'LoggedIn', token,id:isAdmin.id })
+        res.status(200).json({ status: 200, msg: 'LoggedIn', token, id: isAdmin.id })
 
     } catch (error) {
         console.log(error)
@@ -86,16 +86,16 @@ export const adminLogin = async (req, res) => {
 }
 
 // get admin profile
-export const getAdminProfile = async(req,res)=>{
+export const getAdminProfile = async (req, res) => {
     try {
         const adminId = +req.params.adminId
-        const info = await prisma.admin.findUnique({where:{id:adminId}})
-        const profile =  {name:info.name,image:info.image}
-        res.status(200).json({status:200,profile})
-    
+        const info = await prisma.admin.findUnique({ where: { id: adminId } })
+        const profile = { name: info.name, image: info.image }
+        res.status(200).json({ status: 200, profile })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({status:500,msg:'Something went wrong'})
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -255,16 +255,18 @@ export const assignManager_doctor = async (req, res) => {
         const assigned = await prisma.doctor.update({ where: { id: doctorId }, data: { assignedManager } })
 
         // send notification to the manager
-        const findManager = await prisma.manager.findUnique({where:{username:assignedManager}})
-        const sendNotification = await prisma.managerNotification.create({data:{
-            managerId:findManager.id,
-            title:`${assigned.doctorName} as Doctor `,
-            content:'is now registered as Doctor on Harmony',
-            data:JSON.stringify({
-                doctorId:assigned.id,
-                doctorProfilePath:assigned.profileUrl,
-            })
-        }})
+        const findManager = await prisma.manager.findUnique({ where: { username: assignedManager } })
+        const sendNotification = await prisma.managerNotification.create({
+            data: {
+                managerId: findManager.id,
+                title: `${assigned.doctorName} as Doctor `,
+                content: 'is now registered as Doctor on Harmony',
+                data: JSON.stringify({
+                    doctorId: assigned.id,
+                    doctorProfilePath: assigned.profileUrl,
+                })
+            }
+        })
 
         res.status(200).json({ message: 'Manager assigned Succesfully' })
 
@@ -835,19 +837,21 @@ export const creator_profile = async (req, res) => {
         }
 
         // save in database
-        const info = await prisma.creator.create({data})
+        const info = await prisma.creator.create({ data })
 
         // send notification to the corresponding manager
-        const findManager = await prisma.manager.findUnique({where:{username:assignedManager}})
-        const sendNotification = await prisma.managerNotification.create({data:{
-            managerId:findManager.id,
-            title:`${username} as Creator `,
-            content:'is now registered as creator on Harmony',
-            data:JSON.stringify({
-                creatorId:info.id,
-                creatorProfilePath:info.profile_path,
-            })
-        }})
+        const findManager = await prisma.manager.findUnique({ where: { username: assignedManager } })
+        const sendNotification = await prisma.managerNotification.create({
+            data: {
+                managerId: findManager.id,
+                title: `${username} as Creator `,
+                content: 'is now registered as creator on Harmony',
+                data: JSON.stringify({
+                    creatorId: info.id,
+                    creatorProfilePath: info.profile_path,
+                })
+            }
+        })
 
         // for token
         const creator = {
@@ -858,7 +862,7 @@ export const creator_profile = async (req, res) => {
             language: info.language,
             profile_path: info.profile_path
         }
-        
+
         // create token
         const token = jwt.sign(creator, process.env.SECRET_KEY, { expiresIn: '999h' })
 
@@ -1717,7 +1721,7 @@ export const deleteService = async (req, res) => {
 // get all service 
 export const allService = async (req, res) => {
     try {
-        const allService = await prisma.service.findMany({ include: { doctorServices: true,Category:true } })
+        const allService = await prisma.service.findMany({ include: { doctorServices: true, Category: true } })
         const serviceCount = allService.length
 
         const data = { allService, serviceCount }
@@ -1738,7 +1742,16 @@ export const allService = async (req, res) => {
 export const getServiceFromCategoryId = async (req, res) => {
     try {
         const categoryId = +req.params.categoryId;
-        const category = await prisma.service.findMany({ where: { categoryId } })
+        const category = await prisma.service.findMany({ 
+            where: { categoryId },
+            include:{
+                Category:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
+         })
 
         res.status(200).json({ status: 200, msg: category })
 
@@ -1751,7 +1764,16 @@ export const getServiceFromCategoryId = async (req, res) => {
 export const getServiceFromServiceId = async (req, res) => {
     try {
         const serviceId = +req.params.serviceId;
-        const service = await prisma.service.findUnique({ where: { id: serviceId } })
+        const service = await prisma.service.findUnique({
+            where: { id: serviceId },
+            include:{
+                Category:{
+                    select:{
+                        name:true
+                    }
+                }
+            }
+        })
         res.status(200).json({ status: 200, msg: service })
 
     } catch (error) {
