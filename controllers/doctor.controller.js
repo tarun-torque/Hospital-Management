@@ -2067,12 +2067,13 @@ export const doctorSessionHistory = async (req, res) => {
                 patientName: patient?.patientName || "Unknown",
                 patientImageUrl: patient?.profileUrl || null,
                 patientGender: patient?.gender || "Unknown",
+                serviceName:service.title,
                 price: service?.price || null,
                 stars: rating?.stars || null,
                 review: rating?.review || null,
                 dateAndTime: booking.slotStart
-            };
-        }));
+            }
+        }))
 
         res.status(200).json({
             status: 200,

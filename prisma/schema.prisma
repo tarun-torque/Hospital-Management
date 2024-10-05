@@ -30,7 +30,6 @@ model ContentCategory {
   image_path  String
 }
 
-
 model Category {
   id              Int       @id @default(autoincrement())
   name            String

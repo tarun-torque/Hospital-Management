@@ -846,6 +846,7 @@ export const patientSessionHistory = async (req, res) => {
                 doctorName: doctor.doctorName,
                 doctorImageUrl: doctor.profileUrl,
                 gender: doctor.gender,
+                serviceName:service.title,
                 price: service.price,
                 dateAndTime: booking.slotStart,
                 stars: rating?.stars || null,
