@@ -536,14 +536,11 @@ export const upcomingSession = async (req, res) => {
         const doctorId = +req.params.doctorId;
         const currentDateTime = new Date();
 
-        
         const startOfDay = new Date(currentDateTime);
-        startOfDay.setHours(0, 0, 0, 0);
-
+        startOfDay.setHours(0, 0, 0, 0)
    
-        const endOfDay = new Date(currentDateTime);
-        endOfDay.setHours(23, 59, 59, 999);
-
+        const endOfDay = new Date(currentDateTime)
+        endOfDay.setHours(23, 59, 59, 999)
       
         const sessions = await prisma.booking.findMany({
             where: {
@@ -554,7 +551,12 @@ export const upcomingSession = async (req, res) => {
                 }
             },
             include: {
-                Patient: true
+                Patient:true,
+                Service:{
+                    select:{
+                        title:true
+                    }
+                }
             },
             orderBy: {
                 slotStart: 'asc' 
@@ -564,8 +566,9 @@ export const upcomingSession = async (req, res) => {
         if (sessions.length === 0) {
             return res.status(400).json({ status: 400, msg: 'No sessions for today' });
         }
+
         const sessionCount = sessions.length
-        res.status(200).json({ status: 200, upcomingSession:sessions, upcomingSessionCount:sessionCount });
+        res.status(200).json({ status: 200, upcomingSession:sessions, upcomingSessionCount:sessionCount })
 
     } catch (error) {
         console.log(error);
