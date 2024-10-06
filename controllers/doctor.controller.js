@@ -89,20 +89,25 @@ export const getDoctorPrice = async (req, res) => {
 // post ticket
 export const recentTicket = async (req, res) => {
     const { title, description } = req.body
+    const fileInfo = req.file
     const patientId = +req.params.patientId
     try {
 
         if (!title || !description) {
             return res.status(400).json({ msg: 400, msg: 'All fields are required' })
         }
-
         if (!patientId) {
             return res.status(400).json({ msg: 400, msg: 'Patient id is required' })
         }
 
-        const patient = await prisma.patient.findUnique({ where: { id: patientId } })
+        const fileType = fileInfo.mimetype == 'image/jpeg' || fileInfo.mimetype == 'image/png'
+        const fileSize = fileInfo.size / (1024 * 1024) <= 2
 
-        const data = { patientId, title, description }
+        if (!fileType || !fileSize) {
+            return res.status(400).json({ status: 400, msg: 'Image type must be JPG/PNG and size less than 2MB' })
+        }
+
+        const data = { patientId, title, description,imageUrl:fileInfo.path }
         const save = await prisma.recentTicket.create({ data })
         res.status(201).json({ status: 201, msg: 'Ticket added Successfully' })
 
@@ -837,233 +842,6 @@ export const signInDoctorFromGoogle = async (req, res) => {
     }
 }
 
-// register test for doctor
-// export const doctorTest = async (req, res) => {
-//     try {
-//         const { username, fcmToken, doctor_name, email, password, country, contact_number, gender, state, otp, languages, specialities, experience, maximum_education, pricePerSession } = req.body
-
-//         if (!email && !otp && !doctor_name) {
-//             return res.status(400).json({ status: 400, msg: 'Enter email' })
-//         }
-
-//         if (
-//             (email !== undefined && email !== null && email !== '')
-//             && (otp === undefined || otp === null || otp === '')
-//             && (doctor_name === undefined || doctor_name === null || doctor_name === '')
-//         ) {
-//             const isEmail = await prisma.doctor.findUnique({ where: { email } })
-//             if (isEmail) {
-//                 await prisma.doctor.delete({ where: { email } })
-//                 return res.status(400).json({ status: 400, msg: 'Try again' })
-//             }
-
-//             const otpNumber = Math.floor(100000 + Math.random() * 900000).toString();
-//             const otpToken = jwt.sign({ otpNumber }, process.env.SECRET_KEY, { expiresIn: '2m' })
-
-//             const saveEmail = await prisma.doctor.create({ data: { email } })
-//             const saveOtpToken = await prisma.doctor.update({ where: { email }, data: { otp: otpToken } })
-
-//             const mailOptions = {
-//                 from: process.env.ADMIN_EMAIL,
-//                 to: email,
-//                 subject: 'Your One-Time Password (OTP) for Verification',
-//                 html: `
-//                     <p>Hello</p>
-//                     <p>Thank you for signing up. Please use the following OTP to verify your email address. This OTP is valid for 2 minutes.</p>
-//                     <h3>${otpNumber}</h3>
-//                     <p>If you did not request this, please contact our support team immediately at support@example.com.</p>
-//                     <p><a href="https://phoenix-sage.vercel.app/">Visit Our website</a></p>
-//                     <p>Follow us on Social Media:<br/>
-//                     <img src="cid:insta" alt="insta icon" style="width: 30px; height: 30px;" />
-//                     <img src="cid:fb" alt="fb icon" style="width:30px; height:30px" />
-//                     <img src="cid:yt" alt="yt icon" style="width:30px; height:30px" />
-//                     </p>
-//                     <p>Best regards,<br>Kanika Jindal<br>Founder<br>example@gmail.com</p>
-//                 `,
-//                 attachments: [
-//                     {
-//                         filename: 'insta_logo.png',
-//                         path: path.join(__dirname, 'attachements', 'insta_logo.png'),
-//                         cid: 'insta'
-//                     },
-//                     {
-//                         filename: 'fb_logo.png',
-//                         path: path.join(__dirname, 'attachements', 'fb_logo.png'),
-//                         cid: 'fb'
-//                     },
-//                     {
-//                         filename: 'yt_logo.png',
-//                         path: path.join(__dirname, 'attachements', 'yt_logo.jpeg'),
-//                         cid: 'yt'
-//                     }
-//                 ]
-//             }
-
-//             transporter.sendMail(mailOptions, async (error, info) => {
-//                 if (error) {
-//                     await prisma.doctor.delete({ where: { email } })
-//                     return res.status(400).json({ msg: 'OTP not sent' })
-//                 } else {
-//                     // await prisma.patient.update({where:{email},data:{email:null}})
-//                     return res.status(200).json({ msg: 'OTP sent check your Email' })
-//                 }
-//             });
-//         }
-
-//         // verify OTP
-//         else if (
-//             (email !== undefined && email !== null && email !== '')
-//             && (otp !== undefined || otp !== null || otp !== '')
-//             && (doctor_name === undefined || doctor_name === null || doctor_name === '')
-//         ) {
-//             try {
-//                 const findOtp = await prisma.doctor.findUnique({ where: { email } })
-//                 const realOtp = findOtp.otp
-//                 const decode = jwt.verify(realOtp, process.env.SECRET_KEY)
-
-
-//                 if (decode.otpNumber == otp) {
-//                     await prisma.doctor.update({ where: { email }, data: { emailVerified: 'yes' } })
-//                     return res.status(200).json({ status: 200, msg: "Email verified" })
-//                 }
-
-
-//                 if (decode.otpNumber !== otp) {
-//                     return res.status(400).json({ status: 400, msg: 'OTP is invalid or expired' })
-//                 }
-
-
-//                 if (decode.otpNumber !== otp) {
-//                     return res.status(400).json({ status: 400, msg: 'OTP is invalid or expired' })
-//                 }
-//             } catch (error) {
-//                 return res.status(400).json({ status: 400, msg: 'OTP is invalid or expired' })
-//             }
-//         }
-//         // then register doctor
-//         else if (
-//             (email !== undefined || email !== null || email !== '')
-//             && (otp !== undefined || otp !== null || otp !== '')
-//             && (patient_name !== undefined)
-//         ) {
-
-//             const isEmailVerified = await prisma.doctor.findUnique({ where: { email } })
-//             if (isEmailVerified.emailVerified === 'no') {
-//                 return res.status(400).json({ status: 400, msg: 'verify email first' })
-//             }
-
-//             const requiredField = ['username', 'fcmToken', 'doctor_name', 'password', 'country', 'contact_number', 'gender', 'state', 'languages', 'specialities', 'experience', 'maximum_education', 'pricePerSession']
-//             for (const field of requiredField) {
-//                 if (req.body[field] === undefined || req.body[field] === '' || req.body[field] === null) {
-//                     return res.status(400).json({ status: 400, msg: `${field} is required` })
-//                 }
-//             }
-
-
-
-//         }
-
-
-//     } catch (error) {
-
-//     }
-// }
-
-//  requst for approval
-// export const CreateDoctor_profile = async (req, res) => {
-//     try {
-
-//         // gather info from the doctor 
-//         const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession, gender } = req.body
-//         const fileInfo = req.files;
-
-//         const isUsername = await prisma.doctor.findUnique({ where: { username } })
-//         const isemail = await prisma.doctor.findUnique({ where: { email } })
-//         if (isUsername || isemail) {
-//             return res.status(409).json({ message: 'Doctor is already present with this Username or Email' })
-//         }
-
-//         // hashing password
-//         const salt = bcrypt.genSaltSync(10)
-//         const hash_pswd = bcrypt.hashSync(password, salt)
-
-//         // profile pic info
-//         const doctorProfile_originalName = fileInfo.doctorProfile[0].originalname;
-//         const doctorProfile_path = fileInfo.doctorProfile[0].path;
-//         const doctorProfile_type = fileInfo.doctorProfile[0].mimetype;
-//         const doctorProfile_size = (fileInfo.doctorProfile[0].size) / (1024 * 1024); //size in MB
-
-//         // documents info
-//         const doctorDocument_originalName = fileInfo.doctorDocument[0].originalname;
-//         const doctorDocument_path = fileInfo.doctorDocument[0].path;
-//         const doctorDocument_type = fileInfo.doctorDocument[0].mimetype;
-//         const doctorDocument_size = (fileInfo.doctorDocument[0].size) / (1024 * 1024); //size in MB
-
-//         // check profile pic
-//         const isProfilePic = (doctorProfile_type == 'image/jpg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
-//         if (!isProfilePic) {
-//             return res.status(400).json({ message: 'Profile Photo must be jpg or png and size less than 2MB' })
-//         }
-//         // check document
-//         const isDocument = (doctorDocument_type == 'application/zip') && (doctorDocument_size <= 20)
-//         if (!isDocument) {
-//             return res.status(400).json({ message: 'Document must be zip and size not greater than 20MB' })
-//         }
-
-//         const experienceInt = parseInt(experience)
-//         const priceInt = parseInt(pricePerSession)
-
-//         // for database
-//         const data = {
-//             doctor_name,
-//             username,
-//             password: hash_pswd,
-//             email,
-//             country,
-//             contact_number,
-//             state,
-//             languages,
-//             specialities,
-//             gender,
-//             experience: experienceInt,
-//             pricePerSession: priceInt,
-//             maximum_education,
-//             profile_pic: doctorProfile_path,
-//             profile_picType: doctorProfile_type,
-//             documents: doctorDocument_path,
-//             documents_type: doctorDocument_type
-//         }
-
-//         const info = await prisma.doctor.create({ data })
-
-
-//         //  for frontend
-//         const forClient = {
-//             role:info.role,
-//             id: info.id,
-//             doctor_name,
-//             username, state,
-//             languages,
-//             specialities,
-//             experience,
-//             maximum_education,
-//             gender,
-//             profile_pic: doctorProfile_path
-
-//         }
-
-
-//         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
-
-//         res.status(201).json({ message: 'Request is done', token })
-
-//     } catch (error) {
-//         console.log(error)
-//         res.send(error)
-//     }
-// }
-
-
 // login doctor
 export const doctorLogin = async (req, res) => {
     try {
@@ -1247,11 +1025,7 @@ export const bookSlot = async (req, res) => {
         const slotStartTimeISO = new Date(slotStart).toISOString();
         const slotEndTimeISO = new Date(slotEnd).toISOString();
 
-        console.log("after iso", slotStartTimeISO, slotEndTime)
-
-
-
-
+        console.log("after iso", slotStartTimeISO, slotEndTimeISO)
 
         // Create a booking
         const booking = await prisma.booking.create({
@@ -1559,102 +1333,9 @@ export const getCategoriesByDoctorId = async (req, res) => {
         console.error('Error retrieving categories:', error);
         return res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
+}
 
 // complete doctor profile
-
-// export const CreateDoctor_profile = async (req, res) => {
-//     try {
-
-//         // gather info from the doctor 
-//         const { doctor_name, username, password, email, country, contact_number, state, languages, specialities, experience, maximum_education, pricePerSession, gender } = req.body
-//         const fileInfo = req.files;
-
-//         const isUsername = await prisma.doctor.findUnique({ where: { username } })
-//         const isemail = await prisma.doctor.findUnique({ where: { email } })
-//         if (isUsername || isemail) {
-//             return res.status(409).json({ message: 'Doctor is already present with this Username or Email' })
-//         }
-
-//         // hashing password
-//         const salt = bcrypt.genSaltSync(10)
-//         const hash_pswd = bcrypt.hashSync(password, salt)
-
-//         // profile pic info
-//         const doctorProfile_originalName = fileInfo.doctorProfile[0].originalname;
-//         const doctorProfile_path = fileInfo.doctorProfile[0].path;
-//         const doctorProfile_type = fileInfo.doctorProfile[0].mimetype;
-//         const doctorProfile_size = (fileInfo.doctorProfile[0].size) / (1024 * 1024); //size in MB
-
-//         // documents info
-//         const doctorDocument_originalName = fileInfo.doctorDocument[0].originalname;
-//         const doctorDocument_path = fileInfo.doctorDocument[0].path;
-//         const doctorDocument_type = fileInfo.doctorDocument[0].mimetype;
-//         const doctorDocument_size = (fileInfo.doctorDocument[0].size) / (1024 * 1024); //size in MB
-
-//         // check profile pic
-//         const isProfilePic = (doctorProfile_type == 'image/jpg' || doctorProfile_type == 'image/png') && (doctorProfile_size <= 2)
-//         if (!isProfilePic) {
-//             return res.status(400).json({ message: 'Profile Photo must be jpg or png and size less than 2MB' })
-//         }
-//         // check document
-//         const isDocument = (doctorDocument_type == 'application/zip') && (doctorDocument_size <= 20)
-//         if (!isDocument) {
-//             return res.status(400).json({ message: 'Document must be zip and size not greater than 20MB' })
-//         }
-
-//         const experienceInt = parseInt(experience)
-//         const priceInt = parseInt(pricePerSession)
-
-//         // for database
-//         const data = {
-//             doctor_name,
-//             username,
-//             password: hash_pswd,
-//             email,
-//             country,
-//             contact_number,
-//             state,
-//             languages,
-//             specialities,
-//             gender,
-//             experience: experienceInt,
-//             pricePerSession: priceInt,
-//             maximum_education,
-//             profile_pic: doctorProfile_path,
-//             profile_picType: doctorProfile_type,
-//             documents: doctorDocument_path,
-//             documents_type: doctorDocument_type
-//         }
-
-//         const info = await prisma.doctor.create({ data })
-
-
-//         //  for frontend
-//         const forClient = {
-//             role:info.role,
-//             id: info.id,
-//             doctor_name,
-//             username, state,
-//             languages,
-//             specialities,
-//             experience,
-//             maximum_education,
-//             gender,
-//             profile_pic: doctorProfile_path
-
-//         }
-
-
-//         const token = jwt.sign(forClient, process.env.SECRET_KEY, { expiresIn: '999h' })
-
-//         res.status(201).json({ message: 'Request is done', token })
-
-//     } catch (error) {
-//         console.log(error)
-//         res.send(error)
-//     }
-// }
 export const completeDoctorProfile = async (req, res) => {
     const { country, contactNumber, state, languages, experience, maximumEducation, pricePerSession, gender } = req.body;
     const fileInfo = req.files;
@@ -1965,7 +1646,7 @@ export const isBookingCompleted = async (req, res) => {
 
 export const deleteAllAvailableSlots = async (req, res) => {
     try {
-        // Delete all entries from the availableSlots table
+    
         await prisma.availableSlots.deleteMany();
 
         res.status(200).json({

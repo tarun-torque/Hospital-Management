@@ -183,6 +183,7 @@ router.put('/admin/update/remarks/:managerId', updateRemarks)
 router.get('/admin/filter/patient', filterPatient);
 router.get('/admin/all/patients', allPatient)
 
+
 //                                  MANAGER APIs------>
 router.post('/manager/login', login_manager)
 router.get('/get/manager/profile/:managerId', eachManager)
@@ -190,6 +191,7 @@ router.get('/manager/get/content', getContentByManager)
 router.get('/manager/:managerId/search/bar', managerSearchBar)
 router.get('/get/manager/:managerId/unread/notification', getManagerUnreadNotification)
 router.get('/get/manager/:managerId/read/notification', getManagerReadNotification)
+
 
 //                                  DOCTOR APIs  -->
 router.post('/doctor/google/signIn', signInDoctorFromGoogle)
@@ -244,7 +246,7 @@ router.get('/get/support/:supportId', eachSupport)
 router.post('/mood/:patientId', mood)
 router.get('/get/:patientId/mood', get_mood)
 router.get('/get/category/from/:doctorId', getCategoriesByDoctorId)
-router.post('/post/recent/ticket/:patientId', recentTicket)
+router.post('/post/recent/ticket/:patientId',upload.single('image'),recentTicket)
 router.get('/get/all/recent/ticket', getAllRecentTicket)
 router.post('/give/rating/:bookingId/:patientId/:doctorId', giveRatingToDoctor)
 router.post('/add/jounal/:patientId', patientJournal)
@@ -261,11 +263,6 @@ router.get('/get/patient/session/history/:patientId', patientSessionHistory)
 router.post('/post/continumm/:patientId', patientAuthInfo, apiLimiter, createContinum)
 router.get('/get/repeated/continum/:patientId',getContinum)
 
-
-// router.post('/:patientId/support',post_support)
-// router.put('/update/:patientId/:supportId',update_support)
-// router.get('/get/support/:id',get_support)
-// router.delete('/delete/:supportId',delete_support)
 
 
 // test notification for patient app

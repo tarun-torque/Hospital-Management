@@ -181,6 +181,7 @@ model recentTicket {
   id          Int      @id @default(autoincrement())
   title       String
   description String
+  imageUrl    String
   Patient     Patient  @relation(fields: [patientId], references: [id])
   patientId   Int
   createdAt   DateTime @default(now())
