@@ -676,8 +676,8 @@ export const rescheduleBooking = async (req, res) => {
         const slotStartTime = new Date(new Date(newStartTime).getTime() - 5.5 * 60 * 60 * 1000)
         const slotEndTime = new Date(new Date(newEndTime).getTime() - 5.5 * 60 * 60 * 1000)
         console.log("rescheduling time after adjust ", slotStartTime, slotEndTime)
-        const slotStartTimeISO = new Date(slotStart).toISOString()
-        const slotEndTimeISO = new Date(slotEnd).toISOString()
+        const slotStartTimeISO = new Date(newStartTime).toISOString()
+        const slotEndTimeISO = new Date(newEndTime).toISOString()
 
         console.log("rescheduling after iso saved in DB", slotStartTimeISO, slotEndTimeISO)
 
