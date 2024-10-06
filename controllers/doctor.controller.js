@@ -70,7 +70,7 @@ export const getDoctorPrice = async (req, res) => {
                 doctorId_serviceId: { doctorId, serviceId }
             }
         })
-        res.status(200).json({ status: 200, yourPrice })
+        res.status(200).json({ status: 200, yourCharges:yourPrice })
 
     } catch (error) {
         console.log(error)

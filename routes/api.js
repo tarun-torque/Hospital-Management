@@ -223,7 +223,6 @@ router.get('/doctor/dashboard/stats/:doctorId', doctorDashboardStats)
 router.get('/get/doctor/session/history/:doctorId', doctorSessionHistory)
 router.get('/get/reviews/:doctorId', getReviewsFromDoctorId)
 
-
 //                                PATIENT APIs -->
 router.post('/patient/signIn/google', signInPatientFromGoogle)
 router.get('/get/patient/profile/:patientId', getPatientProfile)
