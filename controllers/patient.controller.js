@@ -719,6 +719,7 @@ export const rescheduleBooking = async (req, res) => {
             msg: 'Booking rescheduled successfully',
             booking: updatedBooking,
         })
+
     } catch (error) {
         console.error('Error occurred while rescheduling booking:', error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
@@ -794,39 +795,47 @@ export const patientUpcomingSessions = async (req, res) => {
         const serviceIds = upcomingSessions.map(session => session.serviceId);
         const doctorIds = upcomingSessions.map(session => session.doctorId);
 
-        // Retrieve services with titles
+    
         const services = await prisma.service.findMany({
             where: { id: { in: serviceIds } },
             select: { id: true, title: true },
         });
 
-        // Retrieve doctors with names
+    
         const doctors = await prisma.doctor.findMany({
             where: { id: { in: doctorIds } },
-            select: { id: true, doctorName: true,profileUrl:true },
-        })
+            select: { id: true, doctorName: true, profileUrl: true },
+        });
 
-        // Map service and doctor information by their IDs
+   
         const serviceMap = services.reduce((map, service) => {
-            map[service.id] = service.title
+            map[service.id] = service.title;
             return map;
         }, {});
 
         const doctorMap = doctors.reduce((map, doctor) => {
             map[doctor.id] = {
                 doctorName: doctor.doctorName,
-                doctorProfile: doctor.profileUrl,
+                doctorProfile: doctor.profileUrl, 
             };
             return map;
-        }, {})
+        }, {});
 
-        // Merge doctor name and service title with session details
+    
         const sessionsWithDetails = upcomingSessions.map(session => ({
-            ...session,
-            serviceTitle: serviceMap[session.serviceId],
-            doctorName: doctorMap[session.doctorId],
-            doctorProfile: doctorMap[session.doctorId]?.doctorProfile
-        }))
+            id: session.id,
+            patientId: session.patientId,
+            doctorId: session.doctorId,
+            slotStart: session.slotStart,
+            slotEnd: session.slotEnd,
+            channelName: session.channelName,
+            notes: session.notes,
+            isCompleted: session.isCompleted,
+            notified: session.notified,
+            serviceTitle: serviceMap[session.serviceId], 
+            doctorName: doctorMap[session.doctorId]?.doctorName, 
+            doctorProfile: doctorMap[session.doctorId]?.doctorProfile,
+        }));
 
         res.status(200).json({ status: 200, sessions: sessionsWithDetails });
     } catch (error) {
