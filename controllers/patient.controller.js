@@ -803,26 +803,30 @@ export const patientUpcomingSessions = async (req, res) => {
         // Retrieve doctors with names
         const doctors = await prisma.doctor.findMany({
             where: { id: { in: doctorIds } },
-            select: { id: true, doctorName: true },
-        });
+            select: { id: true, doctorName: true,profileUrl:true },
+        })
 
         // Map service and doctor information by their IDs
         const serviceMap = services.reduce((map, service) => {
-            map[service.id] = service.title;
+            map[service.id] = service.title
             return map;
         }, {});
 
         const doctorMap = doctors.reduce((map, doctor) => {
-            map[doctor.id] = doctor.doctorName;
+            map[doctor.id] = {
+                doctorName: doctor.doctorName,
+                doctorProfile: doctor.profileUrl,
+            };
             return map;
-        }, {});
+        }, {})
 
         // Merge doctor name and service title with session details
         const sessionsWithDetails = upcomingSessions.map(session => ({
             ...session,
             serviceTitle: serviceMap[session.serviceId],
             doctorName: doctorMap[session.doctorId],
-        }));
+            doctorProfile: doctorMap[session.doctorId]?.doctorProfile
+        }))
 
         res.status(200).json({ status: 200, sessions: sessionsWithDetails });
     } catch (error) {
