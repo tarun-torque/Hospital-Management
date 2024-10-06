@@ -78,14 +78,6 @@ export const getDoctorPrice = async (req, res) => {
     }
 }
 
-
-
-
-
-
-
-
-
 // post ticket
 export const recentTicket = async (req, res) => {
     const { title, description } = req.body
@@ -110,7 +102,6 @@ export const recentTicket = async (req, res) => {
         const data = { patientId, title, description,imageUrl:fileInfo.path }
         const save = await prisma.recentTicket.create({ data })
         res.status(201).json({ status: 201, msg: 'Ticket added Successfully' })
-
     } catch (error) {
         console.log(error)
         res.status(500).json({ status: 500, msg: 'Sometging went wrong' })
@@ -504,9 +495,9 @@ export const getDoctorProfile = async (req, res) => {
 
 // add service
 export const addDoctorService = async (req, res) => {
+    const serviceId = +req.params.serviceId
+    const doctorId = +req.params.doctorId
     try {
-        const { serviceId, doctorId } = req.body
-
         // Validate that the doctorId and serviceId exist
         const doctor = await prisma.doctor.findUnique({ where: { id: doctorId } });
         const service = await prisma.service.findUnique({ where: { id: serviceId } });
@@ -519,19 +510,16 @@ export const addDoctorService = async (req, res) => {
             return res.status(404).json({ msg: 'Service not found' });
         }
 
-        // Create or connect the DoctorService relation
         const doctorService = await prisma.doctorService.create({
             data: {
                 doctorId,
                 serviceId
             },
         })
-
         return res.status(201).json({ status: 201, message: 'Service added successfully', doctorService });
-
     } catch (error) {
         console.error('Error adding service:', error);
-        return res.status(500).json({ status: 500, msg: 'Internal server error' });
+        return res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
 }
 
