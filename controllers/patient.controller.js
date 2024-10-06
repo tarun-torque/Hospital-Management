@@ -667,18 +667,26 @@ export const get_mood = async (req, res) => {
     }
 }
 
-
-
 // resheduling the session 
 export const rescheduleBooking = async (req, res) => {
     const { newStartTime, newEndTime } = req.body
     const bookingId = +req.params.bookingId
-    const doctorId = +req.params.doctorId
-    console.log("rescheduling time", newStartTime, newEndTime)
+    console.log("rescheduling time from frontend", newStartTime, newEndTime)
     try {
+        const slotStartTime = new Date(new Date(newStartTime).getTime() - 5.5 * 60 * 60 * 1000)
+        const slotEndTime = new Date(new Date(newEndTime).getTime() - 5.5 * 60 * 60 * 1000)
+        console.log("rescheduling time after adjust ", slotStartTime, slotEndTime)
+        const slotStartTimeISO = new Date(slotStart).toISOString()
+        const slotEndTimeISO = new Date(slotEnd).toISOString()
+
+        console.log("rescheduling after iso saved in DB", slotStartTimeISO, slotEndTimeISO)
+
         const existingBooking = await prisma.booking.findUnique({
             where: { id: bookingId },
         })
+
+        const doctorId = existingBooking.doctorId
+        const patientId = existingBooking.patientId
 
         if (!existingBooking) {
             return res.status(404).json({ status: 404, msg: 'Booking not found' });
@@ -688,8 +696,8 @@ export const rescheduleBooking = async (req, res) => {
             where: {
                 doctorId_startTime_endTime: {
                     doctorId,
-                    startTime: newStartTime,
-                    endTime: newEndTime,
+                    startTime: slotStartTimeISO,
+                    endTime:slotEndTimeISO,
                 },
             },
         })
@@ -701,8 +709,8 @@ export const rescheduleBooking = async (req, res) => {
         const updatedBooking = await prisma.booking.update({
             where: { id: bookingId },
             data: {
-                slotStart: newStartTime,
-                slotEnd: newEndTime,
+                slotStart: slotStartTimeISO,
+                slotEnd:slotEndTimeISO,
             },
         })
 
@@ -716,7 +724,6 @@ export const rescheduleBooking = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
 }
-
 
 // update patient profile
 export const updatePatientProfile = async (req, res) => {
