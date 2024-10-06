@@ -586,7 +586,7 @@ export const getServiceFromId = async (req, res) => {
 // get service from doctor id 
 export const getServicesByDoctorId = async (req, res) => {
     try {
-        const { doctorId } = req.params;
+        const { doctorId } = req.params
 
         const doctorServices = await prisma.doctorService.findMany({
             where: { doctorId: parseInt(doctorId) },
@@ -596,6 +596,14 @@ export const getServicesByDoctorId = async (req, res) => {
                         Category:{
                             select:{
                                 name:true
+                            }
+                        },
+                        doctorPrice:{
+                            where:{
+                                doctorId:parseInt(doctorId)
+                            },
+                            select:{
+                                yourPrice:true
                             }
                         }
                     }
@@ -607,7 +615,8 @@ export const getServicesByDoctorId = async (req, res) => {
             return res.status(404).json({ message: 'No services found for this doctor' });
         }
 
-        return res.status(200).json(doctorServices);
+        return res.status(200).json(doctorServices)
+
     } catch (error) {
         console.error('Error retrieving services by doctorId:', error);
         return res.status(500).json({ error: 'Internal server error' });
