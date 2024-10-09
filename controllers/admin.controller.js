@@ -1922,18 +1922,18 @@ export const getRatingFromId = async (req, res) => {
         const rating = await prisma.rating.findUnique({
             where: { id: ratingId },
             select: {
-                id: true, // Include id
-                stars: true, // Include stars
-                isPublic: true, // Include isPublic
-                review: true, // Include review
-                createdAt: true, // Include createdAt
-                updatedAt: true, // Include updatedAt
-                Doctor: { select: { doctorName: true, profileUrl: true } }, // Include doctor details
-                Patient: { select: { patientName: true, profileUrl: true } }, // Include patient details
-                Booking: { select: { Service: { select: { title: true } } } } // Include service title
+                id: true,
+                stars: true,
+                isPublic: true,
+                review: true,
+                createdAt: true,
+                updatedAt: true,
+                Doctor: { select: { doctorName: true, profileUrl: true } },
+                Patient: { select: { patientName: true, profileUrl: true } },
+                Booking: { select: { Service: { select: { title: true } } } }
             }
         });
-        
+
         if (!rating) {
             return res.status(404).json({ status: 404, msg: 'Rating not found' });
         }
@@ -1971,25 +1971,23 @@ export const disapproveRating = async (req, res) => {
 }
 
 // get completed appointments
-// export const getCompletedAppointmetnts = async (req, res) => {
-//     try {
-//         const appointments = await prisma.appointments.findMany({
-//             where: { isCompleted: 'yes' },
-//             select: {
-//                 slotStart: true
-//             },
-//             include: {
-//                 Doctor: { select: { doctorName: true } },
-//                 Service: { select: { service } },
-//                 Patient: { select: { rating: {} } }
-//             }
+export const getCompletedAppointmetnts = async (req, res) => {
+    try {
+        const appointments = await prisma.booking.findMany({
+            where: { isCompleted: 'yes' },
+            select: {
+                slotStart: true,
+                Patient: { select: { patientName: true, Rating: { stars: true, review: true } } },
+                Service: { select: { title: true } },
+            }
+        })
 
-
-//         },
-
-
-//         )
-//     } catch (error) {
-
-//     }
-// }
+        if (appointments.length === 0) {
+            res.status(404).json({ status: 404, json: 'No Appointments Found' })
+        }
+        res.status(200).json({ status: 200, msg: appointments })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
