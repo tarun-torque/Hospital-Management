@@ -2003,7 +2003,7 @@ export const getCompletedAppointmetnts = async (req, res) => {
 export const adminStats = async (req, res) => {
     try {
         // total doctors
-        const totlaDoctors = (await prisma.doctor.findMany()).length
+        const totalDoctors = (await prisma.doctor.findMany()).length
         // pending doctors
         const pendingDoctors = (await prisma.doctor.findMany({ where: { verified: 'no' } })).length
         // certified doctors
@@ -2079,9 +2079,9 @@ export const adminStats = async (req, res) => {
         // temporary off manager
         const temporarilyOffManagers = (await prisma.manager.findMany({ where: { status: 'temporaryoff' } })).length
 
-        res.status(500).json({
-            status: 500, msg:
-                totlaDoctors,
+        res.status(200).json({
+            status: 200,
+            totalDoctors,
             pendingDoctors,
             certifiedDoctors,
             temporarilyOffDoctors,
