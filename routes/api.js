@@ -168,7 +168,7 @@ router.get('/admin/registered/user', registeredUser)
 
 // ratings 
 router.get('/get/all/rating',getAllRating)
-router.get('/get/rating:ratingId',getRatingFromId)
+router.get('/get/rating/:ratingId',getRatingFromId)
 router.put('/approve/rating/:ratingId',approveRating)
 router.put('/disapprove/rating/:ratingId',disapproveRating)
 
