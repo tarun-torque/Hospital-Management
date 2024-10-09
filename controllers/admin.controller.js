@@ -2081,45 +2081,163 @@ export const adminStats = async (req, res) => {
 
         res.status(200).json({
             status: 200,
-            totalDoctors,
-            pendingDoctors,
-            certifiedDoctors,
-            temporarilyOffDoctors,
-            activeDoctors,
-            inactiveDoctors,
-            appointments,
-            registeredUser,
-            totalServices,
-            earningTillNow: null,
-            earningThisMonth: null,
-            totalCategories,
-            totalContentCategories,
-            totalBlogs,
-            pendingBlogs,
-            publishBlogs,
-            unpublishBlogs,
-            rejectedBlogs,
-            totalArticles,
-            improveBlogs,
-            pendingArticles,
-            publishArticles,
-            unpublishArticles,
-            improveArticles,
-            rejectedArticles,
-            totalYtContent,
-            pendingYtContent,
-            publishYtContent,
-            unpublishYtContent,
-            improveYtContent,
-            rejectedYtContent,
-            totalCreators,
-            activeCreators,
-            inactiveCreators,
-            temporarilyOffCreators,
-            totalManagers,
-            activeManagers,
-            inactiveManagers,
-            temporarilyOffManagers
+            totalDoctors: {
+                "name": "Total Doctors",
+                "number": totalDoctors
+            },
+            pendingDoctors: {
+                "name": "Pending Doctors",
+                "number": pendingDoctors
+            },
+            certifiedDoctors: {
+                "name": "Certified Doctors",
+                "number": certifiedDoctors
+            },
+            temporarilyOffDoctors: {
+                "name": "Temporarily Off Doctors",
+                "number": temporarilyOffDoctors
+            },
+            activeDoctors: {
+                "name": "Active Doctors",
+                "number": activeDoctors
+            },
+            inactiveDoctors: {
+                "name": "Inactive Doctors",
+                "number": inactiveDoctors
+            },
+            appointments: {
+                "name": "Appointments",
+                "number": appointments
+            },
+            registeredUser: {
+                "name": "Registered Users",
+                "number": registeredUser
+            },
+            totalServices: {
+                "name": "Total Services",
+                "number": totalServices
+            },
+            earningTillNow: {
+                "name": "Earning Till Now",
+                "number": earningTillNow
+            },
+            earningThisMonth: {
+                "name": "Earning This Month",
+                "number": earningThisMonth
+            },
+            totalCategories: {
+                "name": "Total Categories",
+                "number": totalCategories
+            },
+            totalContentCategories: {
+                "name": "Total Content Categories",
+                "number": totalContentCategories
+            },
+            totalBlogs: {
+                "name": "Total Blogs",
+                "number": totalBlogs
+            },
+            pendingBlogs: {
+                "name": "Pending Blogs",
+                "number": pendingBlogs
+            },
+            publishBlogs: {
+                "name": "Published Blogs",
+                "number": publishBlogs
+            },
+            unpublishBlogs: {
+                "name": "Unpublished Blogs",
+                "number": unpublishBlogs
+            },
+            rejectedBlogs: {
+                "name": "Rejected Blogs",
+                "number": rejectedBlogs
+            },
+            totalArticles: {
+                "name": "Total Articles",
+                "number": totalArticles
+            },
+            improveBlogs: {
+                "name": "Blogs for Improvement",
+                "number": improveBlogs
+            },
+            pendingArticles: {
+                "name": "Pending Articles",
+                "number": pendingArticles
+            },
+            publishArticles: {
+                "name": "Published Articles",
+                "number": publishArticles
+            },
+            unpublishArticles: {
+                "name": "Unpublished Articles",
+                "number": unpublishArticles
+            },
+            improveArticles: {
+                "name": "Articles for Improvement",
+                "number": improveArticles
+            },
+            rejectedArticles: {
+                "name": "Rejected Articles",
+                "number": rejectedArticles
+            },
+            totalYtContent: {
+                "name": "Total YouTube Content",
+                "number": totalYtContent
+            },
+            pendingYtContent: {
+                "name": "Pending YouTube Content",
+                "number": pendingYtContent
+            },
+            publishYtContent: {
+                "name": "Published YouTube Content",
+                "number": publishYtContent
+            },
+            unpublishYtContent: {
+                "name": "Unpublished YouTube Content",
+                "number": unpublishYtContent
+            },
+            improveYtContent: {
+                "name": "YouTube Content for Improvement",
+                "number": improveYtContent
+            },
+            rejectedYtContent: {
+                "name": "Rejected YouTube Content",
+                "number": rejectedYtContent
+            },
+            totalCreators: {
+                "name": "Total Creators",
+                "number": totalCreators
+            },
+            activeCreators: {
+                "name": "Active Creators",
+                "number": activeCreators
+            },
+            inactiveCreators: {
+                "name": "Inactive Creators",
+                "number": inactiveCreators
+            },
+            temporarilyOffCreators: {
+                "name": "Temporarily Off Creators",
+                "number": temporarilyOffCreators
+            },
+            totalManagers: {
+                "name": "Total Managers",
+                "number": totalManagers
+            },
+            activeManagers: {
+                "name": "Active Managers",
+                "number": activeManagers
+            },
+            inactiveManagers: {
+                "name": "Inactive Managers",
+                "number": inactiveManagers
+            },
+            temporarilyOffManagers: {
+                "name": "Temporarily Off Managers",
+                "number": temporarilyOffManagers
+            }
+            
         })
     } catch (error) {
         console.log(error)

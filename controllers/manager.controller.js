@@ -391,37 +391,119 @@ export const managerStats = async (req, res) => {
         }))
         res.status(200).json({
             status: 200,
-            totalCreators:{
-                "name":"Total creators",
-                "number":totalCreators
+            totalCreators: {
+                "name": "Total Creators",
+                "number": totalCreators
             },
-            activeCreators,
-            inactiveCreators,
-            temporarilyOffCreators,
-            totalDoctors,
-            activeDoctors,
-            inactiveDoctors,
-            temporarilyOffDoctors,
-            pendingDoctors,
-            certifiedDoctors,
-            totalBlogs,
-            pendingBlogs,
-            publishBlogs,
-            unpublishBlogs,
-            improveBlogs,
-            rejectedBlogs,
-            totalArticles,
-            pendingArticles,
-            publishArticles,
-            unpublishArticles,
-            improveArticles,
-            rejectedArticles,
-            totalYtContent,
-            pendingYtContent,
-            publishYtContent,
-            unpublishYtContent,
-            improveYtContent,
-            rejectedYtContent
+            activeCreators: {
+                "name": "Active Creators",
+                "number": activeCreators
+            },
+            inactiveCreators: {
+                "name": "Inactive Creators",
+                "number": inactiveCreators
+            },
+            temporarilyOffCreators: {
+                "name": "Temporarily Off Creators",
+                "number": temporarilyOffCreators
+            },
+            totalDoctors: {
+                "name": "Total Doctors",
+                "number": totalDoctors
+            },
+            activeDoctors: {
+                "name": "Active Doctors",
+                "number": activeDoctors
+            },
+            inactiveDoctors: {
+                "name": "Inactive Doctors",
+                "number": inactiveDoctors
+            },
+            temporarilyOffDoctors: {
+                "name": "Temporarily Off Doctors",
+                "number": temporarilyOffDoctors
+            },
+            pendingDoctors: {
+                "name": "Pending Doctors",
+                "number": pendingDoctors
+            },
+            certifiedDoctors: {
+                "name": "Certified Doctors",
+                "number": certifiedDoctors
+            },
+            totalBlogs: {
+                "name": "Total Blogs",
+                "number": totalBlogs
+            },
+            pendingBlogs: {
+                "name": "Pending Blogs",
+                "number": pendingBlogs
+            },
+            publishBlogs: {
+                "name": "Published Blogs",
+                "number": publishBlogs
+            },
+            unpublishBlogs: {
+                "name": "Unpublished Blogs",
+                "number": unpublishBlogs
+            },
+            improveBlogs: {
+                "name": "Blogs for Improvement",
+                "number": improveBlogs
+            },
+            rejectedBlogs: {
+                "name": "Rejected Blogs",
+                "number": rejectedBlogs
+            },
+            totalArticles: {
+                "name": "Total Articles",
+                "number": totalArticles
+            },
+            pendingArticles: {
+                "name": "Pending Articles",
+                "number": pendingArticles
+            },
+            publishArticles: {
+                "name": "Published Articles",
+                "number": publishArticles
+            },
+            unpublishArticles: {
+                "name": "Unpublished Articles",
+                "number": unpublishArticles
+            },
+            improveArticles: {
+                "name": "Articles for Improvement",
+                "number": improveArticles
+            },
+            rejectedArticles: {
+                "name": "Rejected Articles",
+                "number": rejectedArticles
+            },
+            totalYtContent: {
+                "name": "Total YouTube Content",
+                "number": totalYtContent
+            },
+            pendingYtContent: {
+                "name": "Pending YouTube Content",
+                "number": pendingYtContent
+            },
+            publishYtContent: {
+                "name": "Published YouTube Content",
+                "number": publishYtContent
+            },
+            unpublishYtContent: {
+                "name": "Unpublished YouTube Content",
+                "number": unpublishYtContent
+            },
+            improveYtContent: {
+                "name": "YouTube Content for Improvement",
+                "number": improveYtContent
+            },
+            rejectedYtContent: {
+                "name": "Rejected YouTube Content",
+                "number": rejectedYtContent
+            }
+            
         })
     } catch (error) {
         console.error(error)
