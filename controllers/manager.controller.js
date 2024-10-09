@@ -210,8 +210,7 @@ export const getManagerReadNotification = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
-
+}
 
 // manager stats
 export const managerStats = async (req, res) => {
@@ -229,8 +228,8 @@ export const managerStats = async (req, res) => {
         const activeDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, status: 'active' } })).length
         const inactiveDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, status: 'inactive' } })).length
         const temporarilyOffDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, status: 'temporaryoff' } })).length
-        const pendingDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, isVerified: 'no' } })).length
-        const certifiedDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, isVerified: 'yes' } })).length
+        const pendingDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, verified: 'no' } })).length
+        const certifiedDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, verified: 'yes' } })).length
         // blogs
         const totalBlogs = (await prisma.blog_content.count({
             where: {
