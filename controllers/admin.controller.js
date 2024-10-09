@@ -1891,10 +1891,16 @@ export const registeredUser = async (req, res) => {
 export const getAllRating = async (req, res) => {
     try {
         const allRating = await prisma.rating.findMany({
-            include: {
-                Doctor: { select: { doctorName: true, profileUrl: true } },
-                Patient: { select: { patientName: true, profileUrl: true } },
-                Booking: { select: { Service: { select: { title: true } } } }
+            select: {
+                id: true, // Include id
+                stars: true, // Include stars
+                isPublic: true, // Include isPublic
+                review: true, // Include review
+                createdAt: true, // Include createdAt
+                updatedAt: true, // Include updatedAt
+                Doctor: { select: { doctorName: true, profileUrl: true } }, // Include doctor details
+                Patient: { select: { patientName: true, profileUrl: true } }, // Include patient details
+                Booking: { select: { Service: { select: { title: true } } } } // Include service title
             }
         });
 
@@ -1907,8 +1913,7 @@ export const getAllRating = async (req, res) => {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
-
+}
 
 // get rating from rating id
 export const getRatingFromId = async (req, res) => {
@@ -1916,10 +1921,16 @@ export const getRatingFromId = async (req, res) => {
     try {
         const rating = await prisma.rating.findUnique({
             where: { id: ratingId },
-            include: {
-                Doctor: { select: { doctorName: true, profileUrl: true } },
-                Patient: { select: { patientName: true, profileUrl: true } },
-                Booking: { select: { Service: { select: { title: true } } } }
+            select: {
+                id: true, // Include id
+                stars: true, // Include stars
+                isPublic: true, // Include isPublic
+                review: true, // Include review
+                createdAt: true, // Include createdAt
+                updatedAt: true, // Include updatedAt
+                Doctor: { select: { doctorName: true, profileUrl: true } }, // Include doctor details
+                Patient: { select: { patientName: true, profileUrl: true } }, // Include patient details
+                Booking: { select: { Service: { select: { title: true } } } } // Include service title
             }
         });
         
@@ -1932,7 +1943,8 @@ export const getRatingFromId = async (req, res) => {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
+}
+
 
 // to approve rating 
 export const approveRating = async (req, res) => {

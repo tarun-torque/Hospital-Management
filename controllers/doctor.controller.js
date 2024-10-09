@@ -112,34 +112,71 @@ export const recentTicket = async (req, res) => {
 export const getAllRecentTicket = async (req, res) => {
     try {
         const tickets = await prisma.recentTicket.findMany({
-            include: {
+            select: {
+                id: true, // Include id
+                title: true, // Include title
+                description: true, // Include description
+                imageUrl: true, // Include imageUrl
+                createdAt: true, // Include createdAt timestamp
+                updatedAt: true, // Include updatedAt timestamp
+                // Include patient details without showing patientId
                 Patient: {
                     select: {
-                        username: true,
-                        patient_name: true,
-                        profile_path: true
-                    }
-                }
-            }
+                        patientName: true,
+                        profileUrl: true,
+                    },
+                },
+            },
         });
-        res.status(200).json({ status: 200, tickets });
 
+        if(tickets.length===0){
+            return res.status(404).json({status:404,msg:'No Ticket Founnd'})
+        }
+
+        res.status(200).json({ status: 200, msg:tickets });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
 
-// get recent Ticket from its ID
-export const getRecentTicketFromId = async(req,res)=>{
-    const ticketId = +req.params.id
+// get ticket from ticket id 
+export const getRecentTicketById = async (req, res) => {
+    const ticketId = +req.params.ticketId
     try {
+        const ticket = await prisma.recentTicket.findUnique({
+            where: { id: ticketId },
+            select: {
+                id: true, 
+                title: true, // Include title
+                description: true, 
+                imageUrl: true, // Include imageUrl
+                createdAt: true, // Include createdAt timestamp
+                updatedAt: true, // Include updatedAt timestamp
+                // Include patient details without patientId
+                Patient: {
+                    select: {
+                        patientName: true,
+                        profileUrl: true,
+                    },
+                },
+            },
+        });
 
-        
+        // Check if the ticket exists
+        if (!ticket) {
+            return res.status(404).json({ status: 404, msg: 'Ticket not found' });
+        }
+
+        // Send the found ticket
+        res.status(200).json({ status: 200, msg:ticket });
     } catch (error) {
-        
+        console.log(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
+
 
 // get trending consultant
 export const trendingConsultant = async (req, res) => {
