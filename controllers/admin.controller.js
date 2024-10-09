@@ -2119,11 +2119,11 @@ export const adminStats = async (req, res) => {
             },
             earningTillNow: {
                 "name": "Earning Till Now",
-                "number": earningTillNow
+                "number": null
             },
             earningThisMonth: {
                 "name": "Earning This Month",
-                "number": earningThisMonth
+                "number": null
             },
             totalCategories: {
                 "name": "Total Categories",
