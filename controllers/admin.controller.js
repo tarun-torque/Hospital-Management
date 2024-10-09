@@ -10,6 +10,8 @@ import { json } from 'express'
 import extractContent from '../utils/htmlExtractor.js'
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { title } from 'process'
+import { isBookingCompleted } from './doctor.controller.js'
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -1742,16 +1744,16 @@ export const allService = async (req, res) => {
 export const getServiceFromCategoryId = async (req, res) => {
     try {
         const categoryId = +req.params.categoryId;
-        const category = await prisma.service.findMany({ 
+        const category = await prisma.service.findMany({
             where: { categoryId },
-            include:{
-                Category:{
-                    select:{
-                        name:true
+            include: {
+                Category: {
+                    select: {
+                        name: true
                     }
                 }
             }
-         })
+        })
 
         res.status(200).json({ status: 200, msg: category })
 
@@ -1766,10 +1768,10 @@ export const getServiceFromServiceId = async (req, res) => {
         const serviceId = +req.params.serviceId;
         const service = await prisma.service.findUnique({
             where: { id: serviceId },
-            include:{
-                Category:{
-                    select:{
-                        name:true
+            include: {
+                Category: {
+                    select: {
+                        name: true
                     }
                 }
             }
@@ -1884,3 +1886,99 @@ export const registeredUser = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
+// get all rating
+export const getAllRating = async (req, res) => {
+    try {
+        const allRating = await prisma.rating.findMany({
+            select: {
+                patientId: false,
+                doctorId: false,
+                bookingId: false
+            },
+            include: {
+                Doctor: { select: { doctorName: true, profileUrl: true } },
+                Patient: { select: { patientName: true, profileUrl: true } },
+                Booking: { select: { Service: { select: { title: true } } } }
+            }
+        })
+        if (allRating.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No Rating Found' })
+        }
+        res.status(200).json({ status: 200, msg: allRating })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Somethig went wrong' })
+    }
+}
+
+// get rating from rating id
+export const getRatingFromId = async (req, res) => {
+    const ratingId = +req.params.ratingId
+    try {
+        const rating = await prisma.rating.findUnique({
+            where: { id: ratingId },
+            select: {
+                patientId: false,
+                doctorId: false,
+                bookingId: false
+            },
+            include: {
+                Doctor: { select: { doctorName: true, profileUrl: true } },
+                Patient: { select: { patientName: true, profileUrl: true } },
+                Booking: { select: { Service: { select: { title: true } } } }
+            }
+        })
+        res.status(200).json({ status: 200, msg: rating })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+// to approve rating 
+export const approveRating = async (req, res) => {
+    const ratingId = +req.params.ratingId
+    try {
+        const approveRating = await prisma.rating.update({ where: { id: ratingId }, data: { isPublic: 'yes' } })
+        res.status(200).json({ status: 200, msg: 'Rating Approved Successfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// to disapprove rating
+export const disapproveRating = async (req, res) => {
+    const ratingId = +req.params.ratingId
+    try {
+        const approveRating = await prisma.rating.update({ where: { id: ratingId }, data: { isPublic: 'no' } })
+        res.status(200).json({ status: 200, msg: 'Rating Disapproved Successfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// get completed appointments
+// export const getCompletedAppointmetnts = async (req, res) => {
+//     try {
+//         const appointments = await prisma.appointments.findMany({
+//             where: { isCompleted: 'yes' },
+//             select: {
+//                 slotStart: true
+//             },
+//             include: {
+//                 Doctor: { select: { doctorName: true } },
+//                 Service: { select: { service } },
+//                 Patient: { select: { rating: {} } }
+//             }
+
+
+//         },
+
+
+//         )
+//     } catch (error) {
+
+//     }
+// }

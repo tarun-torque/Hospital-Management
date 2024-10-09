@@ -1336,7 +1336,8 @@ export const getCategoriesByDoctorId = async (req, res) => {
 export const completeDoctorProfile = async (req, res) => {
     const { country, contactNumber, state, languages, experience, maximumEducation, pricePerSession, gender } = req.body;
     const fileInfo = req.files;
-    const doctorId = parseInt(req.params.doctorId);
+    const doctorId = parseInt(req.params.doctorId)
+    
 
     try {
         // Check for required fields
@@ -1388,8 +1389,7 @@ export const completeDoctorProfile = async (req, res) => {
             gender,
             profileUrl: doctorProfile_path,
             documents: doctorDocument_path,
-        };
-
+        }
 
         const saveData = await prisma.doctor.update({ where: { id: doctorId }, data });
         res.status(200).json({ status: 200, msg: 'Profile completed successfully' });
