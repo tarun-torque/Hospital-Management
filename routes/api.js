@@ -191,7 +191,6 @@ router.put('/admin/update/remarks/:managerId', updateRemarks)
 router.get('/admin/filter/patient', filterPatient);
 router.get('/admin/all/patients', allPatient)
 
-
 //                                  MANAGER APIs------>
 router.post('/manager/login', login_manager)
 router.get('/get/manager/profile/:managerId', eachManager)
