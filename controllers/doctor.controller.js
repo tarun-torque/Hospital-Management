@@ -148,12 +148,12 @@ export const getRecentTicketById = async (req, res) => {
             where: { id: ticketId },
             select: {
                 id: true, 
-                title: true, // Include title
+                title: true, 
                 description: true, 
-                imageUrl: true, // Include imageUrl
-                createdAt: true, // Include createdAt timestamp
-                updatedAt: true, // Include updatedAt timestamp
-                // Include patient details without patientId
+                imageUrl: true, 
+                createdAt: true, 
+                updatedAt: true, 
+           
                 Patient: {
                     select: {
                         patientName: true,
@@ -163,12 +163,9 @@ export const getRecentTicketById = async (req, res) => {
             },
         });
 
-        // Check if the ticket exists
         if (!ticket) {
             return res.status(404).json({ status: 404, msg: 'Ticket not found' });
         }
-
-        // Send the found ticket
         res.status(200).json({ status: 200, msg:ticket });
     } catch (error) {
         console.log(error);

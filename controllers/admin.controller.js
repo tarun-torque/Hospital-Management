@@ -1977,8 +1977,14 @@ export const getCompletedAppointmetnts = async (req, res) => {
             where: { isCompleted: 'yes' },
             select: {
                 slotStart: true,
-                Patient: { select: { patientName: true, Rating: { select:{stars: true, review: true} } } },
+                Patient: { select: { patientName: true } },
                 Service: { select: { title: true } },
+                Rating: {
+                    select: {
+                        review: true,
+                        stars: true
+                    }
+                }
             }
         })
 
@@ -1994,7 +2000,7 @@ export const getCompletedAppointmetnts = async (req, res) => {
 
 
 // admin complete stats
-export const adminStats = async(req,res)=>{
+export const adminStats = async (req, res) => {
     try {
         // total doctors
         // pending doctors
@@ -2002,8 +2008,24 @@ export const adminStats = async(req,res)=>{
         // rejected doctors
         // temporary off doctors
         // active doctors
-        // 
+        // appointments this months
+        //registered users
+        // total services
+        // earning this month
+        // earning till now
+        // total categories
+        // total blogs
+        // total articles
+        // total yt content
+        // total creators
+        // active creators 
+        // inactive creators
+        // temporary off creators 
+        // total manager
+        // active manager 
+        // inactive maanger
+        // temporary off manager
     } catch (error) {
-        
+
     }
 } 
