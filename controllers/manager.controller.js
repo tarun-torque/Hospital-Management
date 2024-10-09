@@ -217,7 +217,7 @@ export const getManagerReadNotification = async (req, res) => {
 export const managerStats = async (req, res) => {
     const managerId = +req.params.managerId
     try {
-        const isManager = await prisma.manager.findUnique({ id: managerId })
+        const isManager = await prisma.manager.findUnique({where:{id:managerId}})
         const username = isManager?.username
         //creators
         const totalCreators = (await prisma.creator.findMany({ where: { assignedManager: username } })).length
