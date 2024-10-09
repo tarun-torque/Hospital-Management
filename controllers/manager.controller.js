@@ -392,7 +392,8 @@ export const managerStats = async (req, res) => {
         res.status(200).json({
             status: 200,
             totalCreators:{
-                "Total creators":totalCreators
+                "name":"Total creators",
+                "number":totalCreators
             },
             activeCreators,
             inactiveCreators,
