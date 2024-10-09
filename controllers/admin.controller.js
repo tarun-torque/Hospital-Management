@@ -2003,29 +2003,126 @@ export const getCompletedAppointmetnts = async (req, res) => {
 export const adminStats = async (req, res) => {
     try {
         // total doctors
+        const totlaDoctors = (await prisma.doctor.findMany()).length
         // pending doctors
+        const pendingDoctors = (await prisma.doctor.findMany({ where: { verified: 'no' } })).length
         // certified doctors
-        // rejected doctors
+        const certifiedDoctors = (await prisma.doctor.findMany({ where: { verified: 'yes' } })).length
         // temporary off doctors
+        const temporarilyOffDoctors = (await prisma.doctor.findMany({ where: { status: 'temporaryoff' } })).length
         // active doctors
+        const activeDoctors = (await prisma.doctor.findMany({ where: { status: 'active' } })).length
+        // inactive doctors
+        const inactiveDoctors = (await prisma.doctor.findMany({ where: { status: 'inactive' } })).length
         // appointments this months
+        const appointments = (await prisma.booking.findMany({ where: { isCompleted: 'yes' } })).length
         //registered users
+        const registeredUser = (await prisma.patient.findMany()).length
         // total services
+        const totalServices = (await prisma.service.findMany()).length
         // earning this month
         // earning till now
         // total categories
+        const totalCategories = (await prisma.category.findMany()).length
+        // total content categories
+        const totalContentCategories = (await prisma.contentCategory.findMany()).length
         // total blogs
+        const totalBlogs = (await prisma.blog_content.findMany()).length
+        // pending blog
+        const pendingBlogs = (await prisma.blog_content.findMany({ where: { verified: 'pending' } })).length
+        // publish blog
+        const publishBlogs = (await prisma.blog_content.findMany({ where: { verified: 'publish' } })).length
+        // unpublish blog
+        const unpublishBlogs = (await prisma.blog_content.findMany({ where: { verified: 'unpublish' } })).length
+        // improveBlogs
+        const improveBlogs = (await prisma.blog_content.findMany({ where: { verified: 'improve' } })).length
+        // rejected Blogs
+        const rejectedBlogs = (await prisma.blog_content.findMany({ where: { verified: 'rejected' } })).length
         // total articles
+        const totalArticles = (await prisma.article_content.findMany()).length
+        // pending articles
+        const pendingArticles = (await prisma.article_content.findMany({ where: { verified: 'pending' } })).length
+        // publish articles
+        const publishArticles = (await prisma.article_content.findMany({ where: { verified: 'publish' } })).length
+        // unpublish articles
+        const unpublishArticles = (await prisma.article_content.findMany({ where: { verified: 'unpublish' } })).length
+        // improve articles
+        const improveArticles = (await prisma.article_content.findMany({ where: { verified: 'improve' } })).length
+        // rejected articles
+        const rejectedArticles = (await prisma.article_content.findMany({ where: { verified: 'rejected' } })).length
         // total yt content
+        const totalYtContent = (await prisma.yt_content.findMany()).length
+        // pending yt
+        const pendingYtContent = (await prisma.yt_content.findMany({ where: { verified: 'pending' } })).length
+        // publish yt
+        const publishYtContent = (await prisma.yt_content.findMany({ where: { verified: 'publish' } })).length
+        // unpublish yt
+        const unpublishYtContent = (await prisma.yt_content.findMany({ where: { verified: 'unpublish' } })).length
+        // improve yt
+        const improveYtContent = (await prisma.yt_content.findMany({ where: { verified: 'improve' } })).length
+        // rejected yt
+        const rejectedYtContent = (await prisma.yt_content.findMany({ where: { verified: 'rejected' } })).length
         // total creators
+        const totalCreators = (await prisma.creator.findMany()).length
         // active creators 
+        const activeCreators = (await prisma.creator.findMany({ where: { status: 'active' } })).length
         // inactive creators
+        const inactiveCreators = (await prisma.creator.findMany({ where: { status: 'inactive' } })).length
         // temporary off creators 
+        const temporarilyOffCreators = (await prisma.creator.findMany({ where: { status: 'temporaryoff' } })).length
         // total manager
+        const totalManagers = (await prisma.manager.findMany()).length
         // active manager 
+        const activeManagers = (await prisma.manager.findMany({ where: { status: 'active' } })).length
         // inactive maanger
+        const inactiveManagers = (await prisma.manager.findMany({ where: { status: 'inactive' } })).length
         // temporary off manager
-    } catch (error) {
+        const temporarilyOffManagers = (await prisma.manager.findMany({ where: { status: 'temporaryoff' } })).length
 
+        res.status(500).json({
+            status: 500, msg:
+                totlaDoctors,
+            pendingDoctors,
+            certifiedDoctors,
+            temporarilyOffDoctors,
+            activeDoctors,
+            inactiveDoctors,
+            appointments,
+            registeredUser,
+            totalServices,
+            earningTillNow: null,
+            earningThisMonth: null,
+            totalCategories,
+            totalContentCategories,
+            totalBlogs,
+            pendingBlogs,
+            publishBlogs,
+            unpublishBlogs,
+            rejectedBlogs,
+            totalArticles,
+            improveBlogs,
+            pendingArticles,
+            publishArticles,
+            unpublishArticles,
+            improveArticles,
+            rejectedArticles,
+            totalYtContent,
+            pendingYtContent,
+            publishYtContent,
+            unpublishYtContent,
+            improveYtContent,
+            rejectedYtContent,
+            totalCreators,
+            activeCreators,
+            inactiveCreators,
+            temporarilyOffCreators,
+            totalManagers,
+            activeManagers,
+            inactiveManagers,
+            temporarilyOffManagers
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
-} 
+}

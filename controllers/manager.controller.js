@@ -213,3 +213,11 @@ export const getManagerReadNotification = async (req, res) => {
 };
 
 
+// manager stats
+export const managerStats = (req,res)=>{
+    try {
+        
+    } catch (error) {
+        
+    }
+}

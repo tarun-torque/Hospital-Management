@@ -102,7 +102,6 @@ router.get('/get/all/yt', allYt)
 router.get('/get/all/article', allArticle)
 router.get('/get/all/blog', allBlog)
 
-
 //                                ADMIN APIs --->
 router.get('/admin/search/bar', adminSearchBar)
 router.post('/admin/register', upload.single('profile'), adminRegister)
