@@ -135,7 +135,7 @@ export const getContentByManager = async (req, res) => {
 // get manager specific notification 
 // -------unread
 export const getManagerUnreadNotification = async (req, res) => {
-    const managerId = +req.params.managerId; 
+    const managerId = +req.params.managerId;
     try {
         const Notification = await prisma.managerNotification.findMany({
             where: {
@@ -165,12 +165,12 @@ export const getManagerUnreadNotification = async (req, res) => {
             id: notification.id,
             title: notification.title,
             content: notification.content,
-            data: JSON.parse(notification.data), 
+            data: JSON.parse(notification.data),
             managerId: notification.managerId,
         }));
 
 
-        res.status(200).json({ status: 200, unreadNotifications,count });
+        res.status(200).json({ status: 200, unreadNotifications, count });
 
     } catch (error) {
         console.error(error);
@@ -180,7 +180,7 @@ export const getManagerUnreadNotification = async (req, res) => {
 
 //----------read
 export const getManagerReadNotification = async (req, res) => {
-    const managerId = +req.params.managerId; 
+    const managerId = +req.params.managerId;
     try {
 
         const Notification = await prisma.managerNotification.findMany({
@@ -200,7 +200,7 @@ export const getManagerReadNotification = async (req, res) => {
             id: notification.id,
             title: notification.title,
             content: notification.content,
-            data: JSON.parse(notification.data), 
+            data: JSON.parse(notification.data),
             managerId: notification.managerId,
         }));
 
@@ -214,10 +214,215 @@ export const getManagerReadNotification = async (req, res) => {
 
 
 // manager stats
-export const managerStats = (req,res)=>{
+export const managerStats = async (req, res) => {
+    const managerId = +req.params.managerId
     try {
-        
+        const isManager = await prisma.manager.findUnique({ id: managerId })
+        const username = isManager?.username
+        //creators
+        const totalCreators = (await prisma.creator.findMany({ where: { assignedManager: username } })).length
+        const activeCreators = (await prisma.creator.findMany({ where: { assignedManager: username, status: 'active' } })).length
+        const inactiveCreators = (await prisma.creator.findMany({ where: { assignedManager: username, status: 'inactive' } })).length
+        const temporarilyOffCreators = (await prisma.creator.findMany({ where: { assignedManager: username, status: 'temporaryoff' } })).length
+        //doctors
+        const totalDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username } })).length
+        const activeDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, status: 'active' } })).length
+        const inactiveDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, status: 'inactive' } })).length
+        const temporarilyOffDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, status: 'temporaryoff' } })).length
+        const pendingDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, isVerified: 'no' } })).length
+        const certifiedDoctors = (await prisma.doctor.findMany({ where: { assignedManager: username, isVerified: 'yes' } })).length
+        // blogs
+        const totalBlogs = (await prisma.blog_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                }
+            }
+        }))
+
+        const pendingBlogs = (await prisma.blog_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'pending'
+            }
+        }))
+
+        const publishBlogs = (await prisma.blog_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'publish'
+            }
+        }))
+
+        const unpublishBlogs = (await prisma.blog_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'unpublish'
+            }
+        }))
+
+        const improveBlogs = (await prisma.blog_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'improve'
+            }
+        }))
+
+        const rejectedBlogs = (await prisma.blog_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'rejected'
+            }
+        }))
+        // articles
+        const totalArticles = (await prisma.article_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                }
+            }
+        }))
+
+        const pendingArticles = (await prisma.article_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'pending'
+            }
+        }))
+
+        const publishArticles = (await prisma.article_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'publish'
+            }
+        }))
+
+        const unpublishArticles = (await prisma.article_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'unpublish'
+            }
+        }))
+
+        const improveArticles = (await prisma.article_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'improve'
+            }
+        }))
+
+        const rejectedArticles = (await prisma.article_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'rejected'
+            }
+        }))
+        // yt content
+        const totalYtContent = (await prisma.yt_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                }
+            }
+        }))
+
+        const pendingYtContent = (await prisma.yt_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'pending'
+            }
+        }))
+
+        const publishYtContent = (await prisma.yt_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'publish'
+            }
+        }))
+
+        const unpublishYtContent = (await prisma.yt_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'unpublish'
+            }
+        }))
+
+        const improveYtContent = (await prisma.yt_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'improve'
+            }
+        }))
+
+        const rejectedYtContent = (await prisma.yt_content.count({
+            where: {
+                Creator: {
+                    assignedManager: username
+                },
+                verified: 'rejected'
+            }
+        }))
+        res.status(200).json({
+            status: 200,
+            totalCreators,
+            activeCreators,
+            inactiveCreators,
+            temporarilyOffCreators,
+            totalDoctors,
+            activeDoctors,
+            inactiveDoctors,
+            temporarilyOffDoctors,
+            pendingDoctors,
+            certifiedDoctors,
+            totalBlogs,
+            pendingBlogs,
+            publishBlogs,
+            unpublishBlogs,
+            improveBlogs,
+            rejectedBlogs,
+            totalArticles,
+            pendingArticles,
+            publishArticles,
+            unpublishArticles,
+            improveArticles,
+            rejectedArticles,
+            totalYtContent,
+            pendingYtContent,
+            publishYtContent,
+            unpublishYtContent,
+            improveYtContent,
+            rejectedYtContent
+        })
     } catch (error) {
-        
+        console.error(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }

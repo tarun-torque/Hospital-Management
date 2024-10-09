@@ -2011,7 +2011,7 @@ export const adminStats = async (req, res) => {
         // temporary off doctors
         const temporarilyOffDoctors = (await prisma.doctor.findMany({ where: { status: 'temporaryoff' } })).length
         // active doctors
-        const activeDoctors = (await prisma.doctor.findMany({ where: { status: 'active' } })).length
+        const activeDoctors = (await prisma.doctor.findMany({ where: { verified:'yes',status: 'active' } })).length
         // inactive doctors
         const inactiveDoctors = (await prisma.doctor.findMany({ where: { status: 'inactive' } })).length
         // appointments this months

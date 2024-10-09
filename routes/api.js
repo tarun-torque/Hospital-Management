@@ -8,7 +8,7 @@ import { create_yt_Content, create_blog_content, create_arcticle_content, get_al
 import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, deleteAllAvailableSlots, deleteDoctor_profile, deletePatientSupport, doctorDashboardStats, doctorLogin, DoctorOtpSend, doctorPrice, doctorSessionHistory, doctorVerifyForgotOtp, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getOneHourSlots, getRecentTicketById, getReviewsFromDoctorId, getServiceFromId, getServicesByDoctorId, isBookingCompleted, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, registerPatient, resetDoctorPassword, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp, verifyPatientOtp } from "../controllers/doctor.controller.js";
 import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientDashboardStats, patientJournal, patientJournalAll, patientSessionHistory, patientUpcomingSessions, patientVerifyForgotOtp, post_support, rescheduleBooking, resetPatientPassword, signInPatientFromGoogle, update_support, updateJounal, updatePatientProfile } from "../controllers/patient.controller.js";
 import { creator_profile, approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile, statusOfContent, articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId, getAllRating, getRatingFromId, approveRating, disapproveRating, getCompletedAppointmetnts, adminStats } from "../controllers/admin.controller.js";
-import { eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager } from "../controllers/manager.controller.js";
+import { eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager, managerStats } from "../controllers/manager.controller.js";
 import { patientVideoCallStart, patinetDeclineVideoCall, testFirebase, testFirebasePatient } from "../controllers/push_notification/notification.js";
 import { apiLimiter, createContinum, getContinum, patientAuthInfo } from "../middleware/patientMiddleware.js";
 
@@ -175,7 +175,6 @@ router.get('/get/admin/stats',adminStats)
 // appointments
 router.get('/get/completed/appointments',getCompletedAppointmetnts)
 
-
 // -------ADMIN ----> MANAGER APIs
 router.post('/admin/create/manager', upload.single('managerProfile'), register_manager);
 router.delete('/admin/delete/manager/:managerId', delete_manager)
@@ -200,7 +199,7 @@ router.get('/manager/get/content', getContentByManager)
 router.get('/manager/:managerId/search/bar', managerSearchBar)
 router.get('/get/manager/:managerId/unread/notification', getManagerUnreadNotification)
 router.get('/get/manager/:managerId/read/notification', getManagerReadNotification)
-
+router.get('/get/manager/stats/:managerId',managerStats)
 
 //                                  DOCTOR APIs  -->
 router.post('/doctor/google/signIn', signInDoctorFromGoogle)
