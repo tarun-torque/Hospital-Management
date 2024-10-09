@@ -2125,6 +2125,7 @@ export const adminStats = async (req, res) => {
                 "name": "Earning This Month",
                 "number": null
             },
+            
             totalCategories: {
                 "name": "Total Categories",
                 "number": totalCategories
