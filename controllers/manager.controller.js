@@ -339,7 +339,7 @@ export const managerStats = async (req, res) => {
         // yt content
         const totalYtContent = (await prisma.yt_content.count({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: username
                 }
             }
@@ -347,7 +347,7 @@ export const managerStats = async (req, res) => {
 
         const pendingYtContent = (await prisma.yt_content.count({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: username
                 },
                 verified: 'pending'
@@ -356,7 +356,7 @@ export const managerStats = async (req, res) => {
 
         const publishYtContent = (await prisma.yt_content.count({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: username
                 },
                 verified: 'publish'
@@ -365,7 +365,7 @@ export const managerStats = async (req, res) => {
 
         const unpublishYtContent = (await prisma.yt_content.count({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: username
                 },
                 verified: 'unpublish'
@@ -374,7 +374,7 @@ export const managerStats = async (req, res) => {
 
         const improveYtContent = (await prisma.yt_content.count({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: username
                 },
                 verified: 'improve'
@@ -383,7 +383,7 @@ export const managerStats = async (req, res) => {
 
         const rejectedYtContent = (await prisma.yt_content.count({
             where: {
-                Creator: {
+                creator: {
                     assignedManager: username
                 },
                 verified: 'rejected'
