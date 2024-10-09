@@ -1891,50 +1891,49 @@ export const registeredUser = async (req, res) => {
 export const getAllRating = async (req, res) => {
     try {
         const allRating = await prisma.rating.findMany({
-            select: {
-                patientId: false,
-                doctorId: false,
-                bookingId: false
-            },
             include: {
                 Doctor: { select: { doctorName: true, profileUrl: true } },
                 Patient: { select: { patientName: true, profileUrl: true } },
                 Booking: { select: { Service: { select: { title: true } } } }
             }
-        })
+        });
+
         if (allRating.length === 0) {
-            return res.status(404).json({ status: 404, msg: 'No Rating Found' })
+            return res.status(404).json({ status: 404, msg: 'No Rating Found' });
         }
-        res.status(200).json({ status: 200, msg: allRating })
+
+        res.status(200).json({ status: 200, msg: allRating });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Somethig went wrong' })
+        console.log(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
 
 // get rating from rating id
 export const getRatingFromId = async (req, res) => {
-    const ratingId = +req.params.ratingId
+    const ratingId = +req.params.ratingId;
     try {
         const rating = await prisma.rating.findUnique({
             where: { id: ratingId },
-            select: {
-                patientId: false,
-                doctorId: false,
-                bookingId: false
-            },
             include: {
                 Doctor: { select: { doctorName: true, profileUrl: true } },
                 Patient: { select: { patientName: true, profileUrl: true } },
                 Booking: { select: { Service: { select: { title: true } } } }
             }
-        })
-        res.status(200).json({ status: 200, msg: rating })
+        });
+        
+        if (!rating) {
+            return res.status(404).json({ status: 404, msg: 'Rating not found' });
+        }
+
+        res.status(200).json({ status: 200, msg: rating });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+        console.log(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-}
+};
+
 // to approve rating 
 export const approveRating = async (req, res) => {
     const ratingId = +req.params.ratingId

@@ -130,6 +130,17 @@ export const getAllRecentTicket = async (req, res) => {
     }
 }
 
+// get recent Ticket from its ID
+export const getRecentTicketFromId = async(req,res)=>{
+    const ticketId = +req.params.id
+    try {
+
+        
+    } catch (error) {
+        
+    }
+}
+
 // get trending consultant
 export const trendingConsultant = async (req, res) => {
     try {

@@ -165,6 +165,8 @@ router.get('/admin/get/top/blogs', topBlogs)
 router.get('/admin/get/top/yt', topYt)
 router.get('/admin/consultants/stats', consultants)
 router.get('/admin/registered/user', registeredUser)
+
+
 router.get('/get/all/rating',getAllRating)
 router.get('/get/rating:ratingId',getRatingFromId)
 router.put('/approve/rating/:ratingId',approveRating)
