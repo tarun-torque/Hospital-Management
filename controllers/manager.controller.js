@@ -144,7 +144,7 @@ export const getManagerUnreadNotification = async (req, res) => {
                 isRead: false,
             },
             select: {
-                id,
+                id:true,
                 title:true,
                 content:true,
                 data:true
@@ -173,7 +173,7 @@ export const getManagerReadNotification = async (req, res) => {
                 isRead: true,
             },
             select: {
-                id,
+                id:true,
                 title:true,
                 content:true,
                 data:true
