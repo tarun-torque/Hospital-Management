@@ -687,12 +687,13 @@ export const getCreatorReadNotifications = async (req, res) => {
         const notifications = await prisma.creatorNotifications.findMany({
             where: { creatorId,isRead:true },
             select: {
+                id,
                 title:true,
                 content:true,
                 data:true
             }
         })
-        const count = notifications.count
+        const count = notifications.length
         if (count === 0) {
             res.status(404).json({ status: 404, msg: 'No read notifications' })
         }
@@ -711,12 +712,13 @@ export const getCreatorUnreadNotifications = async (req, res) => {
         const notifications = await prisma.creatorNotifications.findMany({
             where: { creatorId,isRead:false },
             select: {
+                id,
                 title:true,
                 content:true,
                 data:true,
             }
         })
-        const count = notifications.count
+        const count = notifications.length
         if (count === 0) {
             res.status(404).json({ status: 404, msg: 'No unread notifications' })
         }
