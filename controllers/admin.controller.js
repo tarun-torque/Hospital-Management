@@ -803,8 +803,8 @@ export const creator_profile = async (req, res) => {
     try {
         // get data
         const { username, email, country, contact_number, state, language, password, assignedManager } = req.body;
-        const fileInfo = req.file;
-
+        const fileInfo = req.file
+        
         // creator is already present or not 
         const isUsername = await prisma.creator.findUnique({ where: { username } })
         if (isUsername) {
@@ -1187,6 +1187,18 @@ export const articleAction = async (req, res) => {
             data: { verified: action }
         })
 
+        // send notification to the creator 
+        const sendNotification = await prisma.creatorNotifications.create({data:{
+            creatorId:creatorId,
+            title:`Status of article ${updateStatus.heading}`,
+            content:`changed to ${action}`,
+            data:JSON.stringify({
+                creatorId:creatorId,
+                creatorProfilePath:isCreator.profile_path,
+                articleId:articleId
+            })
+        }})
+
         //send email to creator
         if (action == 'improve') {
             const { reason } = req.body;
@@ -1255,6 +1267,18 @@ export const blogAction = async (req, res) => {
             where: { blog_creatorId: creatorId, id: blogId },
             data: { verified: action }
         })
+        // send notification to the creator
+        const sendNotification = await prisma.creatorNotifications.create({data:{
+            creatorId:creatorId,
+            title:`Status of blog`,
+            content:`changed to ${action}`,
+            data:JSON.stringify({
+                creatorId:creatorId,
+                creatorProfilePath:isCreator.profile_path,
+                blogId:blogId
+            })
+        }})
+
 
         //send email to creator
         if (action == 'improve') {
@@ -1322,6 +1346,20 @@ export const ytAction = async (req, res) => {
             where: { yt_creatorId: creatorId, id: ytId },
             data: { verified: action }
         })
+
+         // send notification to the creator 
+         const sendNotification = await prisma.creatorNotifications.create({data:{
+            creatorId:creatorId,
+            title:`Status of youtube content ${updateStatus.heading}`,
+            content:`changed to ${action}`,
+            data:JSON.stringify({
+                creatorId:creatorId,
+                creatorProfilePath:isCreator.profile_path,
+                ytId:ytId
+            })
+        }})
+
+
 
         //send email to creator
         if (action == 'improve') {

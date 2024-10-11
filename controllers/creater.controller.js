@@ -3,6 +3,7 @@ import prisma from '../DB/db.config.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import extractContent from '../utils/htmlExtractor.js';
+import { json } from 'body-parser';
 
 
 
@@ -19,7 +20,7 @@ export const login_creator = async (req, res) => {
             return res.status(404).json({ message: 'Incorrect Email or Password' })
         }
         const data = {
-            role:isCreator.role,
+            role: isCreator.role,
             id: isCreator.id,
             username: isCreator.username,
             email: isCreator.email,
@@ -28,7 +29,7 @@ export const login_creator = async (req, res) => {
             profile_path: isCreator.profile_path
         }
         const token = jwt.sign(data, process.env.SECRET_KEY, { expiresIn: '999h' })
-        res.status(200).json({status:200, messages: 'Logged In', token: token, id: isCreator.id,profile:isCreator})
+        res.status(200).json({ status: 200, messages: 'Logged In', token: token, id: isCreator.id, profile: isCreator })
     } catch (error) {
         res.status(400).json({ message: error.message })
     }
@@ -239,7 +240,7 @@ export const get_blogs = async (req, res) => {
             return res.status(404).json({ msg: 'No Blogs found' });
         }
 
-        
+
 
         const blogDataArray = blogs.map(blog => {
             const extractedContent = extractContent(blog.content);
@@ -575,14 +576,14 @@ export const eachBlog = async (req, res) => {
         const blogId = +req.params.blogId;
 
         const blog = await prisma.blog_content.findUnique({ where: { id: blogId } })
-       
+
         if (!blog) {
             return res.status(404).json({ msg: 'No Blog Found' })
         }
 
-        if(blog.verified === 'publish'){
+        if (blog.verified === 'publish') {
             const views = blog.views + 1
-            const updateViews = await prisma.blog_content.update({where:{id:blogId},data:{views:views}})
+            const updateViews = await prisma.blog_content.update({ where: { id: blogId }, data: { views: views } })
             console.log("updated view")
         }
 
@@ -593,7 +594,7 @@ export const eachBlog = async (req, res) => {
 
         const data = {
             id: blog.id,
-            views:blog.views,
+            views: blog.views,
             data: extract,
             tags: blog.tags,
             category: blog.category,
@@ -644,15 +645,15 @@ export const eachYT = async (req, res) => {
     try {
         const ytId = +req.params.ytId;
         const yt = await prisma.yt_content.findUnique({ where: { id: ytId } })
-    
+
         if (!yt) {
             return res.status(404).json({ msg: 'No Youtube content Found' })
         }
 
-        if(yt.verified === 'publish'){
+        if (yt.verified === 'publish') {
             const views = yt.views + 1
-            const updateViews  = await prisma.yt_content.update({where:{id:ytId},data:{views:views}})
-            
+            const updateViews = await prisma.yt_content.update({ where: { id: ytId }, data: { views: views } })
+
         }
 
         const creator = await prisma.creator.findUnique({ where: { id: yt.yt_creatorId } })
@@ -677,5 +678,60 @@ export const eachCreator = async (req, res) => {
 
     } catch (error) {
         res.status(400).json({ message: error.message })
+    }
+}
+// get read notifications
+export const getCreatorReadNotifications = async (req, res) => {
+    const creatorId = +req.params.creatorId
+    try {
+        const notifications = await prisma.creatorNotifications.findMany({
+            where: { creatorId,isRead:true },
+            select: {
+                creatorId: false
+            }
+        })
+        const count = notifications.count
+        if (count === 0) {
+            res.status(404).json({ status: 404, msg: 'No read notifications' })
+        }
+        res.status(200).json({ status: 200, msg: notifications, count })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// get unread notifications
+export const getCreatorUnreadNotifications = async (req, res) => {
+    const creatorId = +req.params.creatorId
+    try {
+        const notifications = await prisma.creatorNotifications.findMany({
+            where: { creatorId,isRead:false },
+            select: {
+                creatorId: false
+            }
+        })
+        const count = notifications.count
+        if (count === 0) {
+            res.status(404).json({ status: 404, msg: 'No unread notifications' })
+        }
+        res.status(200).json({ status: 200, msg: notifications, count })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+// mark notification as read
+export const markCreatorNotificationAsRead = async (req, res) => {
+    const notificationId = +req.params.notificationId
+    try {
+        const markAsRead = await prisma.creatorNotifications.update({ where: { id: notificationId }, data: { isRead: true } })
+        res.status(200).json({ status: 200, msg: 'Notification marked as read successfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }

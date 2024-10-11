@@ -113,13 +113,13 @@ export const getAllRecentTicket = async (req, res) => {
     try {
         const tickets = await prisma.recentTicket.findMany({
             select: {
-                id: true, // Include id
-                title: true, // Include title
-                description: true, // Include description
-                imageUrl: true, // Include imageUrl
-                createdAt: true, // Include createdAt timestamp
-                updatedAt: true, // Include updatedAt timestamp
-                // Include patient details without showing patientId
+                id: true, 
+                title: true, 
+                description: true, 
+                imageUrl: true, 
+                createdAt: true, 
+                updatedAt: true,
+             
                 Patient: {
                     select: {
                         patientName: true,

@@ -133,45 +133,27 @@ export const getContentByManager = async (req, res) => {
 
 
 // get manager specific notification 
+
 // -------unread
 export const getManagerUnreadNotification = async (req, res) => {
     const managerId = +req.params.managerId;
     try {
-        const Notification = await prisma.managerNotification.findMany({
+        const notifications = await prisma.managerNotification.findMany({
             where: {
                 managerId: managerId,
-                isRead: 'no',
+                isRead: false,
             },
+            select: {
+                managerId: false
+            }
         });
 
-        const count = Notification.length;
+        const count = notifications.length;
 
         if (count === 0) {
             return res.status(404).json({ status: 404, msg: 'No unread notifications' });
         }
-
-        // mark as read
-        await prisma.managerNotification.updateMany({
-            where: {
-                managerId: managerId,
-                isRead: 'no',
-            },
-            data: {
-                isRead: 'yes',
-            },
-        });
-
-        const unreadNotifications = Notification.map(notification => ({
-            id: notification.id,
-            title: notification.title,
-            content: notification.content,
-            data: JSON.parse(notification.data),
-            managerId: notification.managerId,
-        }));
-
-
-        res.status(200).json({ status: 200, unreadNotifications, count });
-
+        res.status(200).json({ status: 200, notifications, count });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
@@ -182,33 +164,36 @@ export const getManagerUnreadNotification = async (req, res) => {
 export const getManagerReadNotification = async (req, res) => {
     const managerId = +req.params.managerId;
     try {
-
-        const Notification = await prisma.managerNotification.findMany({
+        const notifications = await prisma.managerNotification.findMany({
             where: {
                 managerId: managerId,
-                isRead: 'yes',
+                isRead: true,
             },
-        });
+            select: {
+                managerId: false
+            }
+        })
 
-        const count = Notification.length;
-
+        const count = notifications.length;
         if (count === 0) {
             return res.status(404).json({ status: 404, msg: 'No read notifications' });
         }
 
-        const readNotifications = Notification.map(notification => ({
-            id: notification.id,
-            title: notification.title,
-            content: notification.content,
-            data: JSON.parse(notification.data),
-            managerId: notification.managerId,
-        }));
-
-        res.status(200).json({ status: 200, readNotifications, count });
-
+        res.status(200).json({ status: 200, notifications, count });
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+}
+// mark manger notification as read
+export const markManagerNotificationAsRead = async (req, res) => {
+    const notificationId = +req.params.notificationId
+    try {
+        const mark = prisma.managerNotification.update({ where: { id: notificationId }, data: { isRead: true } })
+        res.status(200).json({ status: 200, msg: 'Notification mark as read successfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
 
@@ -216,7 +201,7 @@ export const getManagerReadNotification = async (req, res) => {
 export const managerStats = async (req, res) => {
     const managerId = +req.params.managerId
     try {
-        const isManager = await prisma.manager.findUnique({where:{id:managerId}})
+        const isManager = await prisma.manager.findUnique({ where: { id: managerId } })
         const username = isManager?.username
         //creators
         const totalCreators = (await prisma.creator.findMany({ where: { assignedManager: username } })).length
@@ -503,7 +488,7 @@ export const managerStats = async (req, res) => {
                 "name": "Rejected YouTube Content",
                 "number": rejectedYtContent
             }
-            
+
         })
     } catch (error) {
         console.error(error)

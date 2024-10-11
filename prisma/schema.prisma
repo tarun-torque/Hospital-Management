@@ -71,26 +71,38 @@ model DoctorPrice {
 
 // creator model
 model Creator {
-  id              Int               @id @default(autoincrement())
-  username        String            @unique
-  email           String            @unique
-  profile_path    String
-  profile_type    String
-  country         String //country name (default 91 India)
-  contact_number  String //mobile number
-  state           String
-  language        String[]
-  password        String
-  role            String?           @default("creator")
-  status          String            @default("active") //active pending temporary off
-  remarks         String            @default("no remarks")
-  yt_contents     Yt_content[]
-  blog_contents   Blog_content[]
-  article_content Article_content[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  manager         manager?          @relation(fields: [assignedManager], references: [username])
-  assignedManager String
+  id                   Int                    @id @default(autoincrement())
+  username             String                 @unique
+  email                String                 @unique
+  profile_path         String
+  profile_type         String
+  country              String //country name (default 91 India)
+  contact_number       String //mobile number
+  state                String
+  language             String[]
+  password             String
+  role                 String?                @default("creator")
+  status               String                 @default("active") //active pending temporary off
+  remarks              String                 @default("no remarks")
+  yt_contents          Yt_content[]
+  blog_contents        Blog_content[]
+  article_content      Article_content[]
+  creatorNotifications creatorNotifications[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  manager              manager?               @relation(fields: [assignedManager], references: [username])
+  assignedManager      String
+}
+
+model creatorNotifications {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  data      String
+  isRead    Boolean  @default(false)
+  Creator   Creator  @relation(fields: [creatorId], references: [id])
+  creatorId Int
+  createdAt DateTime @default(now())
 }
 
 // yt model
@@ -345,7 +357,7 @@ model manager {
 
 model managerNotification {
   id        Int     @id @default(autoincrement())
-  isRead    String  @default("no")
+  isRead    Boolean  @default(false)
   title     String
   content   String
   data      String

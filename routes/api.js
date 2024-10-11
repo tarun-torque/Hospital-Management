@@ -4,11 +4,11 @@ import path from 'path'
 import fs from 'fs'
 const router = Router()
 
-import { create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator, creatorSearchBar } from "../controllers/creater.controller.js";
+import { create_yt_Content, create_blog_content, create_arcticle_content, get_all_content, get_profile, update_article, update_yt, update_blog, delete_yt, delete_article, delete_blog, search_creator, login_creator, stateContent, languagePost, categoryContent, get_blogs, eachBlog, eachArticle, eachYT, eachCreator, creatorSearchBar, markCreatorNotificationAsRead, getCreatorUnreadNotifications, getCreatorReadNotifications } from "../controllers/creater.controller.js";
 import { addDoctorService, adminSearchBar, allArticle, allBlog, allDoctors, allYt, bookSlot, completeDoctorProfile, deleteAllAvailableSlots, deleteDoctor_profile, deletePatientSupport, doctorDashboardStats, doctorLogin, DoctorOtpSend, doctorPrice, doctorSessionHistory, doctorVerifyForgotOtp, eachSupport, getAllAvailableSlots, getAllRecentTicket, getAvailableSlotsDoctor, getCategoriesByDoctorId, getDoctorPrice, getDoctorProfile, getDoctorsByServiceId, getOneHourSlots, getRecentTicketById, getReviewsFromDoctorId, getServiceFromId, getServicesByDoctorId, isBookingCompleted, managerSearchBar, patientAllSupport, patientSupport, recentTicket, registerDoctor, registerPatient, resetDoctorPassword, searchDoctorAndServices, signInDoctorFromGoogle, trendingConsultant, upcomingSession, updateAvailability, updateDoctorPrice, updateDoctorProfile, updateDoctorRemarks, updateDoctorStatus, updateSupport, verifyDoctorOtp, verifyPatientOtp } from "../controllers/doctor.controller.js";
 import { delete_support, deleteJournal, get_mood, get_support, getBookingOfPatient, getPatientProfile, giveRatingToDoctor, loginPatient, mood, otpSend, patientDashboardStats, patientJournal, patientJournalAll, patientSessionHistory, patientUpcomingSessions, patientVerifyForgotOtp, post_support, rescheduleBooking, resetPatientPassword, signInPatientFromGoogle, update_support, updateJounal, updatePatientProfile } from "../controllers/patient.controller.js";
 import { creator_profile, approveDoctorRequest, contentCategory, deleteCategory, getActiveDoctors, getApprovedDoctors, getInactiveDoctors, getPendingDoctors, getRejectedDoctors, getTemporaryoffDoctors, register_manager, rejectDoctor, getContentCategory, update_ContentCategory, getAllManager, delete_manager, updateManager, filterPatient, allPatient, getCreators, setInactiveManager, setOffManager, getActiveManager, getInactiveManager, getOffManager, setActiveManager, updateRemarks, deleteCreator, setInactiveCreator, setActiveCreator, setOffCreator, activeCreators, inactiveCreators, offCreators, updateRemarkCreator, assignManager_doctor, updateCreatorProfile, statusOfContent, articleAction, blogAction, ytAction, staff, allContentAdmin, category, updateCategory, allCategory, categoryDelete, createService, updateService, deleteService, allService, getServiceFromCategoryId, getServiceFromServiceId, topArticle, topBlogs, topYt, consultants, registeredUser, adminLogin, adminRegister, getAdminProfile, getCategoryFromCategoryId, getAllRating, getRatingFromId, approveRating, disapproveRating, getCompletedAppointmetnts, adminStats } from "../controllers/admin.controller.js";
-import { eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager, managerStats } from "../controllers/manager.controller.js";
+import { eachManager, getContentByManager, getManagerReadNotification, getManagerUnreadNotification, login_manager, managerStats, markManagerNotificationAsRead } from "../controllers/manager.controller.js";
 import { patientVideoCallStart, patinetDeclineVideoCall, testFirebase, testFirebasePatient } from "../controllers/push_notification/notification.js";
 import { apiLimiter, createContinum, getContinum, patientAuthInfo } from "../middleware/patientMiddleware.js";
 
@@ -74,7 +74,6 @@ const fileFilter = function (req, file, cb) {
 }
 const upload = multer({ storage: storage, fileFilter: fileFilter })
 
-
 //                                 CREATOR APIs---->
 router.post('/login/creator', login_creator)
 router.get('/creator/:creatorId/search/bar', creatorSearchBar)
@@ -101,6 +100,10 @@ router.get('/get/creator/profile/:creatorId', eachCreator)
 router.get('/get/all/yt', allYt)
 router.get('/get/all/article', allArticle)
 router.get('/get/all/blog', allBlog)
+// creator notification
+router.put('/marked/creator/notification/asRead/:notificationId',markCreatorNotificationAsRead)
+router.get('/get/creator/:creatorId/unread/notification',getCreatorUnreadNotifications)
+router.get('/get/creator/:creatorId/read/notification',getCreatorReadNotifications)
 
 //                                ADMIN APIs --->
 router.get('/admin/search/bar', adminSearchBar)
@@ -197,9 +200,12 @@ router.post('/manager/login', login_manager)
 router.get('/get/manager/profile/:managerId', eachManager)
 router.get('/manager/get/content', getContentByManager)
 router.get('/manager/:managerId/search/bar', managerSearchBar)
+router.get('/get/manager/stats/:managerId',managerStats)
+
+// manager notifications
+router.put('/marked/manager/notification/asRead/:notificationId',markManagerNotificationAsRead)
 router.get('/get/manager/:managerId/unread/notification', getManagerUnreadNotification)
 router.get('/get/manager/:managerId/read/notification', getManagerReadNotification)
-router.get('/get/manager/stats/:managerId',managerStats)
 
 //                                  DOCTOR APIs  -->
 router.post('/doctor/google/signIn', signInDoctorFromGoogle)
@@ -275,7 +281,6 @@ router.get('/get/patient/upcomming/session/:patientId', patientUpcomingSessions)
 router.get('/get/patient/session/history/:patientId', patientSessionHistory)
 router.post('/post/continumm/:patientId', patientAuthInfo, apiLimiter, createContinum)
 router.get('/get/repeated/continum/:patientId',getContinum)
-
 
 
 // test notification for patient app
