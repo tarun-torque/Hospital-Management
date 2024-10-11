@@ -13,13 +13,20 @@ datasource db {
 
 // admin model
 model admin {
-  id        Int     @id @default(autoincrement())
-  name      String
-  image     String
-  email     String  @unique
-  role      String? @default("admin")
-  password  String
-  secretKey String
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  image              String
+  email              String               @unique
+  role               String?              @default("admin")
+  password           String
+  adminNotifications adminNotifications[]
+  secretKey          String
+}
+
+model adminNotifications {
+  id      Int   @id @default(autoincrement())
+  admin   admin @relation(fields: [adminId], references: [id])
+  adminId Int
 }
 
 // blogs,ytcontent,article category model
@@ -357,7 +364,7 @@ model manager {
 
 model managerNotification {
   id        Int     @id @default(autoincrement())
-  isRead    Boolean  @default(false)
+  isRead    Boolean @default(false)
   title     String
   content   String
   data      String

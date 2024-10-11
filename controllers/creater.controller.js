@@ -3,7 +3,7 @@ import prisma from '../DB/db.config.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import extractContent from '../utils/htmlExtractor.js';
-import { json } from 'body-parser';
+
 
 
 
