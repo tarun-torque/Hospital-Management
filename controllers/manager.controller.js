@@ -195,7 +195,7 @@ export const getManagerReadNotification = async (req, res) => {
 export const markManagerNotificationAsRead = async (req, res) => {
     const notificationId = +req.params.notificationId
     try {
-        const mark = prisma.managerNotification.update({ where: { id: notificationId }, data: { isRead: true } })
+        const mark = await prisma.managerNotification.update({ where: { id: notificationId }, data: { isRead: true } })
         res.status(200).json({ status: 200, msg: 'Notification mark as read successfully' })
     } catch (error) {
         console.log(error)
