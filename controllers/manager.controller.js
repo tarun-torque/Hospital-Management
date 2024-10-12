@@ -161,7 +161,7 @@ export const getManagerUnreadNotification = async (req, res) => {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
     }
-};
+}
 
 //----------read
 export const getManagerReadNotification = async (req, res) => {

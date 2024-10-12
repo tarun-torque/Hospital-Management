@@ -70,7 +70,7 @@ export const getDoctorPrice = async (req, res) => {
                 doctorId_serviceId: { doctorId, serviceId }
             }
         })
-        res.status(200).json({ status: 200, yourCharges:yourPrice })
+        res.status(200).json({ status: 200, yourCharges: yourPrice })
 
     } catch (error) {
         console.log(error)
@@ -99,7 +99,7 @@ export const recentTicket = async (req, res) => {
             return res.status(400).json({ status: 400, msg: 'Image type must be JPG/PNG and size less than 2MB' })
         }
 
-        const data = { patientId, title, description,imageUrl:fileInfo.path }
+        const data = { patientId, title, description, imageUrl: fileInfo.path }
         const save = await prisma.recentTicket.create({ data })
         res.status(201).json({ status: 201, msg: 'Ticket added Successfully' })
     } catch (error) {
@@ -113,13 +113,13 @@ export const getAllRecentTicket = async (req, res) => {
     try {
         const tickets = await prisma.recentTicket.findMany({
             select: {
-                id: true, 
-                title: true, 
-                description: true, 
-                imageUrl: true, 
-                createdAt: true, 
+                id: true,
+                title: true,
+                description: true,
+                imageUrl: true,
+                createdAt: true,
                 updatedAt: true,
-             
+
                 Patient: {
                     select: {
                         patientName: true,
@@ -129,11 +129,11 @@ export const getAllRecentTicket = async (req, res) => {
             },
         });
 
-        if(tickets.length===0){
-            return res.status(404).json({status:404,msg:'No Ticket Founnd'})
+        if (tickets.length === 0) {
+            return res.status(404).json({ status: 404, msg: 'No Ticket Founnd' })
         }
 
-        res.status(200).json({ status: 200, msg:tickets });
+        res.status(200).json({ status: 200, msg: tickets });
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
@@ -147,13 +147,13 @@ export const getRecentTicketById = async (req, res) => {
         const ticket = await prisma.recentTicket.findUnique({
             where: { id: ticketId },
             select: {
-                id: true, 
-                title: true, 
-                description: true, 
-                imageUrl: true, 
-                createdAt: true, 
-                updatedAt: true, 
-           
+                id: true,
+                title: true,
+                description: true,
+                imageUrl: true,
+                createdAt: true,
+                updatedAt: true,
+
                 Patient: {
                     select: {
                         patientName: true,
@@ -166,7 +166,7 @@ export const getRecentTicketById = async (req, res) => {
         if (!ticket) {
             return res.status(404).json({ status: 404, msg: 'Ticket not found' });
         }
-        res.status(200).json({ status: 200, msg:ticket });
+        res.status(200).json({ status: 200, msg: ticket });
     } catch (error) {
         console.log(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
@@ -576,28 +576,28 @@ export const upcomingSession = async (req, res) => {
 
         const startOfDay = new Date(currentDateTime);
         startOfDay.setHours(0, 0, 0, 0)
-   
+
         const endOfDay = new Date(currentDateTime)
         endOfDay.setHours(23, 59, 59, 999)
-      
+
         const sessions = await prisma.booking.findMany({
             where: {
-                doctorId,isCompleted:'no',
+                doctorId, isCompleted: 'no',
                 slotStart: {
-                    gte: startOfDay, 
-                    lte: endOfDay 
+                    gte: startOfDay,
+                    lte: endOfDay
                 }
             },
             include: {
-                Patient:true,
-                Service:{
-                    select:{
-                        title:true
+                Patient: true,
+                Service: {
+                    select: {
+                        title: true
                     }
                 }
             },
             orderBy: {
-                slotStart: 'asc' 
+                slotStart: 'asc'
             }
         })
 
@@ -606,7 +606,7 @@ export const upcomingSession = async (req, res) => {
         }
 
         const sessionCount = sessions.length
-        res.status(200).json({ status: 200, upcomingSession:sessions, upcomingSessionCount:sessionCount })
+        res.status(200).json({ status: 200, upcomingSession: sessions, upcomingSessionCount: sessionCount })
 
     } catch (error) {
         console.log(error);
@@ -636,19 +636,19 @@ export const getServicesByDoctorId = async (req, res) => {
         const doctorServices = await prisma.doctorService.findMany({
             where: { doctorId: parseInt(doctorId) },
             include: {
-                service:{
-                    include:{
-                        Category:{
-                            select:{
-                                name:true
+                service: {
+                    include: {
+                        Category: {
+                            select: {
+                                name: true
                             }
                         },
-                        doctorPrice:{
-                            where:{
-                                doctorId:parseInt(doctorId)
+                        doctorPrice: {
+                            where: {
+                                doctorId: parseInt(doctorId)
                             },
-                            select:{
-                                yourPrice:true
+                            select: {
+                                yourPrice: true
                             }
                         }
                     }
@@ -1382,7 +1382,6 @@ export const completeDoctorProfile = async (req, res) => {
     const { country, contactNumber, state, languages, experience, maximumEducation, pricePerSession, gender } = req.body;
     const fileInfo = req.files;
     const doctorId = parseInt(req.params.doctorId)
-    
 
     try {
         // Check for required fields
@@ -1435,10 +1434,20 @@ export const completeDoctorProfile = async (req, res) => {
             profileUrl: doctorProfile_path,
             documents: doctorDocument_path,
         }
+        const saveData = await prisma.doctor.update({ where: { id: doctorId }, data })
 
-        const saveData = await prisma.doctor.update({ where: { id: doctorId }, data });
+        // send notification to the admin
+        const sendNotificationToAdmin = await prisma.adminNotifications.create({
+            data: {
+                adminId: 1,
+                title: `Doctor ${saveData.doctorName} has requested approval`,
+                content: `Doctor ${saveData.doctorName} has requested approval for their profile`,
+                data: JSON.stringify({
+                    doctorId:saveData.id,
+                }),
+            },
+        })
         res.status(200).json({ status: 200, msg: 'Profile completed successfully' });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ status: 500, msg: 'Something went wrong' });
@@ -1567,7 +1576,7 @@ export const getOneHourSlots = async (req, res) => {
     const doctorId = +req.params.doctorId;
 
     try {
-     
+
         const availabilities = await prisma.doctorAvailability.findMany({
             where: { doctorId: doctorId },
         })
@@ -1579,7 +1588,7 @@ export const getOneHourSlots = async (req, res) => {
         for (const availability of availabilities) {
             const { startTime, endTime } = availability;
 
-            
+
             const adjustedStart = moment(startTime).add(5, 'hours').add(30, 'minutes');
             const adjustedEnd = moment(endTime).add(5, 'hours').add(30, 'minutes');
 
@@ -1596,7 +1605,7 @@ export const getOneHourSlots = async (req, res) => {
                     continue;
                 }
 
-           
+
                 const existingSlot = await prisma.availableSlots.findUnique({
                     where: {
                         doctorId_startTime_endTime: {
@@ -1607,13 +1616,13 @@ export const getOneHourSlots = async (req, res) => {
                     },
                 })
 
-        
+
                 if (!existingSlot) {
                     oneHourSlots.push({
                         startTime: slotStartTimeISO,
                         endTime: slotEndTimeISO,
                         doctorId: doctorId,
-                        isBooked: "no", 
+                        isBooked: "no",
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                     });
@@ -1631,7 +1640,7 @@ export const getOneHourSlots = async (req, res) => {
             });
         }
 
-      
+
         const availableSlots = await prisma.availableSlots.findMany({
             where: {
                 doctorId: doctorId,
@@ -1688,7 +1697,7 @@ export const isBookingCompleted = async (req, res) => {
 
 export const deleteAllAvailableSlots = async (req, res) => {
     try {
-    
+
         await prisma.availableSlots.deleteMany();
 
         res.status(200).json({
@@ -1715,7 +1724,7 @@ export const updateDoctorProfile = async (req, res) => {
         if (contactNumber) {
             updatedData.contactNumber = contactNumber
         }
-     
+
         if (maximumEducation) {
             updatedData.maximumEducation = maximumEducation
         }
@@ -1787,7 +1796,7 @@ export const doctorSessionHistory = async (req, res) => {
                 patientName: patient?.patientName || "Unknown",
                 patientImageUrl: patient?.profileUrl || null,
                 patientGender: patient?.gender || "Unknown",
-                serviceName:service.title,
+                serviceName: service.title,
                 price: service?.price || null,
                 stars: rating?.stars || null,
                 review: rating?.review || null,
@@ -1811,15 +1820,15 @@ export const getReviewsFromDoctorId = async (req, res) => {
     const doctorId = +req.params.doctorId
     try {
         const reviews = await prisma.rating.findMany({
-            where: { doctorId ,isPublic:'yes'},
+            where: { doctorId, isPublic: 'yes' },
             select: {
                 stars: true,
                 review: true,
-                Patient:{
-                    select:{
-                        patientName:true,
-                        profileUrl:true,
-                        createdAt:true
+                Patient: {
+                    select: {
+                        patientName: true,
+                        profileUrl: true,
+                        createdAt: true
                     }
                 }
             }

@@ -3,6 +3,7 @@ import prisma from '../DB/db.config.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import extractContent from '../utils/htmlExtractor.js';
+import { messages } from '@vinejs/vine/defaults';
 
 
 
@@ -123,6 +124,35 @@ export const create_yt_Content = async (req, res) => {
 
         const data = { yt_creatorId: creator.id, iframe, heading, content, tags, category }
         const info = await prisma.yt_content.create({ data })
+
+        // send notification to the manager
+        const findManager = await prisma.manager.findUnique({where:{username:creator.assignedManager}})
+        const sendNotificationToManager = await prisma.managerNotification.create({
+            data: {
+              managerId: findManager.id,
+              title: `${creator.username} added a new YouTube content`,
+              content: `A new YouTube content titled "${heading}" has been created by ${creator.username}`,
+              data: JSON.stringify({
+                creatorId:id,
+                ytId:info.id ,
+              }),
+            },
+          })
+
+        //send notification to the admin
+        const sendNotificationToAdmin = await prisma.adminNotifications.create({
+            data: {
+              adminId:1,
+              title: `${creator.username} added a new YouTube content`,
+              content: `A new YouTube content titled "${heading}" has been created by ${creator.username}`,
+              data: JSON.stringify({
+                creatorId:id,
+                managerId:findManager.id,
+                ytId:info.id ,
+              }),
+            },
+          })
+
         res.status(201).json({ message: 'Youtube content is created Succesfully' })
 
     } catch (error) {
@@ -142,17 +172,40 @@ export const create_blog_content = async (req, res) => {
         if (!creator) {
             return res.send("creator is not found")
         }
-
-
-
-        // construct the data
         const data = { blog_creatorId: creator.id, content, tags, category }
 
         // // add in db
         const info = await prisma.blog_content.create({ data })
+
+          // send notification to the manager
+          const findManager = await prisma.manager.findUnique({where:{username:creator.assignedManager}})
+          const sendNotificationToManager = await prisma.managerNotification.create({
+              data: {
+                managerId: findManager.id,
+                title: `${creator.username} added a new Blog`,
+                content: `A new Blog been created by ${creator.username}`,
+                data: JSON.stringify({
+                  creatorId:id,
+                  blogId:info.id 
+                }),
+              },
+            })
+  
+          //send notification to the admin
+          const sendNotificationToAdmin = await prisma.adminNotifications.create({
+              data: {
+                adminId:1,
+                title: `${creator.username} added a new Blog`,
+                content: `A new Blog been created by ${creator.username}`,
+                data: JSON.stringify({
+                  creatorId:id,
+                  managerId:findManager.id,
+                  blogId:info.id 
+                }),
+              },
+            })
+
         res.status(201).json({ message: 'Blog is created successfully' })
-
-
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: 'Failed to create blog content' });
@@ -173,15 +226,42 @@ export const create_arcticle_content = async (req, res) => {
         }
 
         const data = { heading, content, tags, category, article_creatorId: creator.id, articleImagePath: req.file.path, articleImageType: req.file.mimetype }
-
         const info = await prisma.article_content.create({ data })
 
+           // send notification to the manager
+           const findManager = await prisma.manager.findUnique({where:{username:creator.assignedManager}})
+           const sendNotificationToManager = await prisma.managerNotification.create({
+               data: {
+                 managerId: findManager.id,
+                 title: `${creator.username} added a new  Article`,
+                 content: `A new Article  titled "${heading}" has been created by ${creator.username}`,
+                 data: JSON.stringify({
+                   creatorId:id,
+                   articleId:info.id,
+                 
+                 }),
+               },
+             })
+   
+           //send notification to the admin
+           const sendNotificationToAdmin = await prisma.adminNotifications.create({
+               data: {
+                 adminId:1,
+                 title: `${creator.username} added a new  Article`,
+                 content: `A new Article  titled "${heading}" has been created by ${creator.username}`,
+                 data: JSON.stringify({
+                   creatorId:id,
+                   managerId:findManager.id,
+                   articleId:info.id ,
+                 }),
+               },
+             })
         res.status(201).json({ message: 'Article created succesfully' })
+        
     } catch (error) {
         console.log(error)
-
+        res.status(500).json({status:500,message:'Something went wrong'})
     }
-
 }
 
 // get profile of creator
@@ -566,10 +646,6 @@ export const categoryContent = async (req, res) => {
 
 }
 
-
-
-
-
 // get individual blogs
 export const eachBlog = async (req, res) => {
     try {
@@ -638,8 +714,6 @@ export const eachArticle = async (req, res) => {
     }
 }
 
-
-
 // get individual yt content 
 export const eachYT = async (req, res) => {
     try {
@@ -662,7 +736,6 @@ export const eachYT = async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 }
-
 
 // get each creator 
 export const eachCreator = async (req, res) => {

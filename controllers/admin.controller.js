@@ -2283,3 +2283,71 @@ export const adminStats = async (req, res) => {
         res.status(500).json({ status: 500, msg: 'Something went wrong' })
     }
 }
+
+
+// mark admin notification as read
+export const markAdminNotificationAsRead = async (req, res) => {
+    const notificationId = +req.params.notificationId
+    try {
+        const mark = await prisma.adminNotifications.update({ where: { id: notificationId }, data: { isRead: true } })
+        res.status(200).json({ status: 200, msg: 'Notification mark as read successfully' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ status: 500, msg: 'Something went wrong' })
+    }
+}
+
+
+// get admin unread notifications
+export const getAdminUnreadNotification = async (req, res) => {
+    try {
+        const notifications = await prisma.adminNotifications.findMany({
+            where: {
+                adminId:1,
+                isRead: false,
+            },
+            select: {
+                id:true,
+                title:true,
+                content:true,
+                data:true
+            }
+        })
+        const count = notifications.length;
+        if (count === 0) {
+            return res.status(404).json({ status: 404, msg: 'No unread notifications' });
+        }
+        res.status(200).json({ status: 200, notifications, count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+}
+
+
+// get admin read notifications
+export const getAdminReadNotification = async (req, res) => {
+    try {
+        const notifications = await prisma.adminNotifications.findMany({
+            where: {
+                adminId:1,
+                isRead: true,
+            },
+            select: {
+                id:true,
+                title:true,
+                content:true,
+                data:true
+            }
+        })
+        const count = notifications.length;
+        if (count === 0) {
+            return res.status(404).json({ status: 404, msg: 'No read notifications' });
+        }
+
+        res.status(200).json({ status: 200, notifications, count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: 500, msg: 'Something went wrong' });
+    }
+}

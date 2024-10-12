@@ -24,8 +24,12 @@ model admin {
 }
 
 model adminNotifications {
-  id      Int   @id @default(autoincrement())
-  admin   admin @relation(fields: [adminId], references: [id])
+  id      Int     @id @default(autoincrement())
+  title   String
+  content String
+  data    String
+  isRead  Boolean @default(false)
+  admin   admin   @relation(fields: [adminId], references: [id])
   adminId Int
 }
 
